@@ -238,9 +238,10 @@ class Repository:
         self.delegates[delegate.c_name or delegate.vala_name] = delegate
         self.c_types[delegate.c_name or delegate.vala_name] = delegate
 
-    def add_function(self, func: Function):
-        self.functions[func.c_name] = func
-        self.c_types[func.c_name] = func
+    def add_function(self, *functions: Function):
+        for func in functions:
+            self.functions[func.c_name] = func
+            self.c_types[func.c_name] = func
 
     def resolve_c_type(self, c_type: str) -> Type:
         c_type = utils.bare_c_type(c_type)
