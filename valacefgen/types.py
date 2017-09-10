@@ -2,6 +2,7 @@ from collections import namedtuple
 from itertools import chain
 from typing import List, Dict
 
+from valacefgen import utils
 from valacefgen.vala import VALA_TYPES, VALA_ALIASES
 
 EnumValue = namedtuple("EnumValue", 'c_name vala_name')
@@ -18,6 +19,17 @@ class Type:
 
     def __vala__(self, repo: "Repository") -> List[str]:
         raise NotImplementedError
+
+
+class SimpleType(Type):
+    def __init__(self, c_name: str, vala_name: str, c_header: str):
+        super().__init__(c_name, vala_name, c_header)
+
+    def __vala__(self, repo: "Repository") -> List[str]:
+        return []
+
+    def is_simple_type(self, repo: "Repository") -> bool:
+        return True
 
 
 class Enum(Type):
@@ -45,19 +57,30 @@ class Enum(Type):
 
 
 class Struct(Type):
-    def __init__(self, c_name: str, vala_name: str, c_header: str):
+    def __init__(self, c_name: str, vala_name: str, c_header: str, members: List["StructMember"]):
         super().__init__(c_name, vala_name, c_header)
+        self.members = members
 
     def is_simple_type(self, repo: "Repository") -> bool:
         return False
 
     def __vala__(self, repo: "Repository") -> List[str]:
         buf = [
-            '[CCode (cname="%s", cheader_file="%s")]' % (self.c_name, self.c_header),
+            '[CCode (cname="%s", cheader_file="%s", has_type_id=false)]' % (self.c_name, self.c_header),
             'public struct %s {' % self.vala_name,
         ]
+        for member in self.members:
+            vala_type = repo.resolve_c_type(member.c_type)
+            buf.append('    public %s %s;' % (vala_type.vala_name, member.vala_name))
         buf.append('}')
         return buf
+
+
+class StructMember:
+    def __init__(self, c_type: str, c_name: str, vala_name: str):
+        self.c_type = c_type
+        self.c_name = c_name
+        self.vala_name = vala_name
 
 
 class Typedef(Type):
@@ -115,6 +138,17 @@ class Repository:
     def add_typedef(self, typedef: Typedef):
         self.typedefs[typedef.c_name] = typedef
         self.c_types[typedef.c_name] = typedef
+
+    def resolve_c_type(self, c_type: str) -> Type:
+        c_type = utils.bare_c_type(c_type)
+        if c_type in VALA_TYPES:
+            return SimpleType(c_type, c_type, "")
+        if c_type in VALA_ALIASES:
+            return self.resolve_c_type(VALA_ALIASES[c_type])
+        try:
+            return self.c_types[c_type]
+        except KeyError:
+            return SimpleType(c_type, c_type, "")
 
     def __repr__(self):
         buf = []

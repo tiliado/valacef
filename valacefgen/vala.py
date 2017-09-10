@@ -1,7 +1,7 @@
 VALA_TYPES = {
     'char', 'short', 'int', 'long',
     'uchar', 'ushort', 'uint', 'ulong',
-    'bool', 'float', 'double', 'string', 'void*',
+    'bool', 'float', 'double', 'string', 'void*', 'size_t',
     'uint8', 'int8', 'int16', 'uint16', 'int32', 'uint32', 'int64', 'uint64'
 }
 

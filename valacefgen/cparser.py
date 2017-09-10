@@ -2,7 +2,7 @@ from typing import Set
 
 from CppHeaderParser import CppHeader
 
-from valacefgen.types import Repository, EnumValue, Enum, Struct, Typedef
+from valacefgen.types import Repository, EnumValue, Enum, Struct, Typedef, StructMember
 from valacefgen.utils import find_prefix, lstrip, rstrip, camel_case
 from valacefgen import utils
 
@@ -19,6 +19,12 @@ class Naming:
 
     def typedef(self, name: str) -> str:
         return camel_case(rstrip(lstrip(name, self.strip_prefix.lower() + "_"), '_t'))
+
+    def camel_case(self, name: str) -> str:
+        return camel_case(rstrip(lstrip(name, self.strip_prefix.lower() + "_"), '_t'))
+
+    def delegate(self, prefix: str, name: str) -> str:
+        return self.camel_case(prefix) + self.camel_case(name)
 
 
 class Parser:
@@ -59,11 +65,17 @@ class Parser:
         for name, klass in structs.items():
             self.parse_struct(c_include_path, name, klass)
 
-    def parse_struct(self, c_include_path: str, name: str, klass):
-        inherits = klass['inherits']
-        methods = klass['methods']
+    def parse_struct(self, c_include_path: str, struct_name: str, klass):
         properties = klass['properties']
         if klass['declaration_method'] == 'class':
-            raise NotImplementedError(name)
-
-        self.repo.add_struct(Struct(name, self.naming.struct(name), c_include_path))
+            raise NotImplementedError(struct_name)
+        struct_members = []
+        for member in properties["public"]:
+            c_name = member["name"]
+            c_type = member["type"]
+            if utils.is_func_pointer(c_type):
+                vala_type = self.naming.delegate(struct_name, c_name)
+                struct_members.append(StructMember(vala_type, c_name, c_name))
+            else:
+                struct_members.append(StructMember(c_type, c_name, c_name))
+        self.repo.add_struct(Struct(struct_name, self.naming.struct(struct_name), c_include_path, struct_members))
