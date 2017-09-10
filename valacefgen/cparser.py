@@ -104,6 +104,7 @@ class Parser:
 
     def finish(self):
         self.resolve_struct_parents()
+        self.wrap_simple_classes()
 
     def resolve_struct_parents(self):
         for struct in self.repo.structs.values():
@@ -116,3 +117,23 @@ class Parser:
                     struct.members.pop(0)
                     if parent_type.c_name in self.base_classes:
                         struct.set_is_class(True)
+
+    def wrap_simple_classes(self):
+        klasses = []
+        for struct in self.repo.structs.values():
+            if struct.is_class and struct.c_name not in self.base_classes:
+                print(struct.vala_name)
+                wrapped_name = struct.vala_name + "Ref"
+                wrapped_c_name = 'Cef' + wrapped_name
+                members = [StructMember("int", "ref_count", "ref_count")]
+                klass = Struct(wrapped_c_name, wrapped_name, "", members)
+                klass.set_parent(struct)
+                klass.set_is_class(True)
+                construct = Function(wrapped_c_name + "New", wrapped_name, "", body=[
+                    '%s(this, sizeof(%s), sizeof(%s));' % ('init_refcounting', struct.vala_name, wrapped_name)
+                ])
+                construct.construct = True
+                klass.add_method(construct)
+                klasses.append(klass)
+
+        self.repo.add_struct(*klasses)

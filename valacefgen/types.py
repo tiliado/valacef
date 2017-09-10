@@ -63,6 +63,7 @@ class Function(Type):
         self.params = params
         self.ret_type = ret_type
         self.body = body
+        self.construct = False
 
     def __vala__(self, repo: "Repository") -> List[str]:
         params = repo.vala_param_list(self.params)
@@ -70,7 +71,7 @@ class Function(Type):
         buf = [
             '[CCode (cname="%s")]' % self.c_name,
             'public %s %s(%s)%s' % (
-                ret_type,
+                ret_type if not self.construct else '',
                 self.vala_name,
                 ', '.join(params),
                 ';' if self.body is None else ' {'
@@ -138,6 +139,11 @@ class Struct(Type):
             vala_type = repo.resolve_c_type(member.c_type)
             buf.append('    public %s %s;' % (vala_type.vala_name, member.vala_name))
 
+        for method in self.methods:
+            if method.construct:
+                break
+        else:
+            buf.append('    protected %s(){}' % self.vala_name)
         for method in self.methods:
             buf.extend('    ' + line for line in method.__vala__(repo))
         buf.append('}')
@@ -226,9 +232,10 @@ class Repository:
         self.enums[enum.c_name] = enum
         self.c_types[enum.c_name] = enum
 
-    def add_struct(self, struct: Struct):
-        self.structs[struct.c_name] = struct
-        self.c_types[struct.c_name] = struct
+    def add_struct(self, *structs: Struct):
+        for struct in structs:
+            self.structs[struct.c_name] = struct
+            self.c_types[struct.c_name] = struct
 
     def add_typedef(self, typedef: Typedef):
         self.typedefs[typedef.c_name] = typedef
