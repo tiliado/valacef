@@ -94,5 +94,7 @@ repo.structs['cef_base_ref_counted_t'].add_method(unref_func)
 parser.finish()
 
 vapi = parser.repo.__vala__()
-with open("cef.vapi", "wt") as f:
+
+os.makedirs("build", exist_ok=True)
+with open("build/cef.vapi", "wt") as f:
     f.write(vapi)
