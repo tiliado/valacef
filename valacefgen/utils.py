@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import List, Tuple
+from typing import List, Tuple, Iterable, Optional
 
 
 def find_prefix(items: List[str]) -> str:
@@ -64,3 +64,13 @@ def parse_c_type(c_type: str) -> TypeInfo:
     c_type = lstrip(c_type, 'struct _')
     return TypeInfo(c_type, pointer, const, volatile)
 
+
+def vala_comment(lines: Iterable[str], valadoc: bool = False) -> Iterable[str]:
+    yield '/*' if not valadoc else '/**'
+    for line in lines:
+        yield ' * ' + line
+    yield ' */'
+
+
+def reformat_comment(comment: Optional[str], strip_chars=3) -> Optional[str]:
+    return [line[strip_chars:] for line in comment.splitlines(False)[1:-1]] if comment else None

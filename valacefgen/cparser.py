@@ -1,3 +1,4 @@
+import re
 from typing import Set, Dict, Any, List, Tuple
 
 from CppHeaderParser import CppHeader
@@ -41,9 +42,18 @@ class Parser:
         self.vala_glue: List[Type] = []
         self.c_glue: List[Type] = []
 
+    def preprocess_header(self, data: str) -> str:
+        data = data.replace('CEF_EXPORT', '').replace('CEF_CALLBACK', '')
+        COMMENT_RE = re.compile(r'^\n?(\s*)///\s*\n((?:\s*//(.*?)\n)+)\s*///\s*\n', re.MULTILINE)
+
+        def repl(match):
+            return match.group(1) + '/**\n' + match.group(2) + match.group(1) + ' */\n'
+
+        return COMMENT_RE.sub(repl, data)
+
     def parse_header(self, path: str, c_include_path: str):
         with open(path) as f:
-            data = f.read().replace('CEF_EXPORT', '').replace('CEF_CALLBACK', '')
+            data = self.preprocess_header(f.read())
         header = CppHeader(data, 'string')
         self.parse_typedefs(c_include_path, header.typedefs)
         self.parse_enums(c_include_path, header.enums)
@@ -70,15 +80,15 @@ class Parser:
         if ret_type == 'void':
             ret_type = None
         params = [(p['type'], p['name']) for p in func['parameters']]
-        self.repo.add_function(Function(func_name, self.naming.function(func_name), c_include_path, ret_type, params))
+        self.repo.add_function(Function(func_name, self.naming.function(func_name), c_include_path, ret_type, params,
+                                        comment=func.get('doxygen')))
 
     def parse_enums(self, c_include_path: str, enums):
         for enum in enums:
             if enum['typedef']:
                 name = enum['name']
-                values = [v['name'] for v in enum['values']]
-                n_prefix = len(find_prefix(values))
-                values = [EnumValue(v, v[n_prefix:]) for v in values]
+                n_prefix = len(find_prefix([v['name'] for v in enum['values']]))
+                values = [EnumValue(v['name'], v['name'][n_prefix:], v.get('doxygen')) for v in enum['values']]
                 self.repo.add_enum(Enum(name, self.naming.enum(name), c_include_path, values))
             else:
                 raise NotImplementedError
@@ -99,10 +109,11 @@ class Parser:
                 ret_type, params = utils.parse_c_func_pointer(c_type)
                 vala_type = self.naming.delegate(struct_name, c_name)
                 self.repo.add_delegate(Delegate("", vala_type, "", ret_type if ret_type != 'void' else None, params))
-                struct_members.append(StructMember(vala_type, c_name, c_name))
+                struct_members.append(StructMember(vala_type, c_name, c_name, member.get('doxygen')))
             else:
-                struct_members.append(StructMember(c_type, c_name, c_name))
-        self.repo.add_struct(Struct(struct_name, self.naming.struct(struct_name), c_include_path, struct_members))
+                struct_members.append(StructMember(c_type, c_name, c_name, member.get('doxygen')))
+        self.repo.add_struct(Struct(struct_name, self.naming.struct(struct_name), c_include_path, struct_members,
+                                    comment=klass.get('doxygen')))
 
     def add_vala_glue(self, *glue: Type):
         self.vala_glue.extend(glue)

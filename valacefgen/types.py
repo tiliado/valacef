@@ -5,11 +5,12 @@ from typing import List, Dict, Tuple
 from valacefgen import utils
 from valacefgen.vala import VALA_TYPES, VALA_ALIASES
 
-EnumValue = namedtuple("EnumValue", 'c_name vala_name')
+EnumValue = namedtuple("EnumValue", 'c_name vala_name comment')
 
 
 class Type:
-    def __init__(self, c_name: str, vala_name: str, c_header: str):
+    def __init__(self, c_name: str, vala_name: str, c_header: str, comment: str = None):
+        self.comment = utils.reformat_comment(comment)
         self.c_name = c_name
         self.vala_name = vala_name
         self.c_header = c_header
@@ -22,8 +23,8 @@ class Type:
 
 
 class SimpleType(Type):
-    def __init__(self, c_name: str, vala_name: str, c_header: str):
-        super().__init__(c_name, vala_name, c_header)
+    def __init__(self, c_name: str, vala_name: str, c_header: str, comment: str = None):
+        super().__init__(c_name, vala_name, c_header, comment)
 
     def __vala__(self, repo: "Repository") -> List[str]:
         return []
@@ -33,8 +34,8 @@ class SimpleType(Type):
 
 
 class Enum(Type):
-    def __init__(self, c_name: str, vala_name: str, c_header: str, values: List[EnumValue]):
-        super().__init__(c_name, vala_name, c_header)
+    def __init__(self, c_name: str, vala_name: str, c_header: str, values: List[EnumValue], comment: str = None):
+        super().__init__(c_name, vala_name, c_header, comment)
         self.values = values
 
     def is_simple_type(self, repo: "Repository") -> bool:
@@ -44,12 +45,17 @@ class Enum(Type):
         return "enum %s" % self.vala_name
 
     def __vala__(self, repo: "Repository") -> List[str]:
-        buf = [
+        buf = []
+        if self.comment:
+            buf.extend(utils.vala_comment(self.comment, valadoc=True))
+        buf.extend([
             '[CCode (cname="%s", cheader_filename="%s", has_type_id=false)]' % (self.c_name, self.c_header),
             'public enum %s {' % self.vala_name,
-        ]
+        ])
         n_values = len(self.values)
         for i, value in enumerate(self.values):
+            if value.comment:
+                buf.extend('    ' + line for line in utils.vala_comment(value.comment, valadoc=True))
             buf.append('    [CCode (cname="%s")]' % value.c_name)
             buf.append('    %s%s' % (value.vala_name, "," if i < n_values - 1 else ";"))
         buf.append('}')
@@ -58,8 +64,8 @@ class Enum(Type):
 
 class Function(Type):
     def __init__(self, c_name: str, vala_name: str, c_header: str, ret_type: str = None,
-                 params: List[Tuple[str, str]] = None, body: List[str] = None):
-        super().__init__(c_name, vala_name, c_header)
+                 params: List[Tuple[str, str]] = None, body: List[str] = None, comment: str = None):
+        super().__init__(c_name, vala_name, c_header, comment)
         self.params = params
         self.ret_type = ret_type
         self.body = body
@@ -68,7 +74,10 @@ class Function(Type):
     def __vala__(self, repo: "Repository") -> List[str]:
         params = repo.vala_param_list(self.params)
         ret_type = repo.vala_ret_type(self.ret_type)
-        buf = [
+        buf = []
+        if self.comment:
+            buf.extend(utils.vala_comment(self.comment, valadoc=True))
+        buf.extend([
             '[CCode (cname="%s")]' % self.c_name,
             'public %s %s(%s)%s' % (
                 ret_type if not self.construct else '',
@@ -76,7 +85,7 @@ class Function(Type):
                 ', '.join(params),
                 ';' if self.body is None else ' {'
             )
-        ]
+        ])
         if self.body is not None:
             body: List[str] = self.body
             buf.extend('    ' + line for line in body)
@@ -108,8 +117,8 @@ class Function(Type):
 
 
 class Struct(Type):
-    def __init__(self, c_name: str, vala_name: str, c_header: str, members: List["StructMember"]):
-        super().__init__(c_name, vala_name, c_header)
+    def __init__(self, c_name: str, vala_name: str, c_header: str, members: List["StructMember"], comment: str = None):
+        super().__init__(c_name, vala_name, c_header, comment)
         self.members = members
         self.parent: Struct = None
         self.methods: List[Function] = []
@@ -135,6 +144,8 @@ class Struct(Type):
 
     def __vala__(self, repo: "Repository") -> List[str]:
         buf = []
+        if self.comment:
+            buf.extend(utils.vala_comment(self.comment, valadoc=True))
         ccode = {
             'cname': '"%s"' % self.c_name,
             'cheader_filename': '"%s"' % self.c_header,
@@ -158,6 +169,8 @@ class Struct(Type):
         for member in self.members:
             type_info = utils.parse_c_type(member.c_type)
             vala_type = repo.resolve_c_type(type_info.c_type)
+            if member.comment:
+                buf.extend('    ' + line for line in utils.vala_comment(member.comment, valadoc=True))
             buf.append('    public %s %s;' % (vala_type.vala_name, member.vala_name))
 
         for method in self.methods:
@@ -192,7 +205,8 @@ class Struct(Type):
 
 
 class StructMember:
-    def __init__(self, c_type: str, c_name: str, vala_name: str):
+    def __init__(self, c_type: str, c_name: str, vala_name: str, comment: str = None):
+        self.comment = utils.reformat_comment(comment, strip_chars=5)
         self.c_type = c_type
         self.c_name = c_name
         self.vala_name = vala_name
