@@ -81,8 +81,8 @@ for entry in header_files:
     parser.parse_header(path, c_include_path)
 
 repo = parser.repo
-ref_func = Function('base_ref_counted_base_ref', 'ref', None, ['this.add_ref(this);'])
-unref_func = Function('base_ref_counted_base_unr', 'unref', None, ['this.release(this);'])
+ref_func = Function('base_ref_counted_base_ref', 'ref', "", body=['this.add_ref(this);'])
+unref_func = Function('base_ref_counted_base_unr', 'unref', "", body=['this.release(this);'])
 repo.structs['cef_base_ref_counted_t'].add_method(ref_func)
 repo.structs['cef_base_ref_counted_t'].add_method(unref_func)
 parser.finish()

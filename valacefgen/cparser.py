@@ -1,8 +1,8 @@
-from typing import Set
+from typing import Set, Dict, Any
 
 from CppHeaderParser import CppHeader
 
-from valacefgen.types import Repository, EnumValue, Enum, Struct, Typedef, StructMember, Delegate
+from valacefgen.types import Repository, EnumValue, Enum, Struct, Typedef, StructMember, Delegate, Function
 from valacefgen.utils import find_prefix, lstrip, rstrip, camel_case
 from valacefgen import utils
 
@@ -26,6 +26,9 @@ class Naming:
     def delegate(self, prefix: str, name: str) -> str:
         return self.camel_case(prefix) + self.camel_case(name)
 
+    def function(self, name: str) -> str:
+        return lstrip(name, self.strip_prefix.lower() + "_")
+
 
 class Parser:
     def __init__(self, naming: Naming, repo: Repository, ignore: Set[str], base_structs: Set[str]):
@@ -41,6 +44,7 @@ class Parser:
         self.parse_typedefs(c_include_path, header.typedefs)
         self.parse_enums(c_include_path, header.enums)
         self.parse_structs(c_include_path, header.classes)
+        self.parse_functions(c_include_path, header.functions)
 
     def parse_typedefs(self, c_include_path: str, typedefs):
         for alias, c_type in typedefs.items():
@@ -50,6 +54,19 @@ class Parser:
     def parse_typedef(self, c_include_path: str, alias: str, c_type: str):
         bare_c_type = utils.bare_c_type(c_type)
         self.repo.add_typedef(Typedef(alias, self.naming.typedef(alias), bare_c_type, c_include_path))
+
+    def parse_functions(self, c_include_path: str, functions):
+        for func in functions:
+            name = func['name']
+            if name not in self.ignore:
+                self.parse_function(c_include_path, name, func)
+
+    def parse_function(self, c_include_path: str, func_name: str, func: Dict[str, Any]):
+        ret_type = func['rtnType']
+        if ret_type == 'void':
+            ret_type = None
+        params = [(p['type'], p['name']) for p in func['parameters']]
+        self.repo.add_function(Function(func_name, self.naming.function(func_name), c_include_path, ret_type, params))
 
     def parse_enums(self, c_include_path: str, enums):
         for enum in enums:
