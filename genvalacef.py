@@ -39,6 +39,7 @@ header_files = [
     'capi/cef_display_handler_capi.h',
     'capi/cef_frame_capi.h',
     'capi/cef_menu_model_capi.h',
+    'capi/cef_menu_model_delegate_capi.h',
     'capi/cef_download_item_capi.h',
     'capi/cef_drag_data_capi.h',
     'capi/cef_image_capi.h',
@@ -59,11 +60,16 @@ header_files = [
     'capi/cef_cookie_capi.h',
     'capi/cef_web_plugin_capi.h',
     'capi/cef_callback_capi.h',
+    'capi/cef_print_handler_capi.h',
+    'capi/cef_print_settings_capi.h',
+    'capi/cef_navigation_entry_capi.h',
+    'capi/cef_ssl_status_capi.h',
 ]
 
 ignore = {
     'XEvent',
     'XDisplay',
+    'cef_get_xdisplay',
 }
 
 base_structs = {

@@ -224,7 +224,7 @@ class Repository:
         try:
             return self.c_types[c_type]
         except KeyError:
-            return SimpleType(c_type, c_type, "")
+            raise NotImplemented(c_type)
 
     def __repr__(self):
         buf = []

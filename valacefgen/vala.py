@@ -1,8 +1,9 @@
 VALA_TYPES = {
     'char', 'short', 'int', 'long',
     'uchar', 'ushort', 'uint', 'ulong',
-    'bool', 'float', 'double', 'string', 'void*', 'size_t',
-    'uint8', 'int8', 'int16', 'uint16', 'int32', 'uint32', 'int64', 'uint64'
+    'bool', 'float', 'double', 'string', 'void*', 'size_t', 'void**',
+    'uint8', 'int8', 'int16', 'uint16', 'int32', 'uint32', 'int64', 'uint64',
+    'Posix.time_t'
 }
 
 VALA_ALIASES = {
@@ -10,5 +11,7 @@ VALA_ALIASES = {
     'short unsigned int': 'ushort',
     'unsigned long': 'ulong',
     'int64_t': 'int64',
-    '': '',
+    'uint64_t': 'uint64',
+    'long long': 'int64',
+    'time_t': 'Posix.time_t',
 }

@@ -28,7 +28,7 @@ def camel_case(name: str) -> str:
 
 
 def correct_c_type(c_type: str) -> str:
-    return c_type.replace(' *', '*')
+    return c_type.replace('const*', '*').replace('const *', '*').replace(' *', '*')
 
 
 def bare_c_type(c_type: str) -> str:
