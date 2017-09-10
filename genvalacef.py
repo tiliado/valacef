@@ -73,9 +73,14 @@ ignore = {
 }
 
 base_structs = {
-    "cef_base_scoped_t", "cef_base_ref_counted_t",
+    "cef_base_scoped_t",
 }
-parser = Parser(Naming('Cef'), Repository('Cef'), ignore, base_structs)
+
+base_classes = {
+    "cef_base_ref_counted_t",
+}
+
+parser = Parser(Naming('Cef'), Repository('Cef'), ignore, base_structs, base_classes)
 
 for entry in header_files:
     if isinstance(entry, str):

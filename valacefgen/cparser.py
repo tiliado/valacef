@@ -31,7 +31,9 @@ class Naming:
 
 
 class Parser:
-    def __init__(self, naming: Naming, repo: Repository, ignore: Set[str], base_structs: Set[str]):
+    def __init__(self, naming: Naming, repo: Repository, ignore: Set[str], base_structs: Set[str],
+                 base_classes: Set[str]):
+        self.base_classes = base_classes
         self.base_structs = base_structs
         self.ignore = ignore
         self.naming = naming
@@ -105,7 +107,12 @@ class Parser:
 
     def resolve_struct_parents(self):
         for struct in self.repo.structs.values():
-            parent_type = self.repo.resolve_c_type(struct.members[0].c_type)
-            if parent_type.c_name in self.base_structs:
-                struct.set_parent(parent_type)
-                struct.members.pop(0)
+            if struct.c_name in self.base_classes:
+                struct.set_is_class(True)
+            else:
+                parent_type = self.repo.resolve_c_type(struct.members[0].c_type)
+                if parent_type.c_name in self.base_structs or parent_type.c_name in self.base_classes:
+                    struct.set_parent(parent_type)
+                    struct.members.pop(0)
+                    if parent_type.c_name in self.base_classes:
+                        struct.set_is_class(True)

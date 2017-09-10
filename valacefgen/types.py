@@ -92,9 +92,13 @@ class Struct(Type):
         self.members = members
         self.parent: Struct = None
         self.methods: List[Function] = []
+        self.is_class: bool = False
 
     def set_parent(self, parent: "Struct"):
         self.parent = parent
+
+    def set_is_class(self, is_class: bool):
+        self.is_class = is_class
 
     def add_method(self, method: Function):
         self.methods.append(method)
@@ -103,14 +107,18 @@ class Struct(Type):
         return False
 
     def __vala__(self, repo: "Repository") -> List[str]:
-        buf = [
-            '[CCode (cname="%s", cheader_filename="%s", has_type_id=false, destroy_function="")]' % (
-                self.c_name, self.c_header),
-        ]
-        if self.parent:
-            buf.append('public struct %s: %s {' % (self.vala_name, self.parent.vala_name))
+        buf = []
+        if self.is_class:
+            buf.append('[Compact]')
+            struct_type = 'class'
         else:
-            buf.append('public struct %s {' % self.vala_name)
+            struct_type = 'struct'
+        buf.append('[CCode (cname="%s", cheader_filename="%s", has_type_id=false, destroy_function="")]' % (
+                self.c_name, self.c_header))
+        if self.parent:
+            buf.append('public %s %s: %s {' % (struct_type, self.vala_name, self.parent.vala_name))
+        else:
+            buf.append('public %s %s {' % (struct_type, self.vala_name))
         for member in self.members:
             vala_type = repo.resolve_c_type(member.c_type)
             buf.append('    public %s %s;' % (vala_type.vala_name, member.vala_name))
