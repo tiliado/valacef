@@ -45,7 +45,7 @@ class Enum(Type):
 
     def __vala__(self, repo: "Repository") -> List[str]:
         buf = [
-            '[CCode (cname="%s", cheader_file="%s", has_type_id=false)]' % (self.c_name, self.c_header),
+            '[CCode (cname="%s", cheader_filename="%s", has_type_id=false)]' % (self.c_name, self.c_header),
             'public enum %s {' % self.vala_name,
         ]
         n_values = len(self.values)
@@ -104,7 +104,7 @@ class Struct(Type):
 
     def __vala__(self, repo: "Repository") -> List[str]:
         buf = [
-            '[CCode (cname="%s", cheader_file="%s", has_type_id=false, destroy_function="")]' % (
+            '[CCode (cname="%s", cheader_filename="%s", has_type_id=false, destroy_function="")]' % (
                 self.c_name, self.c_header),
         ]
         if self.parent:
@@ -156,6 +156,10 @@ class Typedef(Type):
             buf.append('[CCode (cname="%s", has_type_id=false)]' % self.c_name)
             buf.append('public struct %s : %s {' % (self.vala_name, base_type))
             buf.append('}')
+        else:
+            buf.append('[CCode (cname="%s", has_type_id=false)]' % self.c_name)
+            buf.append('public struct %s{' % self.vala_name)
+            buf.append('}')
         return buf
 
 
@@ -170,7 +174,7 @@ class Delegate(Type):
         params = repo.vala_param_list(self.params)
         ret_type = repo.vala_ret_type(self.ret_type)
         buf = [
-            '[CCode (cname="%s", cheader_file="%s", has_target = false)]' % (
+            '[CCode (cname="%s", cheader_filename="%s", has_target = false)]' % (
                 self.c_name, self.c_header),
             'public delegate %s %s(%s);' % (ret_type, self.vala_name, ', '.join(params)),
         ]
