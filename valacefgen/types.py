@@ -93,12 +93,18 @@ class Struct(Type):
         self.parent: Struct = None
         self.methods: List[Function] = []
         self.is_class: bool = False
+        self.ref_func: str = None
+        self.unref_func: str = None
 
     def set_parent(self, parent: "Struct"):
         self.parent = parent
 
     def set_is_class(self, is_class: bool):
         self.is_class = is_class
+
+    def set_ref_counting(self, ref_func: str, unref_func: str):
+        self.ref_func = ref_func
+        self.unref_func = unref_func
 
     def add_method(self, method: Function):
         self.methods.append(method)
@@ -108,13 +114,22 @@ class Struct(Type):
 
     def __vala__(self, repo: "Repository") -> List[str]:
         buf = []
+        ccode = {
+            'cname': '"%s"' % self.c_name,
+            'cheader_filename': '"%s"' % self.c_header,
+            'has_type_id': 'false',
+        }
         if self.is_class:
             buf.append('[Compact]')
             struct_type = 'class'
+            if self.ref_func:
+                ccode['ref_function'] = '"%s"' % self.ref_func
+            if self.unref_func:
+                ccode['unref_function'] = '"%s"' % self.unref_func
         else:
             struct_type = 'struct'
-        buf.append('[CCode (cname="%s", cheader_filename="%s", has_type_id=false, destroy_function="")]' % (
-                self.c_name, self.c_header))
+            ccode['destroy_function'] = '""'
+        buf.append('[CCode (%s)]' % ', '.join('%s=%s' % e for e in ccode.items()))
         if self.parent:
             buf.append('public %s %s: %s {' % (struct_type, self.vala_name, self.parent.vala_name))
         else:

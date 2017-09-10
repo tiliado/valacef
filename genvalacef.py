@@ -92,10 +92,13 @@ for entry in header_files:
     parser.parse_header(path, c_include_path)
 
 repo = parser.repo
-ref_func = Function('base_ref_counted_base_ref', 'ref', "", body=['this.add_ref(this);'])
-unref_func = Function('base_ref_counted_base_unr', 'unref', "", body=['this.release(this);'])
-repo.structs['cef_base_ref_counted_t'].add_method(ref_func)
-repo.structs['cef_base_ref_counted_t'].add_method(unref_func)
+ref_func = Function('base_ref_counted_ref', 'ref', "", body=['this.add_ref(this);'])
+unref_func = Function('base_ref_counted_unref', 'unref', "", body=['this.release(this);'])
+
+base_refcounted = repo.structs['cef_base_ref_counted_t']
+base_refcounted.add_method(ref_func)
+base_refcounted.add_method(unref_func)
+base_refcounted.set_ref_counting(ref_func.c_name, unref_func.c_name)
 parser.finish()
 
 vapi = parser.repo.__vala__()
