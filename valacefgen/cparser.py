@@ -16,9 +16,9 @@ class Naming:
 
 
 class Parser:
-    def __init__(self, naming: Naming):
+    def __init__(self, naming: Naming, repo: Repository):
         self.naming = naming
-        self.repo = Repository()
+        self.repo = repo
 
     def parse_header(self, path: str, c_include_path: str):
         with open(path) as f:

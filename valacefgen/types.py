@@ -1,4 +1,5 @@
 from collections import namedtuple
+from itertools import chain
 from typing import List, Dict
 
 
@@ -52,7 +53,8 @@ class Repository:
     structs: Dict[str, Struct]
     c_types: Dict[str, Type]
 
-    def __init__(self):
+    def __init__(self, vala_namespace: str):
+        self.vala_namespace = vala_namespace
         self.enums = {}
         self.structs = {}
         self.c_types = {}
@@ -72,9 +74,10 @@ class Repository:
         return '\n'.join(buf)
 
     def __vala__(self):
-        buf = []
-        for entry in self.enums.values():
-            buf.extend(entry.__vala__())
-        for entry in self.structs.values():
-            buf.extend(entry.__vala__())
-        return '\n'.join(buf)
+        buf = ['namespace %s {\n' % self.vala_namespace]
+        entries = self.enums, self.structs
+        for entry in chain.from_iterable(e.values() for e in entries):
+            for line in entry.__vala__():
+                buf.extend(('    ', line, '\n'))
+        buf.append('} // namespace %s\n' % self.vala_namespace)
+        return ''.join(buf)

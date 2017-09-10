@@ -1,6 +1,7 @@
 import os
 
 from valacefgen.cparser import Parser, Naming
+from valacefgen.types import Repository
 
 header_files = [
     ('./overrides/cef_primitives.h', 'capi/cef_base_capi.h'),
@@ -60,7 +61,7 @@ header_files = [
     'capi/cef_callback_capi.h',
 ]
 
-parser = Parser(Naming('Cef'))
+parser = Parser(Naming('Cef'), Repository('Cef'))
 
 for entry in header_files:
     if isinstance(entry, str):
