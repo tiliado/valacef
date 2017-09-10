@@ -28,7 +28,8 @@ class Naming:
 
 
 class Parser:
-    def __init__(self, naming: Naming, repo: Repository, ignore: Set[str]):
+    def __init__(self, naming: Naming, repo: Repository, ignore: Set[str], base_structs: Set[str]):
+        self.base_structs = base_structs
         self.ignore = ignore
         self.naming = naming
         self.repo = repo
@@ -79,3 +80,13 @@ class Parser:
             else:
                 struct_members.append(StructMember(c_type, c_name, c_name))
         self.repo.add_struct(Struct(struct_name, self.naming.struct(struct_name), c_include_path, struct_members))
+
+    def finish(self):
+        self.resolve_struct_parents()
+
+    def resolve_struct_parents(self):
+        for struct in self.repo.structs.values():
+            parent_type = self.repo.resolve_c_type(struct.members[0].c_type)
+            if parent_type.c_name in self.base_structs:
+                struct.set_parent(parent_type)
+                struct.members.pop(0)

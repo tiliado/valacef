@@ -66,7 +66,10 @@ ignore = {
     'XDisplay',
 }
 
-parser = Parser(Naming('Cef'), Repository('Cef'), ignore)
+base_structs = {
+    "cef_base_scoped_t", "cef_base_ref_counted_t",
+}
+parser = Parser(Naming('Cef'), Repository('Cef'), ignore, base_structs)
 
 for entry in header_files:
     if isinstance(entry, str):
@@ -76,6 +79,8 @@ for entry in header_files:
         path, c_include_path = entry
 
     parser.parse_header(path, c_include_path)
+
+parser.finish()
 
 vapi = parser.repo.__vala__()
 with open("cef.vapi", "wt") as f:

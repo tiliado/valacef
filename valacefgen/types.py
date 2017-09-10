@@ -60,6 +60,10 @@ class Struct(Type):
     def __init__(self, c_name: str, vala_name: str, c_header: str, members: List["StructMember"]):
         super().__init__(c_name, vala_name, c_header)
         self.members = members
+        self.parent: Struct = None
+
+    def set_parent(self, parent: "Struct"):
+        self.parent = parent
 
     def is_simple_type(self, repo: "Repository") -> bool:
         return False
@@ -67,8 +71,11 @@ class Struct(Type):
     def __vala__(self, repo: "Repository") -> List[str]:
         buf = [
             '[CCode (cname="%s", cheader_file="%s", has_type_id=false)]' % (self.c_name, self.c_header),
-            'public struct %s {' % self.vala_name,
         ]
+        if self.parent:
+            buf.append('public struct %s: %s {' % (self.vala_name, self.parent.vala_name))
+        else:
+            buf.append('public struct %s {' % self.vala_name)
         for member in self.members:
             vala_type = repo.resolve_c_type(member.c_type)
             buf.append('    public %s %s;' % (vala_type.vala_name, member.vala_name))
@@ -132,7 +139,7 @@ class Repository:
         self.c_types[enum.c_name] = enum
 
     def add_struct(self, struct: Struct):
-        self.enums[struct.c_name] = struct
+        self.structs[struct.c_name] = struct
         self.c_types[struct.c_name] = struct
 
     def add_typedef(self, typedef: Typedef):
