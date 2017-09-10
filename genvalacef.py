@@ -78,6 +78,6 @@ for entry in header_files:
     parser.parse_header(path, c_include_path)
 
 vapi = parser.repo.__vala__()
-print(vapi)
 with open("cef.vapi", "wt") as f:
     f.write(vapi)
+print(vapi)
