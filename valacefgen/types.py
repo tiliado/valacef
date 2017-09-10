@@ -1,6 +1,6 @@
 from collections import namedtuple
 from itertools import chain
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from valacefgen import utils
 from valacefgen.vala import VALA_TYPES, VALA_ALIASES
@@ -152,6 +152,42 @@ class Typedef(Type):
         return buf
 
 
+class Delegate(Type):
+    def __init__(self, c_name: str, vala_name: str, c_header: str, ret_type: str = None,
+                 params: List[Tuple[str, str]] = None):
+        super().__init__(c_name, vala_name, c_header)
+        self.ret_type = ret_type
+        self.params = params
+
+    def __vala__(self, repo: "Repository") -> List[str]:
+        params = []
+        if self.ret_type is None:
+            ret_type = "void"
+        else:
+            type_info = utils.parse_c_type(self.ret_type)
+            ret_type = repo.resolve_c_type(type_info.c_type).vala_name
+            if type_info.pointer:
+                ret_type += "?"
+
+        if self.params is not None:
+            for p_type, p_name in self.params:
+                type_info = utils.parse_c_type(p_type)
+                param = repo.resolve_c_type(type_info.c_type).vala_name
+                if type_info.pointer:
+                    param += "?"
+                param += ' ' + p_name
+                params.append(param)
+        buf = [
+            '[CCode (cname="%s", cheader_file="%s", has_target = false)]' % (
+                self.c_name, self.c_header),
+            'public delegate %s %s(%s);' % (ret_type, self.vala_name, ', '.join(params)),
+        ]
+        return buf
+
+    def is_simple_type(self, repo: "Repository") -> bool:
+        return True
+
+
 class Repository:
     enums: Dict[str, Enum]
     structs: Dict[str, Struct]
@@ -163,6 +199,7 @@ class Repository:
         self.enums: Dict[str, Enum] = {}
         self.structs: Dict[str, Struct] = {}
         self.typedefs: Dict[str, Typedef] = {}
+        self.delegates: Dict[str, Delegate] = {}
         self.c_types: Dict[str, Type] = {}
 
     def add_enum(self, enum: Enum):
@@ -176,6 +213,10 @@ class Repository:
     def add_typedef(self, typedef: Typedef):
         self.typedefs[typedef.c_name] = typedef
         self.c_types[typedef.c_name] = typedef
+
+    def add_delegate(self, delegate: Delegate):
+        self.delegates[delegate.c_name or delegate.vala_name] = delegate
+        self.c_types[delegate.c_name or delegate.vala_name] = delegate
 
     def resolve_c_type(self, c_type: str) -> Type:
         c_type = utils.bare_c_type(c_type)
@@ -196,7 +237,7 @@ class Repository:
 
     def __vala__(self):
         buf = ['namespace %s {\n' % self.vala_namespace]
-        entries = self.enums, self.typedefs, self.structs
+        entries = self.enums, self.delegates, self.typedefs, self.structs
         for entry in chain.from_iterable(e.values() for e in entries):
             for line in entry.__vala__(self):
                 buf.extend(('    ', line, '\n'))

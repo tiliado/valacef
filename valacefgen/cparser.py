@@ -2,7 +2,7 @@ from typing import Set
 
 from CppHeaderParser import CppHeader
 
-from valacefgen.types import Repository, EnumValue, Enum, Struct, Typedef, StructMember
+from valacefgen.types import Repository, EnumValue, Enum, Struct, Typedef, StructMember, Delegate
 from valacefgen.utils import find_prefix, lstrip, rstrip, camel_case
 from valacefgen import utils
 
@@ -75,7 +75,9 @@ class Parser:
             c_name = member["name"]
             c_type = member["type"]
             if utils.is_func_pointer(c_type):
+                ret_type, params = utils.parse_c_func_pointer(c_type)
                 vala_type = self.naming.delegate(struct_name, c_name)
+                self.repo.add_delegate(Delegate("", vala_type, "", ret_type if ret_type != 'void' else None, params))
                 struct_members.append(StructMember(vala_type, c_name, c_name))
             else:
                 struct_members.append(StructMember(c_type, c_name, c_name))

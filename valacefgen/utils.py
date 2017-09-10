@@ -1,4 +1,5 @@
-from typing import List
+from collections import namedtuple
+from typing import List, Tuple
 
 
 def find_prefix(items: List[str]) -> str:
@@ -32,8 +33,32 @@ def correct_c_type(c_type: str) -> str:
 
 def bare_c_type(c_type: str) -> str:
     c_type = correct_c_type(c_type)
-    return c_type if c_type == 'void*' else c_type.rstrip('*')
+    return c_type if c_type in ('void*', 'void**') else c_type.rstrip('*')
 
 
 def is_func_pointer(c_type: str) -> bool:
     return ' ( * ) (' in c_type
+
+
+def parse_c_func_pointer(c_type: str) -> Tuple[str, List[Tuple[str, str]]]:
+    func = c_type.replace(' ( * ) ', '')
+    ret_type, params = func.split('(', 1)
+    params = [tuple(p.strip().rsplit(None, 1)) for p in params.rsplit(')', 1)[0].split(',')]
+    return ret_type, params
+
+
+TypeInfo = namedtuple("TypeInfo", 'c_type pointer const')
+
+
+def parse_c_type(c_type: str) -> TypeInfo:
+    const = c_type.startswith('const ')
+    c_type = lstrip(c_type, 'const ')
+    c_type = correct_c_type(c_type)
+    if c_type in ('void*', 'void**'):
+        return TypeInfo(c_type, False, const)
+    pointer = c_type.endswith('*')
+    c_type = c_type.rstrip('*')
+
+    c_type = lstrip(c_type, 'struct _')
+    return TypeInfo(c_type, pointer, const)
+
