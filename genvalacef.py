@@ -90,4 +90,3 @@ parser.finish()
 vapi = parser.repo.__vala__()
 with open("cef.vapi", "wt") as f:
     f.write(vapi)
-print(vapi)
