@@ -56,21 +56,49 @@ class Enum(Type):
         return buf
 
 
+class Function:
+    def __init__(self, c_name: str, vala_name: str, ret_type: str = None, body: List[str] = None):
+        self.c_name = c_name
+        self.vala_name = vala_name
+        self.ret_type = ret_type
+        self.body = body
+
+    def __vala__(self, repo: "Repository") -> List[str]:
+        buf = [
+            '[CCode (cname="%s")]' % self.c_name,
+            'public %s %s()%s' % (
+                'void' if self.ret_type is None else self.ret_type,
+                self.vala_name,
+                ';' if self.body is None else ' {'
+            )
+        ]
+        if self.body is not None:
+            body: List[str] = self.body
+            buf.extend('    ' + line for line in body)
+            buf.append("}")
+        return buf
+
+
 class Struct(Type):
     def __init__(self, c_name: str, vala_name: str, c_header: str, members: List["StructMember"]):
         super().__init__(c_name, vala_name, c_header)
         self.members = members
         self.parent: Struct = None
+        self.methods: List[Function] = []
 
     def set_parent(self, parent: "Struct"):
         self.parent = parent
+
+    def add_method(self, method: Function):
+        self.methods.append(method)
 
     def is_simple_type(self, repo: "Repository") -> bool:
         return False
 
     def __vala__(self, repo: "Repository") -> List[str]:
         buf = [
-            '[CCode (cname="%s", cheader_file="%s", has_type_id=false)]' % (self.c_name, self.c_header),
+            '[CCode (cname="%s", cheader_file="%s", has_type_id=false, destroy_function="")]' % (
+                self.c_name, self.c_header),
         ]
         if self.parent:
             buf.append('public struct %s: %s {' % (self.vala_name, self.parent.vala_name))
@@ -79,6 +107,9 @@ class Struct(Type):
         for member in self.members:
             vala_type = repo.resolve_c_type(member.c_type)
             buf.append('    public %s %s;' % (vala_type.vala_name, member.vala_name))
+
+        for method in self.methods:
+            buf.extend('    ' + line for line in method.__vala__(repo))
         buf.append('}')
         return buf
 
