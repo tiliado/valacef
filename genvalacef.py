@@ -61,7 +61,12 @@ header_files = [
     'capi/cef_callback_capi.h',
 ]
 
-parser = Parser(Naming('Cef'), Repository('Cef'))
+ignore = {
+    'XEvent',
+    'XDisplay',
+}
+
+parser = Parser(Naming('Cef'), Repository('Cef'), ignore)
 
 for entry in header_files:
     if isinstance(entry, str):
@@ -72,4 +77,7 @@ for entry in header_files:
 
     parser.parse_header(path, c_include_path)
 
-print(parser.repo.__vala__())
+vapi = parser.repo.__vala__()
+print(vapi)
+with open("cef.vapi", "wt") as f:
+    f.write(vapi)
