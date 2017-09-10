@@ -47,18 +47,20 @@ def parse_c_func_pointer(c_type: str) -> Tuple[str, List[Tuple[str, str]]]:
     return ret_type, params
 
 
-TypeInfo = namedtuple("TypeInfo", 'c_type pointer const')
+TypeInfo = namedtuple("TypeInfo", 'c_type pointer const volatile')
 
 
 def parse_c_type(c_type: str) -> TypeInfo:
     const = c_type.startswith('const ')
     c_type = lstrip(c_type, 'const ')
+    volatile = c_type.startswith('volatile ')
+    c_type = lstrip(c_type, 'volatile ')
     c_type = correct_c_type(c_type)
     if c_type in ('void*', 'void**'):
-        return TypeInfo(c_type, False, const)
+        return TypeInfo(c_type, False, const, volatile)
     pointer = c_type.endswith('*')
     c_type = c_type.rstrip('*')
 
     c_type = lstrip(c_type, 'struct _')
-    return TypeInfo(c_type, pointer, const)
+    return TypeInfo(c_type, pointer, const, volatile)
 

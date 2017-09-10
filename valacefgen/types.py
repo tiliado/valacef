@@ -83,6 +83,26 @@ class Function(Type):
             buf.append("}")
         return buf
 
+    def __c__(self, repo: "Repository") -> List[str]:
+        params = repo.c_param_list(self.params)
+        ret_type = repo.c_ret_type(self.ret_type)
+        buf = []
+        if self.c_header:
+            buf.extend('#include "%s"' % h for h in self.c_header.split(';'))
+        buf.extend([
+            '%s %s(%s)%s' % (
+                ret_type,
+                self.c_name,
+                ', '.join(params),
+                ';' if self.body is None else ' {'
+            )
+        ])
+        if self.body is not None:
+            body: List[str] = self.body
+            buf.extend('    ' + line for line in body)
+            buf.append("}")
+        return buf
+
     def is_simple_type(self, repo: "Repository") -> bool:
         return False
 
@@ -136,7 +156,8 @@ class Struct(Type):
         else:
             buf.append('public %s %s {' % (struct_type, self.vala_name))
         for member in self.members:
-            vala_type = repo.resolve_c_type(member.c_type)
+            type_info = utils.parse_c_type(member.c_type)
+            vala_type = repo.resolve_c_type(type_info.c_type)
             buf.append('    public %s %s;' % (vala_type.vala_name, member.vala_name))
 
         for method in self.methods:
@@ -147,6 +168,26 @@ class Struct(Type):
         for method in self.methods:
             buf.extend('    ' + line for line in method.__vala__(repo))
         buf.append('}')
+        return buf
+
+    def __c__(self, repo: "Repository") -> List[str]:
+        buf = [
+            '#include "%s"' % self.parent.c_header,
+        ]
+        if self.c_header:
+            buf.extend('#include "%s"' % h for h in self.c_header.split(';'))
+        buf.extend([
+            'typedef struct {',
+            '    %s parent;' % self.parent.c_name,
+        ])
+
+        for member in self.members:
+            type_info = utils.parse_c_type(member.c_type)
+            vala_type = repo.resolve_c_type(type_info.c_type)
+            buf.append('    %s%s %s;' % ('volatile ' if type_info.volatile else '', vala_type.c_name, member.c_name))
+        buf.append('} %s;' % self.c_name)
+        for method in self.methods:
+            buf.extend('    ' + line for line in method.__c__(repo))
         return buf
 
 
@@ -259,7 +300,7 @@ class Repository:
         try:
             return self.c_types[c_type]
         except KeyError:
-            raise NotImplemented(c_type)
+            raise NotImplementedError(c_type)
 
     def __repr__(self):
         buf = []
@@ -275,6 +316,9 @@ class Repository:
                 buf.extend(('    ', line, '\n'))
         buf.append('} // namespace %s\n' % self.vala_namespace)
         return ''.join(buf)
+
+    def c_ret_type(self, c_type: str = None) -> str:
+        return c_type if c_type else 'void'
 
     def vala_ret_type(self, c_type: str = None) -> str:
         if c_type is None:
@@ -296,3 +340,10 @@ class Repository:
                 param += ' ' + p_name
                 vala_params.append(param)
         return vala_params
+
+    def c_param_list(self, params: List[Tuple[str, str]] = None) -> List[str]:
+        c_params = []
+        if params is not None:
+            for p_type, p_name in params:
+                c_params.append('%s %s' % (p_type, p_name))
+        return c_params
