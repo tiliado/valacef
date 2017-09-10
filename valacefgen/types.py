@@ -22,7 +22,7 @@ class Enum(Type):
 
     def __vala__(self) -> List[str]:
         buf = [
-            '[CCode (cname="%s", cheader_file="%s")]' % (self.c_name, self.c_header),
+            '[CCode (cname="%s", cheader_file="%s", has_type_id=false)]' % (self.c_name, self.c_header),
             'public enum %s {' % self.vala_name,
         ]
         n_values = len(self.values)
