@@ -2,6 +2,7 @@ import os
 
 from valacefgen.cparser import Parser, Naming
 from valacefgen.types import Repository, Function
+from valacefgen.utils import TypeInfo
 
 header_files = [
     ('./overrides/cef_primitives.h', 'capi/cef_base_capi.h'),
@@ -80,7 +81,18 @@ base_classes = {
     "cef_base_ref_counted_t",
 }
 
-parser = Parser(Naming('Cef'), Repository('Cef'), ignore, base_structs, base_classes)
+
+class Overrides:
+    def param__cef_string_utf8_to_utf16__src(self, info: TypeInfo):
+        info.c_type = 'string'
+
+    def param__cef_string_utf8_to_utf16__output(self, info: TypeInfo):
+        info.ref = True
+
+    def param__cef_string_utf16_to_utf8_output(self, info: TypeInfo):
+        info.ref = True
+
+parser = Parser(Naming('Cef'), Repository('Cef', Overrides()), ignore, base_structs, base_classes)
 
 for entry in header_files:
     if isinstance(entry, str):
@@ -161,6 +173,34 @@ init_refcounting_func = Function(
         'printf("%d == %d\\n", (int) self->size, *ref_count);',
     ])
 parser.add_c_glue(add_ref_func, release_ref_func, has_one_ref_func, init_refcounting_func)
+
+utf16_to_utf8_func = Function(
+    'cef_utf16_string_to_vala_string', 'get_string', 'capi/cef_base_capi.h;stdio.h', 'char*',
+    params=[('cef_string_t*', 'utf16_str')],
+    body=[
+        'cef_string_utf8_t utf8_str = {};',
+        'cef_string_utf16_to_utf8(utf16_str->str, utf16_str->length, &utf8_str);',
+        'return utf8_str.str;',
+    ])
+parser.add_c_glue(utf16_to_utf8_func)
+
+utf16_to_utf8_func = Function(
+    'cef_utf16_string_to_vala_string', 'get_string', 'valacef.h', 'char*',
+    params=[('cef_string_t*', 'utf16_str')])
+repo.add_function(utf16_to_utf8_func)
+
+utf8_to_utf16_func = Function(
+    'cef_utf16_string_from_vala_string', 'set_string', 'capi/cef_base_capi.h;stdio.h',
+    params=[('cef_string_t*', 'utf16_str'), ('char*', 'str')],
+    body=[
+        'cef_string_utf8_to_utf16(str, strlen(str), utf16_str);',
+    ])
+parser.add_c_glue(utf8_to_utf16_func)
+
+utf8_to_utf16_func = Function(
+    'cef_utf16_string_from_vala_string', 'set_string', 'valacef.h',
+    params=[('cef_string_t*', 'utf16_str'), ('char*', 'str')])
+repo.add_function(utf8_to_utf16_func)
 
 vapi, vala, c_glue = parser.finish()
 

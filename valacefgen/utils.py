@@ -47,7 +47,15 @@ def parse_c_func_pointer(c_type: str) -> Tuple[str, List[Tuple[str, str]]]:
     return ret_type, params
 
 
-TypeInfo = namedtuple("TypeInfo", 'c_type pointer const volatile')
+class TypeInfo:
+    def __init__(self, c_type: str, pointer: bool = False, const: bool = False, volatile: bool = False,
+                 ref: bool = False, out: bool = False):
+        self.c_type = c_type
+        self.pointer = pointer
+        self.const = const
+        self.volatile = volatile
+        self.ref = ref
+        self.out = out
 
 
 def parse_c_type(c_type: str) -> TypeInfo:
@@ -57,12 +65,12 @@ def parse_c_type(c_type: str) -> TypeInfo:
     c_type = lstrip(c_type, 'volatile ')
     c_type = correct_c_type(c_type)
     if c_type in ('void*', 'void**'):
-        return TypeInfo(c_type, False, const, volatile)
+        return TypeInfo(c_type, False, const, volatile, False, False)
     pointer = c_type.endswith('*')
     c_type = c_type.rstrip('*')
 
     c_type = lstrip(c_type, 'struct _')
-    return TypeInfo(c_type, pointer, const, volatile)
+    return TypeInfo(c_type, pointer, const, volatile, False, False)
 
 
 def vala_comment(lines: Iterable[str], valadoc: bool = False) -> Iterable[str]:

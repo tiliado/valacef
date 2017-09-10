@@ -1,6 +1,8 @@
 from collections import namedtuple
 from itertools import chain
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any
+
+from gi._gi import TypeInfo
 
 from valacefgen import utils
 from valacefgen.vala import VALA_TYPES, VALA_ALIASES
@@ -72,13 +74,13 @@ class Function(Type):
         self.construct = False
 
     def __vala__(self, repo: "Repository") -> List[str]:
-        params = repo.vala_param_list(self.params)
+        params = repo.vala_param_list(self.params, self.c_name)
         ret_type = repo.vala_ret_type(self.ret_type)
         buf = []
         if self.comment:
             buf.extend(utils.vala_comment(self.comment, valadoc=True))
         buf.extend([
-            '[CCode (cname="%s")]' % self.c_name,
+            '[CCode (cname="%s", cheader_filename="%s")]' % (self.c_name, self.c_header),
             'public %s %s(%s)%s' % (
                 ret_type if not self.construct else '',
                 self.vala_name,
@@ -274,7 +276,8 @@ class Repository:
     typedefs: Dict[str, Typedef]
     c_types: Dict[str, Type]
 
-    def __init__(self, vala_namespace: str):
+    def __init__(self, vala_namespace: str, overrides: Any = None):
+        self.overrides = overrides
         self.vala_namespace = vala_namespace
         self.enums: Dict[str, Enum] = {}
         self.structs: Dict[str, Struct] = {}
@@ -335,6 +338,8 @@ class Repository:
         return c_type if c_type else 'void'
 
     def vala_ret_type(self, c_type: str = None) -> str:
+        if c_type == 'char*':
+            return 'string?'
         if c_type is None:
             return "void"
         type_info = utils.parse_c_type(c_type)
@@ -343,14 +348,30 @@ class Repository:
             ret_type += "?"
         return ret_type
 
-    def vala_param_list(self, params: List[Tuple[str, str]] = None) -> List[str]:
+    def vala_param_list(self, params: List[Tuple[str, str]] = None, name: str = None) -> List[str]:
         vala_params = []
         if params is not None:
             for p_type, p_name in params:
                 type_info = utils.parse_c_type(p_type)
-                param = self.resolve_c_type(type_info.c_type).vala_name
-                if type_info.pointer:
-                    param += "?"
+                if name:
+                    self.override_param(name, p_name, type_info)
+                param = ""
+                if type_info.ref:
+                    param += 'ref '
+                    type_info.pointer = False
+                if type_info.out:
+                    param += 'out '
+                    type_info.pointer = False
+
+                vala_type = self.resolve_c_type(type_info.c_type).vala_name
+                if vala_type == 'String' and type_info.pointer:
+                    param += 'ref ' + vala_type
+                elif vala_type == 'char' and type_info.pointer:
+                    param += 'string?'
+                else:
+                    param += vala_type
+                    if type_info.pointer:
+                        param += "?"
                 param += ' ' + p_name
                 vala_params.append(param)
         return vala_params
@@ -361,3 +382,9 @@ class Repository:
             for p_type, p_name in params:
                 c_params.append('%s %s' % (p_type, p_name))
         return c_params
+
+    def override_param(self, name: str, p_name: str, type_info: TypeInfo) -> TypeInfo:
+        try:
+            return getattr(self.overrides, 'param__%s__%s' % (name, p_name))(type_info)
+        except AttributeError as e:
+            return type_info
