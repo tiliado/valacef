@@ -69,7 +69,7 @@ class Function(Type):
                  params: List[Tuple[str, str]] = None, body: List[str] = None, comment: str = None):
         super().__init__(c_name, vala_name, c_header, comment)
         self.params = params
-        self.ret_type = ret_type
+        self.ret_type = ret_type if ret_type != 'void' else None
         self.body = body
         self.construct = False
 
@@ -263,7 +263,7 @@ class Delegate(Type):
     def __init__(self, c_name: str, vala_name: str, c_header: str, ret_type: str = None,
                  params: List[Tuple[str, str]] = None):
         super().__init__(c_name, vala_name, c_header)
-        self.ret_type = ret_type
+        self.ret_type = ret_type if ret_type != 'void' else None
         self.params = params
 
     def __vala__(self, repo: "Repository") -> List[str]:

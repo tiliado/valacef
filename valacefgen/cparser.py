@@ -13,19 +13,21 @@ class Naming:
         self.strip_prefix = strip_prefix
 
     def enum(self, name: str) -> str:
+        """Generate Vala name for enum names (not members)."""
         return camel_case(rstrip(lstrip(name, self.strip_prefix.lower() + "_"), '_t'))
 
     def struct(self, name: str) -> str:
         return camel_case(rstrip(lstrip(name, self.strip_prefix.lower() + "_"), '_t'))
 
     def typedef(self, name: str) -> str:
+        """Generate Vala name for typedef's alias."""
         return camel_case(rstrip(lstrip(name, self.strip_prefix.lower() + "_"), '_t'))
 
     def camel_case(self, name: str) -> str:
         return camel_case(rstrip(lstrip(name, self.strip_prefix.lower() + "_"), '_t'))
 
     def delegate(self, prefix: str, name: str) -> str:
-        return self.camel_case(prefix) + self.camel_case(name)
+        return self.camel_case(prefix) + self.camel_case(name) + 'Func'
 
     def function(self, name: str) -> str:
         return lstrip(name, self.strip_prefix.lower() + "_")
@@ -57,7 +59,7 @@ class Parser:
         header = CppHeader(data, 'string')
         self.parse_typedefs(c_include_path, header.typedefs)
         self.parse_enums(c_include_path, header.enums)
-        self.parse_structs(c_include_path, header.classes)
+        self.parse_classes_and_structs(c_include_path, header.classes)
         self.parse_functions(c_include_path, header.functions)
 
     def parse_typedefs(self, c_include_path: str, typedefs):
@@ -67,7 +69,11 @@ class Parser:
 
     def parse_typedef(self, c_include_path: str, alias: str, c_type: str):
         bare_c_type = utils.bare_c_type(c_type)
-        self.repo.add_typedef(Typedef(alias, self.naming.typedef(alias), bare_c_type, c_include_path))
+        self.repo.add_typedef(Typedef(
+            c_name=alias,
+            vala_name=self.naming.typedef(alias),
+            c_type=bare_c_type,
+            c_header=c_include_path))
 
     def parse_functions(self, c_include_path: str, functions):
         for func in functions:
@@ -76,31 +82,42 @@ class Parser:
                 self.parse_function(c_include_path, name, func)
 
     def parse_function(self, c_include_path: str, func_name: str, func: Dict[str, Any]):
-        ret_type = func['rtnType']
-        if ret_type == 'void':
-            ret_type = None
-        params = [(p['type'], p['name']) for p in func['parameters']]
-        self.repo.add_function(Function(func_name, self.naming.function(func_name), c_include_path, ret_type, params,
-                                        comment=func.get('doxygen')))
+        self.repo.add_function(Function(
+            c_name=func_name,
+            vala_name=self.naming.function(func_name),
+            c_header=c_include_path,
+            ret_type=func['rtnType'],
+            params=[(p['type'], p['name']) for p in func['parameters']],
+            comment=func.get('doxygen')))
 
     def parse_enums(self, c_include_path: str, enums):
         for enum in enums:
             if enum['typedef']:
                 name = enum['name']
+                # For vala names, we strip the common prefix to make enum member names shorter.
                 n_prefix = len(find_prefix([v['name'] for v in enum['values']]))
-                values = [EnumValue(v['name'], v['name'][n_prefix:], v.get('doxygen')) for v in enum['values']]
-                self.repo.add_enum(Enum(name, self.naming.enum(name), c_include_path, values))
+                values = [EnumValue(
+                    v['name'],   # c_name
+                    v['name'][n_prefix:],  # vala_name
+                    v.get('doxygen')  # comment
+                    ) for v in enum['values']]
+                self.repo.add_enum(Enum(
+                    c_name=name,
+                    vala_name=self.naming.enum(name),
+                    c_header=c_include_path,
+                    values=values))
             else:
                 raise NotImplementedError
 
-    def parse_structs(self, c_include_path: str, structs):
-        for name, klass in structs.items():
-            self.parse_struct(c_include_path, name, klass)
+    def parse_classes_and_structs(self, c_include_path: str, classes_and_structs):
+        for name, candidate in classes_and_structs.items():
+            if candidate['declaration_method'] == 'class':
+                raise NotImplementedError(name)
+            else:  # struct
+                self.parse_struct(c_include_path, name, candidate)
 
-    def parse_struct(self, c_include_path: str, struct_name: str, klass):
-        properties = klass['properties']
-        if klass['declaration_method'] == 'class':
-            raise NotImplementedError(struct_name)
+    def parse_struct(self, c_include_path: str, struct_name: str, struct):
+        properties = struct['properties']
         struct_members = []
         for member in properties["public"]:
             c_name = member["name"]
@@ -108,15 +125,36 @@ class Parser:
             if utils.is_func_pointer(c_type):
                 ret_type, params = utils.parse_c_func_pointer(c_type)
                 vala_type = self.naming.delegate(struct_name, c_name)
-                self.add_c_glue(Delegate(vala_type, vala_type, "", ret_type if ret_type != 'void' else None,
-                                                params))
-                self.repo.add_delegate(Delegate(vala_type, vala_type, "valacef.h", ret_type if ret_type != 'void' else None,
-                                                params))
-                struct_members.append(StructMember(vala_type, c_name, c_name, member.get('doxygen')))
+                # Delegates (pointers to functions) are not type-defined in CEF C headers.
+                self.add_c_glue(Delegate(
+                    c_name=vala_type,
+                    vala_name=vala_type,
+                    c_header="",
+                    ret_type=ret_type,
+                    params=params))
+                self.repo.add_delegate(Delegate(
+                    c_name=vala_type,
+                    vala_name=vala_type,
+                    c_header="valacef.h",  # Generated typedef is there.
+                    ret_type=ret_type,
+                    params=params))
+                struct_members.append(StructMember(
+                    c_type=vala_type,
+                    c_name=c_name,
+                    vala_name=c_name,
+                    comment=member.get('doxygen')))
             else:
-                struct_members.append(StructMember(utils.correct_c_type(c_type), c_name, c_name, member.get('doxygen')))
-        self.repo.add_struct(Struct(struct_name, self.naming.struct(struct_name), c_include_path, struct_members,
-                                    comment=klass.get('doxygen')))
+                struct_members.append(StructMember(
+                    c_type=utils.normalize_pointer(c_type),
+                    c_name=c_name,
+                    vala_name=c_name,
+                    comment=member.get('doxygen')))
+        self.repo.add_struct(Struct(
+            c_name=struct_name,
+            vala_name=self.naming.struct(struct_name),
+            c_header=c_include_path,
+            members=struct_members,
+            comment=struct.get('doxygen')))
 
     def add_vala_glue(self, *glue: Type):
         self.vala_glue.extend(glue)
@@ -130,6 +168,9 @@ class Parser:
         return self.create_valacef_vapi(), self.create_valacef_vala(), self.create_valacef_c()
 
     def resolve_struct_parents(self):
+        """Resolve inheritance of structs."""
+        # Structs can inherit only from base classes or base structs.
+        # They are then the very first struct members, albeit implicit in Vala struct definition.
         for struct in self.repo.structs.values():
             if struct.c_name in self.base_classes:
                 struct.set_is_class(True)
@@ -142,6 +183,9 @@ class Parser:
                         struct.set_is_class(True)
 
     def wrap_simple_classes(self):
+        """Wrap ref-counted simple classes."""
+        # Base ref-counted classes are abstract because it is necessary to set up reference counting.
+        # Wrapper classes do that in their public constructor.
         klasses = []
         for struct in self.repo.structs.values():
             if struct.is_class and struct.c_name not in self.base_classes:
@@ -151,15 +195,29 @@ class Parser:
                     StructMember("void*", "private_data", "private_data"),
                     StructMember("volatile int", "ref_count", "ref_count")
                 ]
-                klass = Struct(wrapped_c_name, wrapped_name, "valacef.h", members)
+
+                # Vala definition
+                klass = Struct(
+                    c_name=wrapped_c_name,
+                    vala_name=wrapped_name,
+                    c_header="valacef.h",
+                    members=members)
                 klass.set_parent(struct)
                 klass.set_is_class(True)
-                construct = Function(wrapped_c_name + "New", wrapped_name, "valacef.h")
+                construct = Function(
+                    c_name=wrapped_c_name + "New",
+                    vala_name=wrapped_name,
+                    c_header="valacef.h")
                 construct.construct = True
                 klass.add_method(construct)
                 klasses.append(klass)
 
-                c_klass = Struct(wrapped_c_name, wrapped_name, "stdlib.h;capi/cef_base_capi.h", members)
+                # C definition
+                c_klass = Struct(
+                    c_name=wrapped_c_name,
+                    vala_name=wrapped_name,
+                    c_header="stdlib.h;capi/cef_base_capi.h",
+                    members=members)
                 c_klass.set_parent(struct)
                 c_klass.set_is_class(True)
                 construct = Function(wrapped_c_name + "New", wrapped_name, "", wrapped_c_name + '*', body=[

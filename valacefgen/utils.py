@@ -27,16 +27,19 @@ def camel_case(name: str) -> str:
     return ''.join(s[0].upper() + s[1:] for s in name.split('_'))
 
 
-def correct_c_type(c_type: str) -> str:
+def normalize_pointer(c_type: str) -> str:
+    """Remove extra space and const* qualifier."""
     return c_type.replace('const*', '*').replace('const *', '*').replace(' *', '*')
 
 
 def bare_c_type(c_type: str) -> str:
-    c_type = correct_c_type(c_type)
+    """Remove stars from pointer types except for `void*` and `void**`."""
+    c_type = normalize_pointer(c_type)
     return c_type if c_type in ('void*', 'void**') else c_type.rstrip('*')
 
 
 def is_func_pointer(c_type: str) -> bool:
+    """Return true if the C type is a pointer to a function."""
     return ' ( * ) (' in c_type
 
 
@@ -63,7 +66,7 @@ def parse_c_type(c_type: str) -> TypeInfo:
     c_type = lstrip(c_type, 'const ')
     volatile = c_type.startswith('volatile ')
     c_type = lstrip(c_type, 'volatile ')
-    c_type = correct_c_type(c_type)
+    c_type = normalize_pointer(c_type)
     if c_type in ('void*', 'void**'):
         return TypeInfo(c_type, False, const, volatile, False, False)
     pointer = c_type.endswith('*')
