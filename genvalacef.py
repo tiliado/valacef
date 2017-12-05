@@ -190,7 +190,7 @@ utf16_to_utf8_func = Function(
 repo.add_function(utf16_to_utf8_func)
 
 utf8_to_utf16_func = Function(
-    'cef_utf16_string_from_vala_string', 'set_string', 'capi/cef_base_capi.h;stdio.h',
+    'cef_utf16_string_from_vala_string', 'set_string', 'string.h;capi/cef_base_capi.h;stdio.h',
     params=[('cef_string_t*', 'utf16_str'), ('char*', 'str')],
     body=[
         'cef_string_utf8_to_utf16(str, strlen(str), utf16_str);',
