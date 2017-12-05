@@ -108,10 +108,13 @@ class Parser:
             if utils.is_func_pointer(c_type):
                 ret_type, params = utils.parse_c_func_pointer(c_type)
                 vala_type = self.naming.delegate(struct_name, c_name)
-                self.repo.add_delegate(Delegate("", vala_type, "", ret_type if ret_type != 'void' else None, params))
+                self.add_c_glue(Delegate(vala_type, vala_type, "", ret_type if ret_type != 'void' else None,
+                                                params))
+                self.repo.add_delegate(Delegate(vala_type, vala_type, "valacef.h", ret_type if ret_type != 'void' else None,
+                                                params))
                 struct_members.append(StructMember(vala_type, c_name, c_name, member.get('doxygen')))
             else:
-                struct_members.append(StructMember(c_type, c_name, c_name, member.get('doxygen')))
+                struct_members.append(StructMember(utils.correct_c_type(c_type), c_name, c_name, member.get('doxygen')))
         self.repo.add_struct(Struct(struct_name, self.naming.struct(struct_name), c_include_path, struct_members,
                                     comment=klass.get('doxygen')))
 
