@@ -2,11 +2,10 @@ from collections import namedtuple
 from itertools import chain
 from typing import List, Dict, Tuple, Any
 
-from gi._gi import TypeInfo
-
 from valacefgen import utils
 from valacefgen.vala import VALA_TYPES, VALA_ALIASES
 
+TypeInfo = utils.TypeInfo
 EnumValue = namedtuple("EnumValue", 'c_name vala_name comment')
 
 
@@ -261,13 +260,14 @@ class Typedef(Type):
 
 class Delegate(Type):
     def __init__(self, c_name: str, vala_name: str, c_header: str, ret_type: str = None,
-                 params: List[Tuple[str, str]] = None):
+                 params: List[Tuple[str, str]] = None, vfunc_of_class=None):
         super().__init__(c_name, vala_name, c_header)
         self.ret_type = ret_type if ret_type != 'void' else None
         self.params = params
+        self.vfunc_of_class = vfunc_of_class
 
     def __vala__(self, repo: "Repository") -> List[str]:
-        params = repo.vala_param_list(self.params)
+        params = repo.vala_param_list(self.params, vfunc_of_class=self.vfunc_of_class)
         ret_type = repo.vala_ret_type(self.ret_type)
         buf = [
             '[CCode (cname="%s", cheader_filename="%s", has_target = false)]' % (
@@ -380,7 +380,8 @@ class Repository:
             ret_type += "?"
         return ret_type
 
-    def vala_param_list(self, params: List[Tuple[str, str]] = None, name: str = None) -> List[str]:
+    def vala_param_list(self, params: List[Tuple[str, str]] = None, name: str = None, vfunc_of_class: str = None
+                        ) -> List[str]:
         vala_params = []
         if params is not None:
             for p_type, p_name in params:
@@ -391,9 +392,17 @@ class Repository:
                 if type_info.ref:
                     param += 'ref '
                     type_info.pointer = False
-                if type_info.out:
+                elif type_info.out:
                     param += 'out '
                     type_info.pointer = False
+                else:
+                    try:
+                        # CEF reference counting: When passing a struct to delegate/function,
+                        # increase ref unless it is a self-param of vfunc of that struct.
+                        if self.structs[type_info.c_type].is_class and type_info.c_type != vfunc_of_class:
+                            param += "owned "
+                    except KeyError:
+                        pass
 
                 vala_type = self.resolve_c_type(type_info.c_type).vala_name
                 if vala_type == 'String' and type_info.pointer:

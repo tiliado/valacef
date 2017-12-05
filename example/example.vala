@@ -11,7 +11,6 @@ int main(string[] argv) {
 	Cef.override_path(Cef.PathKey.DIR_EXE, ref cef_path);
 	
 	var app = new MyApp();
-	app.ref();
 	Cef.MainArgs main_args = {argv.length, argv};
 	var code = Cef.execute_process(main_args, app, null);
 	if (code >= 0) {

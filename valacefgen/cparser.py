@@ -131,13 +131,15 @@ class Parser:
                     vala_name=vala_type,
                     c_header="",
                     ret_type=ret_type,
-                    params=params))
+                    params=params,
+                    vfunc_of_class=struct_name))
                 self.repo.add_delegate(Delegate(
                     c_name=vala_type,
                     vala_name=vala_type,
                     c_header="valacef.h",  # Generated typedef is there.
                     ret_type=ret_type,
-                    params=params))
+                    params=params,
+                    vfunc_of_class=struct_name))
                 struct_members.append(StructMember(
                     c_type=vala_type,
                     c_name=c_name,
