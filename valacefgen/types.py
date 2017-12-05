@@ -266,6 +266,28 @@ class Delegate(Type):
         ]
         return buf
 
+    def __c__(self, repo: "Repository") -> List[str]:
+        params = repo.c_param_list(self.params)
+        ret_type = repo.c_ret_type(self.ret_type)
+        buf = []
+        if self.c_header:
+            buf.extend('#include "%s"' % h for h in self.c_header.split(';'))
+        if self.ret_type:
+            header = repo.resolve_c_type(utils.parse_c_type(ret_type).c_type).c_header
+            if header:
+                buf.append('#include "%s"' % header)
+        if self.params:
+            headers = (repo.resolve_c_type(utils.parse_c_type(h[0]).c_type).c_header for h in self.params)
+            buf.extend('#include "%s"' % h for h in headers if h)
+        buf.extend([
+            'typedef %s (*%s)(%s);' % (
+                ret_type,
+                self.c_name,
+                ', '.join(params)
+            )
+        ])
+        return buf
+
     def is_simple_type(self, repo: "Repository") -> bool:
         return True
 
