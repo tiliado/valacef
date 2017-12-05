@@ -171,9 +171,19 @@ class Struct(Type):
         for member in self.members:
             type_info = utils.parse_c_type(member.c_type)
             vala_type = repo.resolve_c_type(type_info.c_type)
+            if 'char' in member.c_type:
+                print("!!!", member.c_type)
+            if member.c_type == 'char*':
+                m_type = 'string?'
+            elif member.c_type == 'char**':
+                m_type = 'char**'
+            else:
+                m_type = vala_type.vala_name
+                if type_info.pointer:
+                    m_type += '?'
             if member.comment:
                 buf.extend('    ' + line for line in utils.vala_comment(member.comment, valadoc=True))
-            buf.append('    public %s %s;' % (vala_type.vala_name, member.vala_name))
+            buf.append('    public %s %s;' % (m_type, member.vala_name))
 
         for method in self.methods:
             if method.construct:
