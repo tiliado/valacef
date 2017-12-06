@@ -1,13 +1,22 @@
 import os
-
+import sys
 from valacefgen.cparser import Parser, Naming
 from valacefgen.types import Repository, Function
 from valacefgen.utils import TypeInfo
 
+try:
+	TOP = sys.argv[1] or '.'
+except IndexError:
+	TOP = '.'
+try:
+	OUT = sys.argv[2] or '.'
+except IndexError:
+	OUT = 'build'
+
 header_files = [
-    ('./overrides/cef_primitives.h', 'capi/cef_base_capi.h'),
-    ('./overrides/cef_base.h', 'capi/cef_base_capi.h'),
-    ('./overrides/cef_string.h', 'capi/cef_base_capi.h'),
+    ('%s/overrides/cef_primitives.h' % TOP, 'capi/cef_base_capi.h'),
+    ('%s/overrides/cef_base.h' % TOP, 'capi/cef_base_capi.h'),
+    ('%s/overrides/cef_string.h' % TOP, 'capi/cef_base_capi.h'),
     'internal/cef_types_linux.h',
     'internal/cef_types.h',
     'capi/cef_app_capi.h',
@@ -207,12 +216,12 @@ repo.add_function(utf8_to_utf16_func)
 
 vapi, vala, c_glue = parser.finish()
 
-os.makedirs("build", exist_ok=True)
-with open("build/cef.vapi", "wt") as f:
+os.makedirs(OUT, exist_ok=True)
+with open(OUT + "/valacef.vapi", "wt") as f:
     f.write(vapi)
 
-with open("build/cef.vala", "wt") as f:
+with open(OUT + "/cef.vala", "wt") as f:
     f.write(vala)
 
-with open("build/valacef.h", "wt") as f:
+with open(OUT + "/valacef.h", "wt") as f:
     f.write(c_glue)
