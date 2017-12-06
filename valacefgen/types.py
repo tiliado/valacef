@@ -3,7 +3,7 @@ from itertools import chain
 from typing import List, Dict, Tuple, Any
 
 from valacefgen import utils
-from valacefgen.vala import VALA_TYPES, VALA_ALIASES
+from valacefgen.vala import VALA_TYPES, VALA_ALIASES, GLIB_TYPES
 
 TypeInfo = utils.TypeInfo
 EnumValue = namedtuple("EnumValue", 'c_name vala_name comment')
@@ -346,6 +346,8 @@ class Repository:
             return SimpleType(c_type, c_type, "")
         if c_type in VALA_ALIASES:
             return self.resolve_c_type(VALA_ALIASES[c_type])
+        if c_type in GLIB_TYPES:
+            return SimpleType(c_type + "*", GLIB_TYPES[c_type], "")
         try:
             return self.c_types[c_type]
         except KeyError:

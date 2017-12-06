@@ -142,7 +142,9 @@ release_ref_func = Function(
         'printf("%d -- %d - 1\\n", (int) self->size, g_atomic_int_get(ref_count));',
         'is_dead = g_atomic_int_dec_and_test(ref_count);',
         'if (is_dead) {',
-        '    printf("%d dealloc!\\n", (int) self->size);'
+        '    printf("%d dealloc!\\n", (int) self->size);',
+        '    GData** priv_data = (GData**)(pointer - sizeof(void*));',
+        '    g_datalist_clear(priv_data);',
         '    free(self_ptr);',
         '}',
         'return is_dead;'

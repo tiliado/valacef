@@ -14,3 +14,7 @@ VALA_ALIASES = {
     'uint64_t': 'uint64',
     'long long': 'int64',
 }
+
+GLIB_TYPES = {
+    "GData": "GLib.Datalist",
+}

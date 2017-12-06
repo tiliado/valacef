@@ -194,7 +194,7 @@ class Parser:
                 wrapped_name = struct.vala_name + "Ref"
                 wrapped_c_name = 'Cef' + wrapped_name
                 members = [
-                    StructMember("void*", "private_data", "private_data"),
+                    StructMember("GData*", "private_data", "private_data"),
                     StructMember("volatile int", "ref_count", "ref_count")
                 ]
 
