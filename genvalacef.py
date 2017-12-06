@@ -217,11 +217,11 @@ repo.add_function(utf8_to_utf16_func)
 vapi, vala, c_glue = parser.finish()
 
 os.makedirs(OUT, exist_ok=True)
-with open(OUT + "/valacef.vapi", "wt") as f:
+with open(OUT + "/valacef_api.vapi", "wt") as f:
     f.write(vapi)
 
 with open(OUT + "/cef.vala", "wt") as f:
     f.write(vala)
 
-with open(OUT + "/valacef.h", "wt") as f:
+with open(OUT + "/valacef_api.h", "wt") as f:
     f.write(c_glue)

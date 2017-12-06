@@ -136,7 +136,7 @@ class Parser:
                 self.repo.add_delegate(Delegate(
                     c_name=vala_type,
                     vala_name=vala_type,
-                    c_header="valacef.h",  # Generated typedef is there.
+                    c_header="valacef_api.h",  # Generated typedef is there.
                     ret_type=ret_type,
                     params=params,
                     vfunc_of_class=struct_name))
@@ -202,14 +202,14 @@ class Parser:
                 klass = Struct(
                     c_name=wrapped_c_name,
                     vala_name=wrapped_name,
-                    c_header="valacef.h",
+                    c_header="valacef_api.h",
                     members=members)
                 klass.set_parent(struct)
                 klass.set_is_class(True)
                 construct = Function(
                     c_name=wrapped_c_name + "New",
                     vala_name=wrapped_name,
-                    c_header="valacef.h")
+                    c_header="valacef_api.h")
                 construct.construct = True
                 klass.add_method(construct)
                 klasses.append(klass)

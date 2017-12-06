@@ -47,17 +47,31 @@ def configure(ctx):
 
 
 def build(ctx):
-    cef_vala, valacef_vapi, valacef_h = [ctx.path.find_or_declare(i) for i in ('cef.vala', 'valacef.vapi', 'valacef.h')]
+    cef_vala, valacef_api_vapi, valacef_api_h = [ctx.path.find_or_declare(i) for i in ('cef.vala', 'valacef_api.vapi', 'valacef_api.h')]
     ctx(
         rule='python3 ../genvalacef.py .. .',
         source=[ctx.path.find_node('genvalacef.py')] + ctx.path.ant_glob('valacefgen/*.py'),
-        target=[cef_vala, valacef_vapi, valacef_h]
+        target=[cef_vala, valacef_api_vapi, valacef_api_h]
     )
- 
+    
+    ctx.shlib(
+        source = [cef_vala, 'valacef/hello.vala'],
+        target = 'valacef',
+        packages = "valacef_api",
+        defines = ['G_LOG_DOMAIN="ValaCef"'],
+        vapi_dirs = ["vapi", out],
+        includes = ['.', '/app/include/cef', '/app/include/cef/include', out],
+        lib = ['cef'],
+        libpath = ['/app/lib/cef'],
+        cflags = ['-O2', '/app/lib/cef/libcef_dll_wrapper'], 
+        #vala_target_glib = TARGET_GLIB,
+        #install_path = ctx.env.NUVOLA_LIBDIR,
+    )
+    
     ctx.program(
-        source = [valacef_vapi, 'example/example.vala', 'example/cef_x11.vala'],
+        source = ['example/example.vala', 'example/cef_x11.vala'],
         target = 'example.bin',
-        #vala_dir = 'src/apprunner',
+        use = ['valacef'],
         packages = "gtk+-3.0 gdk-x11-3.0 x11",
         uselib = "GTK GDKX11 X11",
         defines = ['G_LOG_DOMAIN="CefGtk"'],
@@ -65,7 +79,7 @@ def build(ctx):
         includes = ['.', '/app/include/cef', '/app/include/cef/include', out],
         lib = ['cef'],
         libpath = ['/app/lib/cef'],
-        cflags = ['-O2', '/app/lib/cef/libcef_dll_wrapper'], 
+        cflags = ['-O2'], 
         #vala_target_glib = TARGET_GLIB,
         #install_path = ctx.env.NUVOLA_LIBDIR,
     )
