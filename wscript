@@ -7,6 +7,7 @@ MIN_GTK = "3.22.0"
 top = '.'
 out = 'build'
 
+import waflib
 def vala_def(ctx, vala_definition):
     """Appends a Vala definition"""
     ctx.env.append_unique("VALA_DEFINES", vala_definition)
@@ -21,7 +22,7 @@ def pkgconfig(ctx, pkg, uselib, version, mandatory=True, store=None, valadef=Non
         if define:
             for key, value in define.iteritems():
                 ctx.define(key, value)
-    except ConfigurationError as e:
+    except waflib.Errors.ConfigurationError as e:
         result = False
         if mandatory:
             raise e
