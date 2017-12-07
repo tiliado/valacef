@@ -94,6 +94,12 @@ class Function(Type):
         return buf
 
     def gen_c_header(self, repo: "Repository") -> List[str]:
+        return self._gen_c_code(repo, False)
+
+    def gen_c_code(self, repo: "Repository") -> List[str]:
+        return self._gen_c_code(repo, True)
+
+    def _gen_c_code(self, repo: "Repository", gen_body: bool) -> List[str]:
         params = repo.c_param_list(self.params)
         ret_type = repo.c_ret_type(self.ret_type)
         buf = []
@@ -104,10 +110,10 @@ class Function(Type):
                 ret_type,
                 self.c_name,
                 ', '.join(params),
-                ';' if self.body is None else ' {'
+                ';' if not gen_body or self.body is None else ' {'
             )
         ])
-        if self.body is not None:
+        if gen_body and self.body is not None:
             body: List[str] = self.body
             buf.extend('    ' + line for line in body)
             buf.append("}")
@@ -195,6 +201,12 @@ class Struct(Type):
         return buf
 
     def gen_c_header(self, repo: "Repository") -> List[str]:
+        return self._gen_c_code(repo, 'gen_c_header')
+
+    def gen_c_code(self, repo: "Repository") -> List[str]:
+        return self._gen_c_code(repo, 'gen_c_code')
+
+    def _gen_c_code(self, repo: "Repository", generator: str) -> List[str]:
         buf = [
             '#include "%s"' % self.parent.c_header,
         ]
@@ -211,7 +223,7 @@ class Struct(Type):
             buf.append('    %s%s %s;' % ('volatile ' if type_info.volatile else '', vala_type.c_name, member.c_name))
         buf.append('} %s;' % self.c_name)
         for method in self.methods:
-            buf.extend('    ' + line for line in method.gen_c_header(repo))
+            buf.extend('    ' + line for line in getattr(method, generator)(repo))
         return buf
 
 
@@ -297,6 +309,9 @@ class Delegate(Type):
             )
         ])
         return buf
+
+    def gen_c_code(self, repo: "Repository") -> List[str]:
+        return self.gen_c_header(repo)
 
     def is_simple_type(self, repo: "Repository") -> bool:
         return True

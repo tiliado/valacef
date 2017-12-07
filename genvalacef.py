@@ -218,7 +218,7 @@ utf8_to_utf16_func = Function(
     params=[('cef_string_t*', 'utf16_str'), ('char*', 'str')])
 repo.add_function(utf8_to_utf16_func)
 
-vapi, vala, c_glue = parser.finish()
+vapi, vala, c_header, c_glue = parser.finish()
 
 os.makedirs(OUT, exist_ok=True)
 with open(OUT + "/valacef_api.vapi", "wt") as f:
@@ -227,5 +227,8 @@ with open(OUT + "/valacef_api.vapi", "wt") as f:
 with open(OUT + "/cef.vala", "wt") as f:
     f.write(vala)
 
-with open(OUT + "/valacef_api.h", "wt") as f:
+with open(OUT + "/valacef_api.c", "wt") as f:
     f.write(c_glue)
+
+with open(OUT + "/valacef_api.h", "wt") as f:
+    f.write(c_header)

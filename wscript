@@ -124,17 +124,18 @@ def configure(ctx):
 
 def build(ctx):
     include_dirs = [".", ctx.env.CEF_INCLUDE_DIR, os.path.dirname(ctx.env.CEF_INCLUDE_DIR), out]
-    cef_vala, valacef_api_vapi, valacef_api_h = [ctx.path.find_or_declare(i) for i in ('cef.vala', 'valacef_api.vapi', 'valacef_api.h')]
+    cef_vala, valacef_api_vapi, valacef_api_h, valacef_api_c = [ctx.path.find_or_declare(i) for i in (
+        'cef.vala', 'valacef_api.vapi', 'valacef_api.h', 'valacef_api.c')]
     ctx.define('VALACEF_VERSION_MAJOR', VERSION_MAJOR)
     ctx.define('VALACEF_VERSION_MINOR', VERSION_MINOR)
     ctx(
         rule='${PYTHON3} ../genvalacef.py ${CEF_INCLUDE_DIR} .. .',
         source=[ctx.path.find_node('genvalacef.py')] + ctx.path.ant_glob('valacefgen/*.py'),
-        target=[cef_vala, valacef_api_vapi, valacef_api_h]
+        target=[cef_vala, valacef_api_vapi, valacef_api_h, valacef_api_c]
     )
     
     ctx.shlib(
-        source = [cef_vala, 'valacef/version.vala'],
+        source = [cef_vala, valacef_api_c, 'valacef/version.vala'],
         target = 'valacef',
         packages = "valacef_api",
         defines = ['G_LOG_DOMAIN="ValaCef"'],

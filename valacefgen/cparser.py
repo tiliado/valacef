@@ -164,10 +164,12 @@ class Parser:
     def add_c_glue(self, *glue: Type):
         self.c_glue.extend(glue)
 
-    def finish(self) -> Tuple[str, str, str]:
+    def finish(self) -> Tuple[str, str, str, str]:
         self.resolve_struct_parents()
         self.wrap_simple_classes()
-        return self.create_valacef_vapi(), self.create_valacef_vala(), self.create_valacef_c()
+        return (
+            self.create_valacef_vapi(), self.create_valacef_vala(),
+            self.create_valacef_c_header(),  self.create_valacef_c_code())
 
     def resolve_struct_parents(self):
         """Resolve inheritance of structs."""
@@ -245,10 +247,17 @@ class Parser:
         buf.append('}')
         return "".join(buf)
 
-    def create_valacef_c(self) -> str:
+    def create_valacef_c_header(self) -> str:
         buf = ['#ifndef VALACEF_H\n#define VALACEF_H\n\n']
         for entry in self.c_glue:
             for line in entry.gen_c_header(self.repo):
                 buf.extend((line, '\n'))
         buf.append('\n#endif\n')
+        return "".join(buf)
+
+    def create_valacef_c_code(self) -> str:
+        buf = ['#include <glib.h>\n']
+        for entry in self.c_glue:
+            for line in entry.gen_c_code(self.repo):
+                buf.extend((line, '\n'))
         return "".join(buf)
