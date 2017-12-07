@@ -31,6 +31,43 @@ def pkgconfig(ctx, pkg, uselib, version, mandatory=True, store=None, valadef=Non
             ctx.env[store] = result
     return res
 
+def find_python3(ctx, version=None):
+    ctx.find_program('python3', var='PYTHON3')
+    if version:
+        versions = [int(s) for s in version.split('.')]
+        ctx.start_msg("Checking for Python >= %s" % version)
+        py_version = ctx.cmd_and_log(
+            [ctx.env.PYTHON3[0], '--version'], output=waflib.Context.STDOUT, quiet=waflib.Context.BOTH)
+        py_version = py_version.strip().split(' ')[1]
+        py_versions = [int(s) for s in py_version.split('.')]
+        if py_versions >= versions:
+            ctx.end_msg(py_version, color='GREEN')
+        else:
+            ctx.end_msg(py_version, color='RED')
+            if len(versions) == 1:
+                ctx.fatal("Could not find Python >= %s" % version)
+            else:
+                del ctx.env.PYTHON3
+                for i in reversed(range(versions[1], 8)):
+                    try:
+                        ctx.find_program('python3.%d' % i, var='PYTHON3')
+                        break
+                    except waflib.Errors.ConfigurationError:
+                        pass
+                else:
+                    ctx.fatal("Could not find PythonXX >= %s" % version)
+                ctx.start_msg("Checking for Python >= %s" % version)
+                py_version = ctx.cmd_and_log(
+                    [ctx.env.PYTHON3[0], '--version'], output=waflib.Context.STDOUT, quiet=waflib.Context.BOTH)
+                py_version = py_version.strip().split(' ')[1]
+                py_versions = [int(s) for s in py_version.split('.')]
+                if py_versions >= versions:
+                    ctx.end_msg(py_version, color='GREEN')
+                else:
+                    ctx.end_msg(py_version, color='RED')
+                    ctx.fatal("Could not find Python >= %s" % version)
+
+
 def options(ctx):
     ctx.load('compiler_c vala')
 
@@ -44,13 +81,13 @@ def configure(ctx):
     pkgconfig(ctx, 'gtk+-3.0', 'GTK', MIN_GTK)
     pkgconfig(ctx, 'gdk-x11-3.0', 'GDKX11', MIN_GTK)
     pkgconfig(ctx, 'x11', 'X11', "0")
-
+    find_python3(ctx, "3.6")
 
 
 def build(ctx):
     cef_vala, valacef_api_vapi, valacef_api_h = [ctx.path.find_or_declare(i) for i in ('cef.vala', 'valacef_api.vapi', 'valacef_api.h')]
     ctx(
-        rule='python3 ../genvalacef.py .. .',
+        rule='${PYTHON3} ../genvalacef.py .. .',
         source=[ctx.path.find_node('genvalacef.py')] + ctx.path.ant_glob('valacefgen/*.py'),
         target=[cef_vala, valacef_api_vapi, valacef_api_h]
     )
