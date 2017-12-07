@@ -19,7 +19,7 @@ class Type:
     def is_simple_type(self, repo: "Repository") -> bool:
         raise NotImplementedError
 
-    def __vala__(self, repo: "Repository") -> List[str]:
+    def gen_vala_code(self, repo: "Repository") -> List[str]:
         raise NotImplementedError
 
 
@@ -27,7 +27,7 @@ class SimpleType(Type):
     def __init__(self, c_name: str, vala_name: str, c_header: str, comment: str = None):
         super().__init__(c_name, vala_name, c_header, comment)
 
-    def __vala__(self, repo: "Repository") -> List[str]:
+    def gen_vala_code(self, repo: "Repository") -> List[str]:
         return []
 
     def is_simple_type(self, repo: "Repository") -> bool:
@@ -45,7 +45,7 @@ class Enum(Type):
     def __repr__(self):
         return "enum %s" % self.vala_name
 
-    def __vala__(self, repo: "Repository") -> List[str]:
+    def gen_vala_code(self, repo: "Repository") -> List[str]:
         buf = []
         if self.comment:
             buf.extend(utils.vala_comment(self.comment, valadoc=True))
@@ -72,7 +72,7 @@ class Function(Type):
         self.body = body
         self.construct = False
 
-    def __vala__(self, repo: "Repository") -> List[str]:
+    def gen_vala_code(self, repo: "Repository") -> List[str]:
         params = repo.vala_param_list(self.params, self.c_name)
         ret_type = repo.vala_ret_type(self.ret_type)
         buf = []
@@ -93,7 +93,7 @@ class Function(Type):
             buf.append("}")
         return buf
 
-    def __c__(self, repo: "Repository") -> List[str]:
+    def gen_c_header(self, repo: "Repository") -> List[str]:
         params = repo.c_param_list(self.params)
         ret_type = repo.c_ret_type(self.ret_type)
         buf = []
@@ -143,7 +143,7 @@ class Struct(Type):
     def is_simple_type(self, repo: "Repository") -> bool:
         return False
 
-    def __vala__(self, repo: "Repository") -> List[str]:
+    def gen_vala_code(self, repo: "Repository") -> List[str]:
         buf = []
         if self.comment:
             buf.extend(utils.vala_comment(self.comment, valadoc=True))
@@ -190,11 +190,11 @@ class Struct(Type):
         else:
             buf.append('    protected %s(){}' % self.vala_name)
         for method in self.methods:
-            buf.extend('    ' + line for line in method.__vala__(repo))
+            buf.extend('    ' + line for line in method.gen_vala_code(repo))
         buf.append('}')
         return buf
 
-    def __c__(self, repo: "Repository") -> List[str]:
+    def gen_c_header(self, repo: "Repository") -> List[str]:
         buf = [
             '#include "%s"' % self.parent.c_header,
         ]
@@ -211,7 +211,7 @@ class Struct(Type):
             buf.append('    %s%s %s;' % ('volatile ' if type_info.volatile else '', vala_type.c_name, member.c_name))
         buf.append('} %s;' % self.c_name)
         for method in self.methods:
-            buf.extend('    ' + line for line in method.__c__(repo))
+            buf.extend('    ' + line for line in method.gen_c_header(repo))
         return buf
 
 
@@ -234,7 +234,7 @@ class Typedef(Type):
             return True
         return repo.c_types[c_type].is_simple_type(repo)
 
-    def __vala__(self, repo: "Repository") -> List[str]:
+    def gen_vala_code(self, repo: "Repository") -> List[str]:
         buf = []
         c_type = self.c_type
         if c_type != 'void*':
@@ -266,7 +266,7 @@ class Delegate(Type):
         self.params = params
         self.vfunc_of_class = vfunc_of_class
 
-    def __vala__(self, repo: "Repository") -> List[str]:
+    def gen_vala_code(self, repo: "Repository") -> List[str]:
         params = repo.vala_param_list(self.params, vfunc_of_class=self.vfunc_of_class)
         ret_type = repo.vala_ret_type(self.ret_type)
         buf = [
@@ -276,7 +276,7 @@ class Delegate(Type):
         ]
         return buf
 
-    def __c__(self, repo: "Repository") -> List[str]:
+    def gen_c_header(self, repo: "Repository") -> List[str]:
         params = repo.c_param_list(self.params)
         ret_type = repo.c_ret_type(self.ret_type)
         buf = []
@@ -359,11 +359,11 @@ class Repository:
             buf.append(repr(enum))
         return '\n'.join(buf)
 
-    def __vala__(self):
+    def gen_vala_code(self):
         buf = ['namespace %s {\n' % self.vala_namespace]
         entries = self.enums, self.delegates, self.functions, self.typedefs, self.structs
         for entry in chain.from_iterable(e.values() for e in entries):
-            for line in entry.__vala__(self):
+            for line in entry.gen_vala_code(self):
                 buf.extend(('    ', line, '\n'))
         buf.append('} // namespace %s\n' % self.vala_namespace)
         return ''.join(buf)

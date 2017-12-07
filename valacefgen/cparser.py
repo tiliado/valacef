@@ -235,12 +235,12 @@ class Parser:
         self.repo.add_struct(*klasses)
 
     def create_valacef_vapi(self) -> str:
-        return "".join(self.repo.__vala__())
+        return "".join(self.repo.gen_vala_code())
 
     def create_valacef_vala(self) -> str:
         buf = ['namespace Cef {']
         for entry in self.vala_glue:
-            for line in entry.__vala__(self.repo):
+            for line in entry.gen_vala_code(self.repo):
                 buf.extend(('    ', line, '\n'))
         buf.append('}')
         return "".join(buf)
@@ -248,7 +248,7 @@ class Parser:
     def create_valacef_c(self) -> str:
         buf = ['#ifndef VALACEF_H\n#define VALACEF_H\n\n']
         for entry in self.c_glue:
-            for line in entry.__c__(self.repo):
+            for line in entry.gen_c_header(self.repo):
                 buf.extend((line, '\n'))
         buf.append('\n#endif\n')
         return "".join(buf)
