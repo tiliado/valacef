@@ -1,9 +1,9 @@
 APPNAME = 'valacef'
-VERSION = '1.0'
+VERSION = '3.0'
 MIN_VALA = "0.34.7"
 MIN_GLIB = "2.52.0"
 MIN_GTK = "3.22.0"
-
+VERSION_MAJOR, VERSION_MINOR = [int(s) for s in VERSION.split('.')]
 top = '.'
 out = 'build'
 
@@ -125,6 +125,8 @@ def configure(ctx):
 def build(ctx):
     include_dirs = [".", ctx.env.CEF_INCLUDE_DIR, os.path.dirname(ctx.env.CEF_INCLUDE_DIR), out]
     cef_vala, valacef_api_vapi, valacef_api_h = [ctx.path.find_or_declare(i) for i in ('cef.vala', 'valacef_api.vapi', 'valacef_api.h')]
+    ctx.define('VALACEF_VERSION_MAJOR', VERSION_MAJOR)
+    ctx.define('VALACEF_VERSION_MINOR', VERSION_MINOR)
     ctx(
         rule='${PYTHON3} ../genvalacef.py ${CEF_INCLUDE_DIR} .. .',
         source=[ctx.path.find_node('genvalacef.py')] + ctx.path.ant_glob('valacefgen/*.py'),
@@ -132,7 +134,7 @@ def build(ctx):
     )
     
     ctx.shlib(
-        source = [cef_vala, 'valacef/hello.vala'],
+        source = [cef_vala, 'valacef/version.vala'],
         target = 'valacef',
         packages = "valacef_api",
         defines = ['G_LOG_DOMAIN="ValaCef"'],

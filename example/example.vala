@@ -18,6 +18,10 @@ int main(string[] argv) {
 	if (code >= 0) {
 		return code;
 	}
+	var versions = "ValaCEF %s, CEF %s, Chrome %s, GTK+ %u.%u.%u".printf(
+		Cef.get_valacef_version(), Cef.get_cef_version(), Cef.get_chrome_version(),
+		Gtk.get_major_version(), Gtk.get_minor_version(), Gtk.get_micro_version());
+	message("Versions: %s", versions);
 	
 	Cef.Settings settings = {sizeof(Cef.Settings)};
 	settings.no_sandbox = 1;
@@ -31,7 +35,7 @@ int main(string[] argv) {
 	CefX11.set_x11_error_handlers();
 	var win = new Gtk.Window();
 	CefX11.fix_default_visual(win);
-	win.title = "ValaCEF";
+	win.title = versions;
 	win.delete_event.connect(() => {Gtk.main_quit(); return true;});
 	win.set_default_size(800, 600);
 	win.realize();
