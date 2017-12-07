@@ -5,11 +5,15 @@ from valacefgen.types import Repository, Function
 from valacefgen.utils import TypeInfo
 
 try:
-	TOP = sys.argv[1] or '.'
+	CEF_INCLUDE_DIR = sys.argv[1]
+except IndexError:
+	CEF_INCLUDE_DIR = "/app/include/cef/include"
+try:
+	TOP = sys.argv[2] or '.'
 except IndexError:
 	TOP = '.'
 try:
-	OUT = sys.argv[2] or '.'
+	OUT = sys.argv[3] or '.'
 except IndexError:
 	OUT = 'build'
 
@@ -106,7 +110,7 @@ parser = Parser(Naming('Cef'), Repository('Cef', Overrides()), ignore, base_stru
 for entry in header_files:
     if isinstance(entry, str):
         c_include_path = entry
-        path = os.path.join("/app/include/cef/include", entry)
+        path = os.path.join(CEF_INCLUDE_DIR, entry)
     else:
         path, c_include_path = entry
 

@@ -1,6 +1,6 @@
 run:
 	./waf build -v
-	LD_LIBRARY_PATH=/app/lib/cef:build build/example.bin
+	sh build/launch.sh build/example.bin
 
 config:
 	./waf configure

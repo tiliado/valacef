@@ -1,3 +1,5 @@
+extern const string CEF_LIB_DIR;
+
 public class MyApp: Cef.AppRef {
 	public MyApp() {
 		base();
@@ -6,7 +8,7 @@ public class MyApp: Cef.AppRef {
 
 int main(string[] argv) {
 	Cef.String cef_path = {};
-	Cef.set_string(ref cef_path, "/app/lib/cef");
+	Cef.set_string(ref cef_path, CEF_LIB_DIR);
 	Cef.override_path(Cef.PathKey.DIR_MODULE, ref cef_path);
 	Cef.override_path(Cef.PathKey.DIR_EXE, ref cef_path);
 	
@@ -20,8 +22,8 @@ int main(string[] argv) {
 	Cef.Settings settings = {sizeof(Cef.Settings)};
 	settings.no_sandbox = 1;
 	settings.log_severity = Cef.LogSeverity.WARNING;
-	Cef.set_string(ref settings.resources_dir_path, "/app/lib/cef");
-	Cef.set_string(ref settings.locales_dir_path, "/app/lib/cef/locales");
+	Cef.set_string(ref settings.resources_dir_path, CEF_LIB_DIR);
+	Cef.set_string(ref settings.locales_dir_path, CEF_LIB_DIR + "/locales");
 	Cef.initialize(main_args, settings, app, null);
 	
 	unowned string[]? gtk_argv = null;
