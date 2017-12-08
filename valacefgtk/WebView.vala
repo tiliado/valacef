@@ -41,9 +41,9 @@ public class WebView : Gtk.Widget {
         Cef.String url = {};
         Cef.set_string(ref url, "https://www.google.com");
         browser = Cef.browser_host_create_browser_sync(window_info, client, ref url, browser_settings, null);
-        var host = browser.get_host(browser);
+        var host = browser._get_host(browser);
 		return new Gdk.X11.Window.foreign_for_display(
-			parent_window.get_display() as Gdk.X11.Display, (X.Window) host.get_window_handle(host));
+			parent_window.get_display() as Gdk.X11.Display, (X.Window) host._get_window_handle(host));
     }
 }
 

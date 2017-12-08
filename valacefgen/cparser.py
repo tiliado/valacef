@@ -143,7 +143,7 @@ class Parser:
                 struct_members.append(StructMember(
                     c_type=vala_type,
                     c_name=c_name,
-                    vala_name=c_name,
+                    vala_name="_" + c_name,
                     comment=member.get('doxygen')))
             else:
                 struct_members.append(StructMember(

@@ -188,6 +188,8 @@ class Struct(Type):
                     m_type += '?'
             if member.comment:
                 buf.extend('    ' + line for line in utils.vala_comment(member.comment, valadoc=True))
+            if member.c_name != member.vala_name:
+                buf.append('    [CCode (cname="%s")]' % member.c_name)
             buf.append('    public %s %s;' % (m_type, member.vala_name))
 
         for method in self.methods:
