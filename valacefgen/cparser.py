@@ -147,7 +147,7 @@ class Parser:
                 struct_members.append(StructMember(
                     c_type=vala_type,
                     c_name=c_name,
-                    vala_name="_" + c_name,
+                    vala_name="vfunc_" + c_name,
                     comment=member.get('doxygen')))
                 struct_virtual_funcs.append(StructVirtualFunc(
                     c_name="%s_%s" % (struct_name, c_name),
