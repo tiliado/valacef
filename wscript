@@ -169,12 +169,26 @@ def build(ctx):
     )
     
     ctx.program(
+        source = ['cefsubprocess/Subprocess.vala'],
+        target = 'CefSubprocess',
+        use = ['valacef'],
+        defines = ['G_LOG_DOMAIN="CefSub"', 'CEF_LIB_DIR="%s"' % ctx.env.CEF_LIB_DIR],
+        vapi_dirs = ["vapi"],
+        includes = include_dirs,
+        lib = ['cef'],
+        libpath = [ctx.env.CEF_LIB_DIR],
+        cflags = ['-O2'], 
+        #vala_target_glib = TARGET_GLIB,
+        #install_path = ctx.env.NUVOLA_LIBDIR,
+    )
+    
+    ctx.program(
         source = ['example/example.vala'],
         target = 'example.bin',
         use = ['valacef', 'valacefgtk'],
         packages = "gtk+-3.0 gdk-x11-3.0 x11",
         uselib = "GTK GDKX11 X11",
-        defines = ['G_LOG_DOMAIN="CefGtk"', 'CEF_LIB_DIR="%s"' % ctx.env.CEF_LIB_DIR],
+        defines = ['G_LOG_DOMAIN="Example"'],
         vapi_dirs = ["vapi"],
         includes = include_dirs,
         lib = ['cef'],

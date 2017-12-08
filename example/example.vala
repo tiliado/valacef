@@ -1,23 +1,4 @@
-extern const string CEF_LIB_DIR;
-
-public class MyApp: Cef.AppRef {
-	public MyApp() {
-		base();
-	}
-}
-
 int main(string[] argv) {
-	Cef.String cef_path = {};
-	Cef.set_string(ref cef_path, CEF_LIB_DIR);
-	Cef.override_path(Cef.PathKey.DIR_MODULE, ref cef_path);
-	Cef.override_path(Cef.PathKey.DIR_EXE, ref cef_path);
-	
-	var app = new MyApp();
-	Cef.MainArgs main_args = {argv.length, argv};
-	var code = Cef.execute_process(main_args, app, null);
-	if (code >= 0) {
-		return code;
-	}
 	var versions = "ValaCEF %s, CEF %s, Chrome %s, GTK+ %u.%u.%u".printf(
 		Cef.get_valacef_version(), Cef.get_cef_version(), Cef.get_chrome_version(),
 		Gtk.get_major_version(), Gtk.get_minor_version(), Gtk.get_micro_version());
