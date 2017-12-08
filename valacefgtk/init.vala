@@ -14,7 +14,7 @@ public void init() {
 		Cef.override_path(Cef.PathKey.DIR_EXE, ref cef_path);
 		
 		Cef.MainArgs main_args = {0, null};
-		var app = new Cef.AppRef();
+		var app = new BrowserProcess();
 		var code = Cef.execute_process(main_args, app, null);
 		assert(code < 0);
 		

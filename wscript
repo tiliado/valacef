@@ -153,6 +153,7 @@ def build(ctx):
             'valacefgtk/init.vala',
             'valacefgtk/x11.vala',
             'valacefgtk/WebView.vala',
+            'valacefgtk/BrowserProcess.vala',
         ],
         target = 'valacefgtk',
         packages = "valacef valacef_api gtk+-3.0 gdk-x11-3.0 x11",
