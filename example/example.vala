@@ -14,7 +14,7 @@ int main(string[] argv) {
 	win.set_default_size(800, 600);
 	var panels = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
 	win.add(panels);
-	panels.add1(new Gtk.Label("Left"));
+	panels.add1(new Gtk.Entry());
 	panels.add2(new CefGtk.WebView());
 	win.realize();
 	win.show_all();
