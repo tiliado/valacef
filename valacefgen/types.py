@@ -124,8 +124,10 @@ class Function(Type):
 
 
 class Struct(Type):
-    def __init__(self, c_name: str, vala_name: str, c_header: str, members: List["StructMember"], comment: str = None):
+    def __init__(self, c_name: str, vala_name: str, c_header: str, members: List["StructMember"], comment: str = None,
+                 virtual_funcs: List["StructVirtualFunc"] = None):
         super().__init__(c_name, vala_name, c_header, comment)
+        self.virtual_funcs = virtual_funcs
         self.members = members
         self.parent: Struct = None
         self.methods: List[Function] = []
@@ -199,6 +201,15 @@ class Struct(Type):
             buf.append('    protected %s(){}' % self.vala_name)
         for method in self.methods:
             buf.extend('    ' + line for line in method.gen_vala_code(repo))
+        for vfunc in self.virtual_funcs or []:
+            params = repo.vala_param_list(vfunc.params, vfunc_of_class=self.c_name)
+            ret_type = repo.vala_ret_type(vfunc.ret_type)
+            if vfunc.comment:
+                buf.extend('    ' + line for line in utils.vala_comment(vfunc.comment, valadoc=True))
+            buf.extend([
+                '    [CCode (cname="%s", cheader_filename="valacef_api.h")]' % vfunc.c_name,
+                '    public %s %s(%s);' % (ret_type, vfunc.vala_name, ', '.join(params[1:])),
+            ])
         buf.append('}')
         return buf
 
@@ -235,6 +246,16 @@ class StructMember:
         self.c_type = c_type
         self.c_name = c_name
         self.vala_name = vala_name
+
+
+class StructVirtualFunc:
+    def __init__(self, c_name: str, vala_name: str, ret_type: str = None, params: List[Tuple[str, str]] = None,
+                 comment: str = None):
+        self.comment = utils.reformat_comment(comment, strip_chars=5)
+        self.c_name = c_name
+        self.vala_name = vala_name
+        self.ret_type = ret_type if ret_type != 'void' else None
+        self.params = params
 
 
 class Typedef(Type):
@@ -274,8 +295,9 @@ class Typedef(Type):
 
 class Delegate(Type):
     def __init__(self, c_name: str, vala_name: str, c_header: str, ret_type: str = None,
-                 params: List[Tuple[str, str]] = None, vfunc_of_class=None):
+                 params: List[Tuple[str, str]] = None, vfunc_of_class=None, vfunc_name=None):
         super().__init__(c_name, vala_name, c_header)
+        self.vfunc_name = vfunc_name
         self.ret_type = ret_type if ret_type != 'void' else None
         self.params = params
         self.vfunc_of_class = vfunc_of_class
@@ -290,7 +312,7 @@ class Delegate(Type):
         ]
         return buf
 
-    def gen_c_header(self, repo: "Repository") -> List[str]:
+    def _gen_c_code(self, repo: "Repository", body: bool) -> List[str]:
         params = repo.c_param_list(self.params)
         ret_type = repo.c_ret_type(self.ret_type)
         buf = []
@@ -310,10 +332,33 @@ class Delegate(Type):
                 ', '.join(params)
             )
         ])
+        if self.vfunc_name:
+            buf.extend([
+                '%s %s_%s(%s)%s' % (
+                    ret_type,
+                    self.vfunc_of_class,
+                    self.vfunc_name,
+                    ', '.join(params),
+                    ' {' if body else ';'
+                )
+            ])
+            if body:
+                buf.extend([
+                    '    %sself->%s(%s);' % (
+                        'return ' if ret_type else '',
+                        self.vfunc_name,
+                        ', '.join(p[1] for p in self.params),
+                    ),
+                    '}'
+                ])
+
         return buf
 
     def gen_c_code(self, repo: "Repository") -> List[str]:
-        return self.gen_c_header(repo)
+        return self._gen_c_code(repo, True)
+
+    def gen_c_header(self, repo: "Repository") -> List[str]:
+        return self._gen_c_code(repo, False)
 
     def is_simple_type(self, repo: "Repository") -> bool:
         return True

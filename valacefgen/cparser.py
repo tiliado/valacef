@@ -3,7 +3,8 @@ from typing import Set, Dict, Any, List, Tuple
 
 from CppHeaderParser import CppHeader
 
-from valacefgen.types import Repository, EnumValue, Enum, Struct, Typedef, StructMember, Delegate, Function, Type
+from valacefgen.types import Repository, EnumValue, Enum, Struct, Typedef, StructMember, Delegate, Function, Type, \
+    StructVirtualFunc
 from valacefgen.utils import find_prefix, lstrip, rstrip, camel_case
 from valacefgen import utils
 
@@ -119,6 +120,7 @@ class Parser:
     def parse_struct(self, c_include_path: str, struct_name: str, struct):
         properties = struct['properties']
         struct_members = []
+        struct_virtual_funcs = []
         for member in properties["public"]:
             c_name = member["name"]
             c_type = member["type"]
@@ -132,7 +134,9 @@ class Parser:
                     c_header="",
                     ret_type=ret_type,
                     params=params,
-                    vfunc_of_class=struct_name))
+                    vfunc_of_class=struct_name,
+                    vfunc_name=c_name if params[0][1] == "self" else None,
+                ))
                 self.repo.add_delegate(Delegate(
                     c_name=vala_type,
                     vala_name=vala_type,
@@ -145,6 +149,12 @@ class Parser:
                     c_name=c_name,
                     vala_name="_" + c_name,
                     comment=member.get('doxygen')))
+                struct_virtual_funcs.append(StructVirtualFunc(
+                    c_name="%s_%s" % (struct_name, c_name),
+                    vala_name=c_name,
+                    ret_type=ret_type,
+                    params=params,
+                    comment=member.get('doxygen')))
             else:
                 struct_members.append(StructMember(
                     c_type=utils.normalize_pointer(c_type),
@@ -156,6 +166,7 @@ class Parser:
             vala_name=self.naming.struct(struct_name),
             c_header=c_include_path,
             members=struct_members,
+            virtual_funcs=struct_virtual_funcs,
             comment=struct.get('doxygen')))
 
     def add_vala_glue(self, *glue: Type):
