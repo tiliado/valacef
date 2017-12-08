@@ -2,6 +2,7 @@ namespace CefGtk {
 
 public class WebView : Gtk.Widget {
     private Cef.Browser? browser = null;
+    private Client? client = null;
     
     public WebView() {
     }
@@ -37,7 +38,7 @@ public class WebView : Gtk.Widget {
         window_info.width = clip.width;
         window_info.height = clip.height;
         Cef.BrowserSettings browser_settings = {sizeof(Cef.BrowserSettings)};
-        var client = new Cef.ClientRef();
+        client = new Client();
         Cef.String url = {};
         Cef.set_string(ref url, "https://www.google.com");
         browser = Cef.browser_host_create_browser_sync(window_info, client, ref url, browser_settings, null);
