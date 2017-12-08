@@ -225,6 +225,40 @@ class Parser:
                     c_header="valacef_api.h")
                 construct.construct = True
                 klass.add_method(construct)
+
+                priv_set = Function(
+                    c_name=wrapped_c_name + "PrivSet",
+                    vala_name="priv_set",
+                    c_header="valacef_api.h",
+                    params=[
+                        ("const char*", "key"),
+                        ("T", "data"),
+                    ],
+                    vala_generics=["T"],
+                    vala_simple_generics=True
+                )
+                klass.add_method(priv_set)
+                priv_get = Function(
+                    c_name=wrapped_c_name + "PrivGet",
+                    vala_name="priv_get",
+                    c_header="valacef_api.h",
+                    params=[
+                        ("const char*", "key"),
+                    ],
+                    ret_type="T",
+                    vala_generics=["T"],
+                    vala_simple_generics=True
+                )
+                klass.add_method(priv_get)
+                klass.add_method(Function(
+                    c_name=wrapped_c_name + "PrivDel",
+                    vala_name="priv_del",
+                    c_header="valacef_api.h",
+                    params=[
+                        ("const char*", "key"),
+                    ],
+                ))
+
                 klasses.append(klass)
 
                 # C definition
@@ -239,10 +273,45 @@ class Parser:
                     '%s* self = (%s*) calloc(1, sizeof(%s));' % (wrapped_c_name, wrapped_c_name, wrapped_c_name),
                     '%s((void*) self, sizeof(%s), sizeof(%s));' % (
                         'cef_base_ref_counted_init_ref_counting', struct.c_name, wrapped_c_name),
+                    'g_datalist_init(&(self->private_data));',
                     'return self;'
                 ])
                 construct.construct = True
                 c_klass.add_method(construct)
+
+                priv_set = Function(wrapped_c_name + "PrivSet", "priv_set", "", params=[
+                        (wrapped_c_name + "*", "self"),
+                        ("const char*", "key"),
+                        ("void*", "data"),
+                        ('GDestroyNotify', 'destroy'),
+                    ],
+                    body=[
+                        'g_return_if_fail (self != NULL);',
+                        'g_return_if_fail (key != NULL);',
+                        'g_datalist_id_set_data_full(',
+                        '&self->private_data, g_quark_from_string(key), data, data ? destroy : (GDestroyNotify) NULL);',
+                ])
+                c_klass.add_method(priv_set)
+                priv_get = Function(wrapped_c_name + "PrivGet", "priv_get", "", params=[
+                        (wrapped_c_name + "*", "self"),
+                        ("const char*", "key"),
+                    ],
+                    ret_type="void*",
+                    body=[
+                        'g_return_if_fail (self != NULL);',
+                        'g_return_if_fail (key != NULL);',
+                        'return g_datalist_get_data(&self->private_data, key);',
+                ])
+                c_klass.add_method(priv_get)
+                c_klass.add_method(Function(wrapped_c_name + "PrivDel", "priv_del", "", params=[
+                        (wrapped_c_name + "*", "self"),
+                        ("const char*", "key"),
+                    ],
+                    body=[
+                        'g_return_if_fail (self != NULL);',
+                        'g_return_if_fail (key != NULL);',
+                        'g_datalist_remove_data(&self->private_data, key);',
+                ]))
                 self.add_c_glue(c_klass)
 
         self.repo.add_struct(*klasses)

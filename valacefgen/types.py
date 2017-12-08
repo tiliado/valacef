@@ -65,24 +65,31 @@ class Enum(Type):
 
 class Function(Type):
     def __init__(self, c_name: str, vala_name: str, c_header: str, ret_type: str = None,
-                 params: List[Tuple[str, str]] = None, body: List[str] = None, comment: str = None):
+                 params: List[Tuple[str, str]] = None, body: List[str] = None, comment: str = None,
+                 vala_generics: List[str] = None, vala_simple_generics: bool = False):
         super().__init__(c_name, vala_name, c_header, comment)
+        self.vala_simple_generics = vala_simple_generics
+        self.vala_generics = vala_generics
         self.params = params
         self.ret_type = ret_type if ret_type != 'void' else None
         self.body = body
         self.construct = False
 
     def gen_vala_code(self, repo: "Repository") -> List[str]:
-        params = repo.vala_param_list(self.params, self.c_name)
-        ret_type = repo.vala_ret_type(self.ret_type)
+        params = repo.vala_param_list(self.params, self.c_name, generics=self.vala_generics)
+        ret_type = repo.vala_ret_type(self.ret_type, generics=self.vala_generics)
         buf = []
         if self.comment:
             buf.extend(utils.vala_comment(self.comment, valadoc=True))
+
         buf.extend([
-            '[CCode (cname="%s", cheader_filename="%s")]' % (self.c_name, self.c_header),
-            'public %s %s(%s)%s' % (
+            '[CCode (cname="%s", cheader_filename="%s"%s)]' % (
+                self.c_name, self.c_header,
+                ', simple_generics=true' if self.vala_simple_generics else ''),
+            'public %s %s%s(%s)%s' % (
                 ret_type if not self.construct else '',
                 self.vala_name,
+                '<%s>' % (','.join(self.vala_generics),) if self.vala_generics else '',
                 ', '.join(params),
                 ';' if self.body is None else ' {'
             )
@@ -433,50 +440,56 @@ class Repository:
     def c_ret_type(self, c_type: str = None) -> str:
         return c_type if c_type else 'void'
 
-    def vala_ret_type(self, c_type: str = None) -> str:
+    def vala_ret_type(self, c_type: str = None, generics: List[str] = None) -> str:
+        if generics and c_type in generics:
+            return "unowned " + c_type
         if c_type == 'char*':
             return 'string?'
         if c_type is None:
             return "void"
         type_info = utils.parse_c_type(c_type)
+
         ret_type = self.resolve_c_type(type_info.c_type).vala_name
         if type_info.pointer:
             ret_type += "?"
         return ret_type
 
-    def vala_param_list(self, params: List[Tuple[str, str]] = None, name: str = None, vfunc_of_class: str = None
-                        ) -> List[str]:
+    def vala_param_list(self, params: List[Tuple[str, str]] = None, name: str = None, vfunc_of_class: str = None,
+                        generics: List[str] = None) -> List[str]:
         vala_params = []
         if params is not None:
             for p_type, p_name in params:
-                type_info = utils.parse_c_type(p_type)
-                if name:
-                    self.override_param(name, p_name, type_info)
-                param = ""
-                if type_info.ref:
-                    param += 'ref '
-                    type_info.pointer = False
-                elif type_info.out:
-                    param += 'out '
-                    type_info.pointer = False
+                if generics and p_type in generics:
+                    param = "owned " + p_type
                 else:
-                    try:
-                        # CEF reference counting: When passing a struct to delegate/function,
-                        # increase ref unless it is a self-param of vfunc of that struct.
-                        if self.structs[type_info.c_type].is_class and type_info.c_type != vfunc_of_class:
-                            param += "owned "
-                    except KeyError:
-                        pass
+                    type_info = utils.parse_c_type(p_type)
+                    if name:
+                        self.override_param(name, p_name, type_info)
+                    param = ""
+                    if type_info.ref:
+                        param += 'ref '
+                        type_info.pointer = False
+                    elif type_info.out:
+                        param += 'out '
+                        type_info.pointer = False
+                    else:
+                        try:
+                            # CEF reference counting: When passing a struct to delegate/function,
+                            # increase ref unless it is a self-param of vfunc of that struct.
+                            if self.structs[type_info.c_type].is_class and type_info.c_type != vfunc_of_class:
+                                param += "owned "
+                        except KeyError:
+                            pass
 
-                vala_type = self.resolve_c_type(type_info.c_type).vala_name
-                if vala_type == 'String' and type_info.pointer:
-                    param += 'ref ' + vala_type
-                elif vala_type == 'char' and type_info.pointer:
-                    param += 'string?'
-                else:
-                    param += vala_type
-                    if type_info.pointer:
-                        param += "?"
+                    vala_type = self.resolve_c_type(type_info.c_type).vala_name
+                    if vala_type == 'String' and type_info.pointer:
+                        param += 'ref ' + vala_type
+                    elif vala_type == 'char' and type_info.pointer:
+                        param += 'string?'
+                    else:
+                        param += vala_type
+                        if type_info.pointer:
+                            param += "?"
                 param += ' ' + p_name
                 vala_params.append(param)
         return vala_params
