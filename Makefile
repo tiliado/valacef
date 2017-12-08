@@ -2,6 +2,10 @@ run:
 	./waf build -v
 	sh build/launch.sh build/example.bin
 
+gdb:
+	./waf build -v
+	sh build/launch.sh gdb --args build/example.bin
+
 config:
 	./waf configure
 
