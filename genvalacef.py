@@ -141,7 +141,7 @@ add_ref_func = Function(
         'cef_base_ref_counted_t* self = (cef_base_ref_counted_t*) self_ptr;',
         'char* pointer = (char*) self + (self->size - (sizeof(int) > sizeof(void*) ? sizeof(int) : sizeof(void*)));',
         'volatile int* ref_count = (volatile int*) pointer;',
-        'printf("%d ++ %d + 1\\n", (int) self->size, *ref_count);',
+        '// printf("%d ++ %d + 1\\n", (int) self->size, *ref_count);',
         'g_atomic_int_inc(ref_count);',
     ])
 release_ref_func = Function(
@@ -152,10 +152,10 @@ release_ref_func = Function(
         'cef_base_ref_counted_t* self = (cef_base_ref_counted_t*) self_ptr;',
         'char* pointer = (char*) self + (self->size - (sizeof(int) > sizeof(void*) ? sizeof(int) : sizeof(void*)));',
         'volatile int* ref_count = (volatile int*) pointer;',
-        'printf("%d -- %d - 1\\n", (int) self->size, g_atomic_int_get(ref_count));',
+        '// printf("%d -- %d - 1\\n", (int) self->size, g_atomic_int_get(ref_count));',
         'is_dead = g_atomic_int_dec_and_test(ref_count);',
         'if (is_dead) {',
-        '    printf("%d dealloc!\\n", (int) self->size);',
+        '    // printf("%d dealloc!\\n", (int) self->size);',
         '    GData** priv_data = (GData**)(pointer - sizeof(void*));',
         '    g_datalist_clear(priv_data);',
         '    free(self_ptr);',
@@ -169,7 +169,7 @@ has_one_ref_func = Function(
         'cef_base_ref_counted_t* self = (cef_base_ref_counted_t*) self_ptr;',
         'char* pointer = (char*) self + (self->size - (sizeof(int) > sizeof(void*) ? sizeof(int) : sizeof(void*)));',
         'volatile int* ref_count = (volatile int*) pointer;',
-        'printf("%d ?? %d\\n", (int) self->size, *ref_count);',
+        '// printf("%d ?? %d\\n", (int) self->size, *ref_count);',
         'return g_atomic_int_get(ref_count) == 1;',
     ])
 init_refcounting_func = Function(
@@ -186,7 +186,7 @@ init_refcounting_func = Function(
         'char* pointer = (char*) self + (self->size - (sizeof(int) > sizeof(void*) ? sizeof(int) : sizeof(void*)));',
         'volatile int* ref_count = (volatile int*) pointer;',
         'g_atomic_int_set(ref_count, 1);',
-        'printf("%d == %d\\n", (int) self->size, *ref_count);',
+        '// printf("%d == %d\\n", (int) self->size, *ref_count);',
     ])
 parser.add_c_glue(add_ref_func, release_ref_func, has_one_ref_func, init_refcounting_func)
 
