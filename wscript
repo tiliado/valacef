@@ -138,7 +138,7 @@ def build(ctx):
         source = [cef_vala, valacef_api_c, 'valacef/version.vala'],
         target = 'valacef',
         packages = "valacef_api",
-        defines = ['G_LOG_DOMAIN="ValaCef"'],
+        defines = ['G_LOG_DOMAIN="Cef"'],
         vapi_dirs = ["vapi", out],
         includes = include_dirs,
         lib = ['cef'],
@@ -148,10 +148,30 @@ def build(ctx):
         #install_path = ctx.env.NUVOLA_LIBDIR,
     )
     
-    ctx.program(
-        source = ['example/example.vala', 'example/cef_x11.vala'],
-        target = 'example.bin',
+    ctx.shlib(
+        source = [
+            'valacefgtk/init.vala',
+            'valacefgtk/x11.vala',
+            'valacefgtk/WebView.vala',
+        ],
+        target = 'valacefgtk',
+        packages = "valacef valacef_api gtk+-3.0 gdk-x11-3.0 x11",
+        uselib = "GTK GDKX11 X11",
+        defines = ['G_LOG_DOMAIN="CefGtk"', 'CEF_LIB_DIR="%s"' % ctx.env.CEF_LIB_DIR],
+        vapi_dirs = ["vapi", out],
+        includes = include_dirs,
         use = ['valacef'],
+        lib = ['cef'],
+        libpath = [ctx.env.CEF_LIB_DIR],
+        cflags = ['-O2'], 
+        #vala_target_glib = TARGET_GLIB,
+        #install_path = ctx.env.NUVOLA_LIBDIR,
+    )
+    
+    ctx.program(
+        source = ['example/example.vala'],
+        target = 'example.bin',
+        use = ['valacef', 'valacefgtk'],
         packages = "gtk+-3.0 gdk-x11-3.0 x11",
         uselib = "GTK GDKX11 X11",
         defines = ['G_LOG_DOMAIN="CefGtk"', 'CEF_LIB_DIR="%s"' % ctx.env.CEF_LIB_DIR],

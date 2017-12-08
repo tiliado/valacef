@@ -23,43 +23,21 @@ int main(string[] argv) {
 		Gtk.get_major_version(), Gtk.get_minor_version(), Gtk.get_micro_version());
 	message("Versions: %s", versions);
 	
-	Cef.Settings settings = {sizeof(Cef.Settings)};
-	settings.no_sandbox = 1;
-	settings.log_severity = Cef.LogSeverity.WARNING;
-	Cef.set_string(ref settings.resources_dir_path, CEF_LIB_DIR);
-	Cef.set_string(ref settings.locales_dir_path, CEF_LIB_DIR + "/locales");
-	Cef.initialize(main_args, settings, app, null);
-	
+	CefGtk.init();
 	unowned string[]? gtk_argv = null;
 	Gtk.init(ref gtk_argv);
-	CefX11.set_x11_error_handlers();
 	var win = new Gtk.Window();
-	CefX11.fix_default_visual(win);
+	win.set_visual(CefGtk.get_default_visual());
 	win.title = versions;
 	win.delete_event.connect(() => {Gtk.main_quit(); return true;});
 	win.set_default_size(800, 600);
+	var panels = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
+	win.add(panels);
+	panels.add1(new Gtk.Label("Left"));
+	panels.add2(new CefGtk.WebView());
 	win.realize();
-	
-	var xid = (win.get_window() as Gdk.X11.Window).get_xid();
-	Cef.WindowInfo window_info = {};
-	window_info.parent_window = (Cef.WindowHandle) xid;
-	window_info.width = 800;
-	window_info.height = 600;
-	Cef.BrowserSettings browser_settings = {sizeof(Cef.BrowserSettings)};
-	var client = new Cef.ClientRef();
-	Cef.String url = {};
-	Cef.set_string(ref url, "https://www.google.com");
-	win.show_all();
-	var browser = Cef.browser_host_create_browser_sync(window_info, client, ref url, browser_settings, null);
-	var message_loop_source_id = GLib.Timeout.add(30, () => {
-		Cef.do_message_loop_work();
-		return true;
-	});
-	var host = browser.get_host(browser);
-	host.get_window_handle(host);
 	win.show_all();
 	Gtk.main();
-	Source.remove(message_loop_source_id);
-	Cef.shutdown();
+	CefGtk.quit();
 	return 0;
 }
