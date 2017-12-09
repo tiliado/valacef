@@ -3,6 +3,8 @@ namespace CefGtk {
 public class BrowserProcess : Cef.AppRef {
     public BrowserProcess() {
         base();
+        priv_set<BrowserProcessHandler>("bph", new BrowserProcessHandler());
+        
         /**
          * Provides an opportunity to register custom schemes. Do not keep a reference
          * to the |registrar| object. This function is called on the main thread for
@@ -25,7 +27,7 @@ public class BrowserProcess : Cef.AppRef {
          */
         vfunc_get_browser_process_handler = (self) => {
             message("get_browser_process_handler");
-            return null;
+            return ((BrowserProcess) self).priv_get<BrowserProcessHandler>("bph");
         };
     }
 }
