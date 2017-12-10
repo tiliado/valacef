@@ -303,7 +303,7 @@ public class WebView : Gtk.Widget {
         window_info.width = clip.width;
         window_info.height = clip.height;
         Cef.BrowserSettings browser_settings = {sizeof(Cef.BrowserSettings)};
-        client = new Client(new FocusHandler(this));
+        client = new Client(new FocusHandler(this), new DisplayHandler(this));
         Cef.String url = {};
         Cef.set_string(&url, "https://www.google.com");
         browser = Cef.browser_host_create_browser_sync(window_info, client, &url, browser_settings, null);

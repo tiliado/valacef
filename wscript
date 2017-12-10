@@ -157,6 +157,7 @@ def build(ctx):
             'valacefgtk/Client.vala',
             'valacefgtk/BrowserProcessHandler.vala',
             'valacefgtk/FocusHandler.vala',
+            'valacefgtk/DisplayHandler.vala',
             'valacefgtk/KeyboardHandler.vala',
             'valacefgtk/Keyboard.vala',
         ],
