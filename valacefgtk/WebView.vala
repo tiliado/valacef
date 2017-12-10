@@ -12,6 +12,7 @@ public class WebView : Gtk.Widget {
     private Gdk.Window? event_window = null;
     private Gdk.Window? cef_window = null;
     private bool io = true;
+    private string? uri_to_load = null;
     
     public WebView() {
         CefGtk.init();
@@ -28,6 +29,16 @@ public class WebView : Gtk.Widget {
     
     public virtual signal void console_message(string? source, int line, string? text) {
         message("Console: %s:%d: %s", source, line, text);
+    }
+    
+    public void load_uri(string? uri) {
+        if (browser != null) {
+            Cef.String cef_uri = {};
+            Cef.set_string(&cef_uri, uri);
+            browser.get_main_frame().load_url(&cef_uri);
+        } else {
+            uri_to_load = uri;
+        }
     }
     
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
@@ -324,7 +335,8 @@ public class WebView : Gtk.Widget {
             new DisplayHandler(this),
             new LoadHandler(this));
         Cef.String url = {};
-        Cef.set_string(&url, "https://www.google.com");
+        Cef.set_string(&url, uri_to_load ?? "about:blank");
+        uri_to_load = null;
         browser = Cef.browser_host_create_browser_sync(window_info, client, &url, browser_settings, null);
         var host = browser.get_host();
         host.set_focus(io ? 0 : 1);

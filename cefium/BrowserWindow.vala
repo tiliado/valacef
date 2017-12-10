@@ -31,6 +31,7 @@ public class BrowserWindow : Gtk.Window {
         update("title");
         update("uri");
         update("status-message");
+        web_view.load_uri("https://google.com");
     }
     
     private void on_web_view_notify(GLib.Object? o, ParamSpec param) {
