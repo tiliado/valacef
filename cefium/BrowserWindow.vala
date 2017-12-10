@@ -40,7 +40,9 @@ public class BrowserWindow : Gtk.Window {
     private void update(string property) {
         switch (property) {
         case "title":
-            title = web_view.title ?? default_status;
+            var title = web_view.title;
+            title = title != null && title != "" ? title + " ~~ " : "";
+            this.title = title + "Cefium browser " + Cef.get_valacef_version();
             break;
         case "uri":
             address_entry.set_text(web_view.uri ?? "");
