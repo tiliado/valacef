@@ -189,7 +189,10 @@ def build(ctx):
     )
     
     ctx.program(
-        source = ['example/example.vala'],
+        source = [
+            'example/example.vala',
+            'example/BrowserWindow.vala',
+            ],
         target = 'example.bin',
         use = ['valacef', 'valacefgtk'],
         packages = "gtk+-3.0 gdk-x11-3.0 x11",
