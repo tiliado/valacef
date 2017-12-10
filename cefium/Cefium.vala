@@ -1,4 +1,4 @@
-namespace Example {
+namespace Cefium {
 	
 int main(string[] argv) {
 	var versions = "ValaCEF %s, CEF %s, Chrome %s, GTK+ %u.%u.%u".printf(
@@ -16,4 +16,4 @@ int main(string[] argv) {
 	return 0;
 }
 
-} // namespace Example
+} // namespace Cefium

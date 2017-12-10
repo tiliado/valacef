@@ -1,4 +1,4 @@
-namespace Example {
+namespace Cefium {
 
 public class BrowserWindow : Gtk.Window {
     public Gtk.Grid grid;
@@ -52,4 +52,4 @@ public class BrowserWindow : Gtk.Window {
     }
 }
 
-} // namespace Example
+} // namespace Cefium
