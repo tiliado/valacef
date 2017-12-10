@@ -194,6 +194,7 @@ utf16_to_utf8_func = Function(
     'cef_utf16_string_to_vala_string', 'get_string', 'capi/cef_base_capi.h;stdio.h', 'char*',
     params=[('cef_string_t*', 'utf16_str')],
     body=[
+        'if (utf16_str == NULL) return NULL;',
         'cef_string_utf8_t utf8_str = {};',
         'cef_string_utf16_to_utf8(utf16_str->str, utf16_str->length, &utf8_str);',
         'return utf8_str.str;',
