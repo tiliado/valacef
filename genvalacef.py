@@ -78,6 +78,8 @@ header_files = [
     'capi/cef_print_settings_capi.h',
     'capi/cef_navigation_entry_capi.h',
     'capi/cef_ssl_status_capi.h',
+    'capi/cef_extension_capi.h',
+    'capi/cef_extension_handler_capi.h',
 ]
 
 ignore = {
