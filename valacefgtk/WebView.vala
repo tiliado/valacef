@@ -8,6 +8,7 @@ public class WebView : Gtk.Widget {
     private bool io = true;
     
     public WebView() {
+        CefGtk.init();
         set_has_window(true);
 		set_can_focus(true);
         add_events(Gdk.EventMask.ALL_EVENTS_MASK);

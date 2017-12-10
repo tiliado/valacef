@@ -4,7 +4,6 @@ int main(string[] argv) {
 		Gtk.get_major_version(), Gtk.get_minor_version(), Gtk.get_micro_version());
 	message("Versions: %s", versions);
 	
-	CefGtk.init();
 	unowned string[]? gtk_argv = null;
 	Gtk.init(ref gtk_argv);
 	var win = new Gtk.Window();
