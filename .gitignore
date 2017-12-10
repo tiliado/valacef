@@ -1,6 +1,7 @@
 __pycache__
 .idea
 cef
+_cef
 build
 .lock*
 .waf*
