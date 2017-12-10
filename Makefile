@@ -1,10 +1,10 @@
 run:
 	./waf build -v
-	sh build/launch.sh build/example.bin
+	sh build/launch.sh build/Cefium
 
 gdb:
 	./waf build -v
-	sh build/launch.sh gdb --args build/example.bin
+	sh build/launch.sh gdb --args build/Cefium
 
 config:
 	./waf configure

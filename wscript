@@ -191,14 +191,14 @@ def build(ctx):
     
     ctx.program(
         source = [
-            'example/example.vala',
-            'example/BrowserWindow.vala',
+            'cefium/Cefium.vala',
+            'cefium/BrowserWindow.vala',
             ],
-        target = 'example.bin',
+        target = 'Cefium',
         use = ['valacef', 'valacefgtk'],
         packages = "gtk+-3.0 gdk-x11-3.0 x11",
         uselib = "GTK GDKX11 X11",
-        defines = ['G_LOG_DOMAIN="Example"'],
+        defines = ['G_LOG_DOMAIN="Cefium"'],
         vapi_dirs = ["vapi"],
         includes = include_dirs,
         lib = ['cef'],
