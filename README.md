@@ -1,4 +1,4 @@
-Vala-CEF 3.1
+Vala-CEF 3.0
 ===========
 
 **WIP [Vala](https://wiki.gnome.org/Projects/Vala) bindings for
