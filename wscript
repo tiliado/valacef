@@ -194,6 +194,7 @@ def build(ctx):
         source = [
             'cefium/Cefium.vala',
             'cefium/BrowserWindow.vala',
+            'cefium/URLBar.vala',
             ],
         target = 'Cefium',
         use = ['valacef', 'valacefgtk'],

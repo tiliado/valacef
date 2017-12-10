@@ -5,7 +5,7 @@ public class BrowserWindow : Gtk.Window {
     private Gtk.Label status_bar;
     private string? default_status;
     private CefGtk.WebView web_view;
-    private Gtk.Entry address_entry;
+    private URLBar url_bar;
     
     public BrowserWindow(CefGtk.WebView web_view, string? default_status) {
         set_visual(CefGtk.get_default_visual());
@@ -14,16 +14,17 @@ public class BrowserWindow : Gtk.Window {
         grid = new Gtk.Grid();
         grid.hexpand = grid.vexpand = true;
         add(grid);
-        address_entry = new Gtk.Entry();
-        address_entry.hexpand = true;
-        address_entry.margin = 5;
+        url_bar = new URLBar(null);
+        url_bar.hexpand = true;
+        url_bar.margin = 5;
+        url_bar.response.connect(on_url_bar_response);
         status_bar = new Gtk.Label(default_status);
         status_bar.hexpand = true;
         status_bar.halign = Gtk.Align.START;
         status_bar.margin = 5;
         status_bar.ellipsize = Pango.EllipsizeMode.MIDDLE;
         web_view.hexpand = web_view.vexpand = true;
-        grid.attach(address_entry, 0, 0, 1, 1);
+        grid.attach(url_bar, 0, 0, 1, 1);
         grid.attach(web_view, 0, 1, 1, 1);
         grid.attach(status_bar, 0, 5, 1, 1);
         grid.show_all();
@@ -46,11 +47,17 @@ public class BrowserWindow : Gtk.Window {
             this.title = title + "Cefium browser " + Cef.get_valacef_version();
             break;
         case "uri":
-            address_entry.set_text(web_view.uri ?? "");
+            url_bar.url = web_view.uri ?? "";
             break;
         case "status-message":
             status_bar.label = web_view.status_message ?? default_status ?? "";
             break;
+        }
+    }
+    
+    private void on_url_bar_response(bool accepted) {
+        if (accepted) {
+            web_view.load_uri(url_bar.url);
         }
     }
 }
