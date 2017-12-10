@@ -1,8 +1,9 @@
 namespace CefGtk {
 
 public class Client : Cef.ClientRef {
-    public Client() {
+    public Client(FocusHandler focus_handler) {
         base();
+        priv_set("focus_handler", focus_handler);
         /**
          * Return the handler for context menus. If no handler is provided the default
          * implementation will be used.
@@ -58,8 +59,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for focus events.
          */
         vfunc_get_focus_handler = (self) => {
-            message("get_focus_handler");
-            return null;
+            return ((Cef.ClientRef?)self).priv_get<Cef.FocusHandler?>("focus_handler");
         };
 
         /**
@@ -84,8 +84,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for keyboard events.
          */
         vfunc_get_keyboard_handler = (self) => {
-            message("get_keyboard_handler");
-            return null;
+            return new KeyboardHandler();
         };
 
         /**
