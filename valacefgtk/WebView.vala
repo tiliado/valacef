@@ -88,6 +88,7 @@ public class WebView : Gtk.Widget {
         if (!has_focus) {
             grab_focus();
         }
+        send_click_event(event);
         return false;
     }
     
@@ -96,7 +97,58 @@ public class WebView : Gtk.Widget {
         if (!has_focus) {
             grab_focus();
         }
+        send_click_event(event);
         return false;
+    }
+    
+    public void send_click_event(Gdk.EventButton event) {
+        var host = browser.get_host();
+        Cef.MouseButtonType button_type;
+        switch (event.button) {
+        case 1:
+            button_type = Cef.MouseButtonType.LEFT;
+            break;
+        case 2:
+            button_type = Cef.MouseButtonType.MIDDLE;
+            break;
+        case 3:
+            button_type = Cef.MouseButtonType.RIGHT;
+            break;
+        default:
+            // Other mouse buttons are not handled here.
+            return;
+        }
+
+        Cef.MouseEvent mouse = {};
+        mouse.x = (int) event.x;
+        mouse.y = (int) event.y;
+//~         self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
+//~         DeviceToLogical(mouse_event, self->device_scale_factor_);
+        mouse.modifiers = Keyboard.get_cef_state_modifiers(event.state);
+
+        bool mouse_up = event.type == Gdk.EventType.BUTTON_RELEASE;
+        int click_count;
+        switch (event.type) {
+        case Gdk.EventType.2BUTTON_PRESS:
+            click_count = 2;
+            break;
+        case Gdk.EventType.3BUTTON_PRESS:
+            click_count = 3;
+            break;
+        default:
+            click_count = 1;
+            break;
+        }
+        host.send_mouse_click_event(mouse, button_type, (int) mouse_up, click_count);
+
+//~       // Save mouse event that can be a possible trigger for drag.
+//~       if (!self->drag_context_ && button_type == MBT_LEFT) {
+//~         if (self->drag_trigger_event_) {
+//~           gdk_event_free(self->drag_trigger_event_);
+//~         }
+//~         self->drag_trigger_event_ =
+//~             gdk_event_copy(reinterpret_cast<GdkEvent*>(event));
+//~       }
     }
     
     public override bool key_press_event(Gdk.EventKey event) {
