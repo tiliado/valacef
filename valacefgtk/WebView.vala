@@ -150,6 +150,49 @@ public class WebView : Gtk.Widget {
         }
     }
     
+    public override bool motion_notify_event(Gdk.EventMotion event) {
+        send_motion_event(event);
+        return false;
+    }
+    
+    public void send_motion_event(Gdk.EventMotion event) {
+        var host = browser.get_host();
+        int x, y;
+        Gdk.ModifierType state;
+        if (event.is_hint > 0) {
+            event.window.get_pointer(out x, out y, out state);
+        } else {
+            x = (int) event.x;
+            y = (int) event.y;
+            state = event.state;
+            if (x == 0 && y == 0) {
+                // Invalid coordinates of (0,0) appear from time to time in
+                // enter-notify-event and leave-notify-event events. Sending them may
+                // cause StartDragging to never get called, so just ignore these.
+                return;
+            }
+        }
+
+        Cef.MouseEvent mouse = {};
+        mouse.x = x;
+        mouse.y = y;
+        // self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
+        // DeviceToLogical(mouse_event, self->device_scale_factor_);
+        mouse.modifiers = Keyboard.get_cef_state_modifiers(state);
+        bool mouse_leave = event.type == Gdk.EventType.LEAVE_NOTIFY;
+        host.send_mouse_move_event(mouse, (int) mouse_leave);
+
+//~           // Save mouse event that can be a possible trigger for drag.
+//~           if (!self->drag_context_ &&
+//~               (mouse_event.modifiers & EVENTFLAG_LEFT_MOUSE_BUTTON)) {
+//~             if (self->drag_trigger_event_) {
+//~               gdk_event_free(self->drag_trigger_event_);
+//~             }
+//~             self->drag_trigger_event_ =
+//~                 gdk_event_copy(reinterpret_cast<GdkEvent*>(event));
+//~           }
+    }
+    
     public override void size_allocate(Gtk.Allocation allocation) {
         base.size_allocate(allocation);
         if (event_window != null && cef_window != null) {
