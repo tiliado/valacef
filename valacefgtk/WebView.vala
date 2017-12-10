@@ -17,6 +17,10 @@ public class WebView : Gtk.Widget {
         add_events(Gdk.EventMask.ALL_EVENTS_MASK);
     }
     
+    public virtual signal void console_message(string? source, int line, string? text) {
+        message("Console: %s:%d: %s", source, line, text);
+    }
+    
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
         minimum_width = natural_width = 100;
     }

@@ -62,8 +62,9 @@ public class DisplayHandler : Cef.DisplayHandlerRef {
          * Called to display a console message. Return true (1) to stop the message
          * from being output to the console.
          */
-        /*int*/ vfunc_on_console_message = (self, /*Browser*/ browser, /*String*/ message, /*String*/ source,
+        /*int*/ vfunc_on_console_message = (self, /*Browser*/ browser, /*String*/ text, /*String*/ source,
         /*int*/ line) => {
+            get_web_view(self).console_message(Cef.get_string(source), line, Cef.get_string(text));
             return 0;
         };
     
