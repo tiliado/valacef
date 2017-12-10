@@ -1,10 +1,11 @@
 namespace CefGtk {
 
 public class Client : Cef.ClientRef {
-    public Client(FocusHandler focus_handler, DisplayHandler display_handler) {
+    public Client(FocusHandler focus_handler, DisplayHandler display_handler, LoadHandler load_handler) {
         base();
         priv_set("focus_handler", focus_handler);
         priv_set("display_handler", display_handler);
+        priv_set("load_handler", load_handler);
         /**
          * Return the handler for context menus. If no handler is provided the default
          * implementation will be used.
@@ -27,7 +28,6 @@ public class Client : Cef.ClientRef {
          * Return the handler for browser display state events.
          */
         vfunc_get_display_handler = (self) => {
-            message("get_display_handler");
             return ((Cef.ClientRef?)self).priv_get<Cef.DisplayHandler?>("display_handler");
         };
 
@@ -100,8 +100,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for browser load status events.
          */
         vfunc_get_load_handler = (self) => {
-            message("get_load_handler");
-            return null;
+            return ((Cef.ClientRef?)self).priv_get<Cef.LoadHandler?>("load_handler");
         };
 
         /**

@@ -4,6 +4,9 @@ public class WebView : Gtk.Widget {
     public string? title {get; internal set; default = null;}
     public string? uri {get; internal set; default = null;}
     public string? status_message {get; internal set; default = null;}
+    public bool can_go_back {get; internal set; default = false;}
+    public bool can_go_forward {get; internal set; default = false;}
+    public bool is_loading {get; internal set; default = false;}
     private Cef.Browser? browser = null;
     private Client? client = null;
     private Gdk.Window? event_window = null;
@@ -16,6 +19,12 @@ public class WebView : Gtk.Widget {
 		set_can_focus(true);
         add_events(Gdk.EventMask.ALL_EVENTS_MASK);
     }
+    
+    public signal void load_started(Cef.TransitionType transition);
+    
+    public signal void load_ended(int http_status_code);
+    
+    public signal void load_error(Cef.Errorcode error_code, string? error_text, string? failed_url);
     
     public virtual signal void console_message(string? source, int line, string? text) {
         message("Console: %s:%d: %s", source, line, text);
@@ -310,7 +319,10 @@ public class WebView : Gtk.Widget {
         window_info.width = clip.width;
         window_info.height = clip.height;
         Cef.BrowserSettings browser_settings = {sizeof(Cef.BrowserSettings)};
-        client = new Client(new FocusHandler(this), new DisplayHandler(this));
+        client = new Client(
+            new FocusHandler(this),
+            new DisplayHandler(this),
+            new LoadHandler(this));
         Cef.String url = {};
         Cef.set_string(&url, "https://www.google.com");
         browser = Cef.browser_host_create_browser_sync(window_info, client, &url, browser_settings, null);
