@@ -28,6 +28,7 @@ public class BrowserWindow : Gtk.Window {
         grid.show_all();
         web_view.notify.connect_after(on_web_view_notify);
         update("title");
+        update("uri");
     }
     
     private void on_web_view_notify(GLib.Object? o, ParamSpec param) {
@@ -38,6 +39,9 @@ public class BrowserWindow : Gtk.Window {
         switch (property) {
         case "title":
             title = web_view.title ?? default_status;
+            break;
+        case "uri":
+            address_entry.set_text(web_view.uri ?? "");
             break;
         }
     }

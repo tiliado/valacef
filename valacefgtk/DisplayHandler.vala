@@ -9,6 +9,10 @@ public class DisplayHandler : Cef.DisplayHandlerRef {
          * Called when a frame's address has changed.
          */
         /*void*/ vfunc_on_address_change = (self, /*Browser*/ browser, /*Frame*/ frame, /*String*/ url) => {
+            if (frame.is_main() == 1) {
+                var uri = Cef.get_string(url);
+                get_web_view(self).uri = uri != "" && uri != "about:blank" ? uri : null;
+            }
         };
 
         /**
