@@ -286,8 +286,8 @@ class Parser:
                         ('GDestroyNotify', 'destroy'),
                     ],
                     body=[
-                        'g_return_if_fail (self != NULL);',
-                        'g_return_if_fail (key != NULL);',
+                        'g_assert (self != NULL);',
+                        'g_assert (key != NULL);',
                         'g_datalist_id_set_data_full(',
                         '&self->private_data, g_quark_from_string(key), data, data ? destroy : (GDestroyNotify) NULL);',
                 ])
@@ -298,8 +298,8 @@ class Parser:
                     ],
                     ret_type="void*",
                     body=[
-                        'g_return_if_fail (self != NULL);',
-                        'g_return_if_fail (key != NULL);',
+                        'g_assert (self != NULL);',
+                        'g_assert (key != NULL);',
                         'return g_datalist_get_data(&self->private_data, key);',
                 ])
                 c_klass.add_method(priv_get)
