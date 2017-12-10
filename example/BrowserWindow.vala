@@ -30,6 +30,7 @@ public class BrowserWindow : Gtk.Window {
         web_view.notify.connect_after(on_web_view_notify);
         update("title");
         update("uri");
+        update("status-message");
     }
     
     private void on_web_view_notify(GLib.Object? o, ParamSpec param) {
@@ -43,6 +44,9 @@ public class BrowserWindow : Gtk.Window {
             break;
         case "uri":
             address_entry.set_text(web_view.uri ?? "");
+            break;
+        case "status-message":
+            status_bar.label = web_view.status_message ?? default_status ?? "";
             break;
         }
     }

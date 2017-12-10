@@ -3,6 +3,7 @@ namespace CefGtk {
 public class WebView : Gtk.Widget {
     public string? title {get; internal set; default = null;}
     public string? uri {get; internal set; default = null;}
+    public string? status_message {get; internal set; default = null;}
     private Cef.Browser? browser = null;
     private Client? client = null;
     private Gdk.Window? event_window = null;

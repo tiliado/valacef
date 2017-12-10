@@ -54,7 +54,8 @@ public class DisplayHandler : Cef.DisplayHandlerRef {
          * Called when the browser receives a status message. |value| contains the
          * text that will be displayed in the status message.
          */
-        /*void*/ vfunc_on_status_message = (self, /*Browser*/ browser, /*String*/ value) => {
+        /*void*/ vfunc_on_status_message = (self, /*Browser*/ browser, /*String*/ status_message) => {
+            get_web_view(self).status_message = Cef.get_string(status_message);
         };
 
         /**
