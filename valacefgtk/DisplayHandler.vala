@@ -47,6 +47,7 @@ public class DisplayHandler : Cef.DisplayHandlerRef {
          * for drawing tooltips and the return value is ignored.
          */
         /*int*/ vfunc_on_tooltip = (self, /*Browser*/ browser, /*String*/ text) => {
+            message("Tooltip: %s", Cef.get_string(text));
             return 0;
         };
 
