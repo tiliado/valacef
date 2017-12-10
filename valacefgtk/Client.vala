@@ -115,7 +115,6 @@ public class Client : Cef.ClientRef {
          * Return the handler for browser request events.
          */
         vfunc_get_request_handler = (self) => {
-            message("get_request_handler");
             return null;
         };
         /**

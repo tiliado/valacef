@@ -15,9 +15,7 @@ public class BrowserProcessHandler : Cef.BrowserProcessHandlerRef {
          * Called on the browser process UI thread immediately after the CEF context
          * has been initialized.
          */
-        /*void*/ vfunc_on_context_initialized = (self) => {
-            message("vfunc_on_context_initialized");
-        };
+        /*void*/ vfunc_on_context_initialized = (self) => {};
 
         /**
          * Called before a child process is launched. Will be called on the browser
@@ -26,9 +24,7 @@ public class BrowserProcessHandler : Cef.BrowserProcessHandlerRef {
          * opportunity to modify the child process command line. Do not keep a
          * reference to |command_line| outside of this function.
          */
-        /*void*/ vfunc_on_before_child_process_launch = (self, /*CommandLine*/ command_line) => {
-            message("vfunc_on_before_child_process_launch");
-        };
+        /*void*/ vfunc_on_before_child_process_launch = (self, /*CommandLine*/ command_line) => {};
 
         /**
          * Called on the browser process IO thread after the main thread has been
@@ -37,18 +33,13 @@ public class BrowserProcessHandler : Cef.BrowserProcessHandlerRef {
          * cef_render_process_handler_t::on_render_thread_created() in the render
          * process. Do not keep a reference to |extra_info| outside of this function.
          */
-        /*void*/ vfunc_on_render_process_thread_created = (self, /*ListValue*/ extra_info) => {
-            message("vfunc_on_render_process_thread_created");
-        };
+        /*void*/ vfunc_on_render_process_thread_created = (self, /*ListValue*/ extra_info) => {};
 
         /**
          * Return the handler for printing on Linux. If a print handler is not
          * provided then printing will not be supported on the Linux platform.
          */
-        /*PrintHandler*/ vfunc_get_print_handler = (self) => {
-            message("vfunc_get_print_handler");
-            return null;
-        };
+        /*PrintHandler*/ vfunc_get_print_handler = (self) => null;
 
         /**
          * Called from any thread when work has been scheduled for the browser process

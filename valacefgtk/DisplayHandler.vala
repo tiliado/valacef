@@ -25,8 +25,7 @@ public class DisplayHandler : Cef.DisplayHandlerRef {
         /**
          * Called when the page icon changes.
          */
-        /*void*/ vfunc_on_favicon_urlchange = (self, /*Browser*/ browser, /*StringList*/ icon_urls) => {
-        };
+        /*void*/ vfunc_on_favicon_urlchange = (self, /*Browser*/ browser, /*StringList*/ icon_urls) => {};
 
         /**
          * Called when web content in the page has toggled fullscreen mode. If
@@ -35,8 +34,7 @@ public class DisplayHandler : Cef.DisplayHandlerRef {
          * automatically return to its original size and position. The client is
          * responsible for resizing the browser if desired.
          */
-        /*void*/ vfunc_on_fullscreen_mode_change = (self, /*Browser*/ browser, /*int*/ fullscreen) => {
-        };
+        /*void*/ vfunc_on_fullscreen_mode_change = (self, /*Browser*/ browser, /*int*/ fullscreen) => {};
 
         /**
          * Called when the browser is about to display a tooltip. |text| contains the

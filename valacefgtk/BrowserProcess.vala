@@ -26,7 +26,6 @@ public class BrowserProcess : Cef.AppRef {
          * function is called on multiple threads in the browser process.
          */
         vfunc_get_browser_process_handler = (self) => {
-            message("get_browser_process_handler");
             return ((BrowserProcess) self).priv_get<BrowserProcessHandler>("bph");
         };
     }
