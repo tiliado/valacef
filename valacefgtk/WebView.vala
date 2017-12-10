@@ -51,8 +51,6 @@ public class WebView : Gtk.Widget {
                 Gdk.WindowAttributesType.X|Gdk.WindowAttributesType.Y/*|Gdk.WindowAttributesType.VISUAL*/);
             register_window(event_window);
             event_window.add_filter(() => Gdk.FilterReturn.CONTINUE);  // Necessary!
-            event_window.restack(cef_window, io);
-            Timeout.add(100, () => {event_window.restack(cef_window, true); return true;});
         }
         set_window(io ? event_window : cef_window);
         set_realized(true);
@@ -283,7 +281,6 @@ public class WebView : Gtk.Widget {
         base.size_allocate(allocation);
         if (event_window != null && cef_window != null) {
             cef_window.move_resize(allocation.x, allocation.y, allocation.width, allocation.height);
-            event_window.restack(cef_window, true);
         }
     }
     
