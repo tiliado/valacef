@@ -305,8 +305,8 @@ public class WebView : Gtk.Widget {
         Cef.BrowserSettings browser_settings = {sizeof(Cef.BrowserSettings)};
         client = new Client(new FocusHandler(this));
         Cef.String url = {};
-        Cef.set_string(ref url, "https://www.google.com");
-        browser = Cef.browser_host_create_browser_sync(window_info, client, ref url, browser_settings, null);
+        Cef.set_string(&url, "https://www.google.com");
+        browser = Cef.browser_host_create_browser_sync(window_info, client, &url, browser_settings, null);
         var host = browser.get_host();
         host.set_focus(io ? 0 : 1);
 		return new Gdk.X11.Window.foreign_for_display(

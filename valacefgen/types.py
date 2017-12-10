@@ -483,7 +483,7 @@ class Repository:
 
                     vala_type = self.resolve_c_type(type_info.c_type).vala_name
                     if vala_type == 'String' and type_info.pointer:
-                        param += 'ref ' + vala_type
+                        param += '' + vala_type + '*'
                     elif vala_type == 'char' and type_info.pointer:
                         param += 'string?'
                     else:
