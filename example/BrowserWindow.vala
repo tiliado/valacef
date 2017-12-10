@@ -21,6 +21,7 @@ public class BrowserWindow : Gtk.Window {
         status_bar.hexpand = true;
         status_bar.halign = Gtk.Align.START;
         status_bar.margin = 5;
+        status_bar.ellipsize = Pango.EllipsizeMode.MIDDLE;
         web_view.hexpand = web_view.vexpand = true;
         grid.attach(address_entry, 0, 0, 1, 1);
         grid.attach(web_view, 0, 1, 1, 1);
