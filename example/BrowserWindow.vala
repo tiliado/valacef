@@ -26,6 +26,20 @@ public class BrowserWindow : Gtk.Window {
         grid.attach(web_view, 0, 1, 1, 1);
         grid.attach(status_bar, 0, 5, 1, 1);
         grid.show_all();
+        web_view.notify.connect_after(on_web_view_notify);
+        update("title");
+    }
+    
+    private void on_web_view_notify(GLib.Object? o, ParamSpec param) {
+        update(param.name);
+    }
+    
+    private void update(string property) {
+        switch (property) {
+        case "title":
+            title = web_view.title ?? default_status;
+            break;
+        }
     }
 }
 

@@ -8,7 +8,6 @@ int main(string[] argv) {
 	unowned string[]? gtk_argv = null;
 	Gtk.init(ref gtk_argv);
 	var win = new BrowserWindow(new CefGtk.WebView(), versions);
-	win.title = versions;
 	win.delete_event.connect(() => {Gtk.main_quit(); return true;});
 	win.set_default_size(800, 600);
 	win.present();

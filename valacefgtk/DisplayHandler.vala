@@ -15,6 +15,7 @@ public class DisplayHandler : Cef.DisplayHandlerRef {
          * Called when the page title changes.
          */
         /*void*/ vfunc_on_title_change = (self, /*Browser*/ browser, /*String*/ title) => {
+            get_web_view(self).title = Cef.get_string(title);
         };
 
         /**
