@@ -151,6 +151,40 @@ public class WebView : Gtk.Widget {
 //~       }
     }
     
+    public override bool scroll_event(Gdk.EventScroll event) {
+        send_scroll_event(event);
+        return false;
+    }
+    
+    public void send_scroll_event(Gdk.EventScroll event) {
+        var host = browser.get_host();
+        Cef.MouseEvent mouse = {};
+        mouse.x = (int) event.x;
+        mouse.y = (int) event.y;
+//~         self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
+//~         DeviceToLogical(mouse_event, self->device_scale_factor_);
+        mouse.modifiers = Keyboard.get_cef_state_modifiers(event.state);
+
+        const int SCROLLBAR_PIXELS_PER_GTK_TICK = 40;
+        int dx = 0;
+        int dy = 0;
+        switch (event.direction) {
+        case Gdk.ScrollDirection.UP:
+            dy = 1;
+            break;
+        case Gdk.ScrollDirection.DOWN:
+            dy = -1;
+            break;
+        case Gdk.ScrollDirection.LEFT:
+            dx = 1;
+            break;
+        case Gdk.ScrollDirection.RIGHT:
+            dx = -1;
+            break;
+        }
+        host.send_mouse_wheel_event(mouse, dx * SCROLLBAR_PIXELS_PER_GTK_TICK, dy * SCROLLBAR_PIXELS_PER_GTK_TICK);
+    }
+    
     public override bool key_press_event(Gdk.EventKey event) {
         send_key_event(event);
         return false;
