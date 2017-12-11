@@ -153,6 +153,7 @@ def build(ctx):
             'valacefgtk/init.vala',
             'valacefgtk/x11.vala',
             'valacefgtk/WebView.vala',
+            'valacefgtk/WebContext.vala',
             'valacefgtk/BrowserProcess.vala',
             'valacefgtk/Client.vala',
             'valacefgtk/BrowserProcessHandler.vala',

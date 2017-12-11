@@ -5,4 +5,4 @@ _cef
 build
 .lock*
 .waf*
-GPUCache
+cefium_data

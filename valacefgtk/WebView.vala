@@ -7,6 +7,7 @@ public class WebView : Gtk.Widget {
     public bool can_go_back {get; internal set; default = false;}
     public bool can_go_forward {get; internal set; default = false;}
     public bool is_loading {get; internal set; default = false;}
+    public WebContext web_context {get; private set;}
     private Cef.Browser? browser = null;
     private Client? client = null;
     private Gdk.Window? event_window = null;
@@ -14,11 +15,11 @@ public class WebView : Gtk.Widget {
     private bool io = true;
     private string? uri_to_load = null;
     
-    public WebView() {
-        CefGtk.init();
+    public WebView(WebContext web_context) {
         set_has_window(true);
 		set_can_focus(true);
         add_events(Gdk.EventMask.ALL_EVENTS_MASK);
+        this.web_context = web_context;
     }
     
     public signal void load_started(Cef.TransitionType transition);
@@ -337,7 +338,7 @@ public class WebView : Gtk.Widget {
         Cef.String url = {};
         Cef.set_string(&url, uri_to_load ?? "about:blank");
         uri_to_load = null;
-        browser = Cef.browser_host_create_browser_sync(window_info, client, &url, browser_settings, null);
+        browser = Cef.browser_host_create_browser_sync(window_info, client, &url, browser_settings, web_context.request_context);
         var host = browser.get_host();
         host.set_focus(io ? 0 : 1);
 		return new Gdk.X11.Window.foreign_for_display(
