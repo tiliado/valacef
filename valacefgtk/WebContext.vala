@@ -11,7 +11,7 @@ public class WebContext : GLib.Object {
     }
     
     construct {
-        CefGtk.init();
+        assert(CefGtk.is_initialized());
         Cef.RequestContextSettings request_settings = {sizeof(Cef.RequestContextSettings)};
         if (user_data_path != null) {
             Cef.set_string(&request_settings.cache_path, user_data_path);
