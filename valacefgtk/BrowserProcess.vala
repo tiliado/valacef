@@ -28,6 +28,34 @@ public class BrowserProcess : Cef.AppRef {
         vfunc_get_browser_process_handler = (self) => {
             return ((BrowserProcess) self).priv_get<BrowserProcessHandler>("bph");
         };
+        
+        /**
+         * Provides an opportunity to view and/or modify command-line arguments before
+         * processing by CEF and Chromium. The |process_type| value will be NULL for
+         * the browser process. Do not keep a reference to the cef_command_line_t
+         * object passed to this function. The CefSettings.command_line_args_disabled
+         * value can be used to start with an NULL command-line object. Any values
+         * specified in CefSettings that equate to command-line arguments will be set
+         * before this function is called. Be cautious when using this function to
+         * modify command-line arguments for non-browser processes as this may result
+         * in undefined behavior including crashes.
+         */
+        /*void*/ vfunc_on_before_command_line_processing = (self, /*String*/ process_type, /*CommandLine*/ command_line
+        ) => {
+            if (flash_plugin.available) {
+                Cef.String name = {};
+                Cef.String value = {};
+                Cef.set_string(&name, "ppapi-flash-path");
+                Cef.set_string(&value, flash_plugin.plugin_path);
+                command_line.append_switch_with_value(&name, &value);
+                Cef.set_string(&name, "ppapi-flash-version");
+                Cef.set_string(&value, flash_plugin.version);
+                command_line.append_switch_with_value(&name, &value);
+                Cef.set_string(&name, "plugin-policy");
+                Cef.set_string(&value, "allow");
+                command_line.append_switch_with_value(&name, &value);
+            }
+        };
     }
 }
 
