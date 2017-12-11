@@ -32,7 +32,7 @@ int main(string[] argv) {
 	unowned string[]? gtk_argv = null;
 	Gtk.init(ref gtk_argv);
     CefGtk.init(!Args.disable_widevine, !Args.disable_flash);
-    var ctx = new CefGtk.WebContext("cefium_data");
+    var ctx = new CefGtk.WebContext(GLib.Environment.get_user_config_dir() + "/cefium");
     var web_view = new CefGtk.WebView(ctx);
     web_view.load_uri(Args.url ?? "https://google.com");
 	var win = new BrowserWindow(web_view, versions);
