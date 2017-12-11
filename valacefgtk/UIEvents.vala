@@ -1,4 +1,4 @@
-namespace CefGtk.Keyboard {
+namespace CefGtk.UIEvents {
 
 public int get_cef_state_modifiers(uint state) {
     int modifiers = 0;
@@ -838,5 +838,155 @@ public int get_control_character(KeyboardCode windows_key_code, bool shift) {
   }
 }
 
+public void send_click_event(Gdk.EventButton event, Cef.BrowserHost host) {
+    Cef.MouseButtonType button_type;
+    switch (event.button) {
+    case 1:
+        button_type = Cef.MouseButtonType.LEFT;
+        break;
+    case 2:
+        button_type = Cef.MouseButtonType.MIDDLE;
+        break;
+    case 3:
+        button_type = Cef.MouseButtonType.RIGHT;
+        break;
+    default:
+        // Other mouse buttons are not handled here.
+        return;
+    }
 
-} // namespace CefGtk.Keyboard
+    Cef.MouseEvent mouse = {};
+    mouse.x = (int) event.x;
+    mouse.y = (int) event.y;
+//~         self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
+//~         DeviceToLogical(mouse_event, self->device_scale_factor_);
+    mouse.modifiers = get_cef_state_modifiers(event.state);
+
+    bool mouse_up = event.type == Gdk.EventType.BUTTON_RELEASE;
+    int click_count;
+    switch (event.type) {
+    case Gdk.EventType.2BUTTON_PRESS:
+        click_count = 2;
+        break;
+    case Gdk.EventType.3BUTTON_PRESS:
+        click_count = 3;
+        break;
+    default:
+        click_count = 1;
+        break;
+    }
+    host.send_mouse_click_event(mouse, button_type, (int) mouse_up, click_count);
+
+//~       // Save mouse event that can be a possible trigger for drag.
+//~       if (!self->drag_context_ && button_type == MBT_LEFT) {
+//~         if (self->drag_trigger_event_) {
+//~           gdk_event_free(self->drag_trigger_event_);
+//~         }
+//~         self->drag_trigger_event_ =
+//~             gdk_event_copy(reinterpret_cast<GdkEvent*>(event));
+//~       }
+}
+
+public void send_scroll_event(Gdk.EventScroll event, Cef.BrowserHost host) {
+    Cef.MouseEvent mouse = {};
+    mouse.x = (int) event.x;
+    mouse.y = (int) event.y;
+//~         self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
+//~         DeviceToLogical(mouse_event, self->device_scale_factor_);
+    mouse.modifiers = get_cef_state_modifiers(event.state);
+    const int SCROLLBAR_PIXELS_PER_GTK_TICK = 40;
+    int dx = 0;
+    int dy = 0;
+    switch (event.direction) {
+    case Gdk.ScrollDirection.UP:
+        dy = 1;
+        break;
+    case Gdk.ScrollDirection.DOWN:
+        dy = -1;
+        break;
+    case Gdk.ScrollDirection.LEFT:
+        dx = 1;
+        break;
+    case Gdk.ScrollDirection.RIGHT:
+        dx = -1;
+        break;
+    }
+    host.send_mouse_wheel_event(mouse, dx * SCROLLBAR_PIXELS_PER_GTK_TICK, dy * SCROLLBAR_PIXELS_PER_GTK_TICK);
+}
+
+public void send_key_event(Gdk.EventKey event, Cef.BrowserHost host) {
+    Cef.KeyEvent key = {};
+    KeyboardCode windows_keycode = gdk_event_to_windows_keycode(event);
+    key.windows_key_code = get_windows_keycode_without_location(windows_keycode);
+    key.native_key_code = event.hardware_keycode;
+    key.modifiers = get_cef_state_modifiers(event.state);
+    if (event.keyval >= Gdk.Key.KP_Space && event.keyval <= Gdk.Key.KP_9) {
+        key.modifiers |= Cef.EventFlags.IS_KEY_PAD;
+    }
+    if ((key.modifiers & Cef.EventFlags.ALT_DOWN) != 0) {
+        key.is_system_key = 1;
+    }
+    if (windows_keycode == KeyboardCode.VKEY_RETURN) {
+        // We need to treat the enter key as a key press of character \r.  This
+        // is apparently just how webkit handles it and what it expects.
+        key.unmodified_character = '\r';
+    } else {
+        // FIXME: fix for non BMP chars
+        key.unmodified_character = (Cef.Char16) Gdk.keyval_to_unicode(event.keyval);
+    }
+    // If ctrl key is pressed down, then control character shall be input.
+    if ((key.modifiers & Cef.EventFlags.CONTROL_DOWN) != 0) {
+        key.character = (Cef.Char16) get_control_character(
+            windows_keycode, (key.modifiers & Cef.EventFlags.SHIFT_DOWN) != 0);
+    } else {
+        key.character = key.unmodified_character;
+    }
+    if (event.type == Gdk.EventType.KEY_PRESS) {
+        key.type = Cef.KeyEventType.RAWKEYDOWN;
+        host.send_key_event(key);
+        key.type = Cef.KeyEventType.CHAR;
+        host.send_key_event(key);
+    } else {
+        key.type = Cef.KeyEventType.KEYUP;
+        host.send_key_event(key);
+    }
+}
+
+public void send_motion_event(Gdk.EventMotion event, Cef.BrowserHost host) {
+    int x, y;
+    Gdk.ModifierType state;
+    if (event.is_hint > 0) {
+        event.window.get_pointer(out x, out y, out state);
+    } else {
+        x = (int) event.x;
+        y = (int) event.y;
+        state = event.state;
+        if (x == 0 && y == 0) {
+            // Invalid coordinates of (0,0) appear from time to time in
+            // enter-notify-event and leave-notify-event events. Sending them may
+            // cause StartDragging to never get called, so just ignore these.
+            return;
+        }
+    }
+
+    Cef.MouseEvent mouse = {};
+    mouse.x = x;
+    mouse.y = y;
+    // self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
+    // DeviceToLogical(mouse_event, self->device_scale_factor_);
+    mouse.modifiers = get_cef_state_modifiers(state);
+    bool mouse_leave = event.type == Gdk.EventType.LEAVE_NOTIFY;
+    host.send_mouse_move_event(mouse, (int) mouse_leave);
+
+//~           // Save mouse event that can be a possible trigger for drag.
+//~           if (!self->drag_context_ &&
+//~               (mouse_event.modifiers & EVENTFLAG_LEFT_MOUSE_BUTTON)) {
+//~             if (self->drag_trigger_event_) {
+//~               gdk_event_free(self->drag_trigger_event_);
+//~             }
+//~             self->drag_trigger_event_ =
+//~                 gdk_event_copy(reinterpret_cast<GdkEvent*>(event));
+//~           }
+}
+
+} // namespace CefGtk.UIEvents
