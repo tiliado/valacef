@@ -53,7 +53,7 @@ public InitializationResult init(bool enable_widevine_plugin, bool enable_flash_
 	}
 	
 	Cef.initialize(main_args, settings, app, null);
-	message_loop_source_id = GLib.Timeout.add(50, () => {
+	message_loop_source_id = GLib.Timeout.add(20, () => {
 		Cef.do_message_loop_work();
 		return true;
 	});
