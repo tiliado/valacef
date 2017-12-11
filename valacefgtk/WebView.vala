@@ -42,6 +42,36 @@ public class WebView : Gtk.Widget {
         }
     }
     
+    public void go_back() {
+        if (browser != null) {
+            browser.go_back();
+        }
+    }
+    
+    public void go_forward() {
+        if (browser != null) {
+            browser.go_forward();
+        }
+    }
+    
+    public void reload() {
+        if (browser != null) {
+            browser.reload();
+        }
+    }
+    
+    public void reload_ignore_cache() {
+        if (browser != null) {
+            browser.reload_ignore_cache();
+        }
+    }
+    
+    public void stop_load() {
+        if (browser != null) {
+            browser.stop_load();
+        }
+    }
+    
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
         minimum_width = natural_width = 100;
     }
