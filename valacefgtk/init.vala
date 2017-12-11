@@ -4,6 +4,7 @@ namespace CefGtk {
 
 private static bool initialized = false;
 private static uint message_loop_source_id = 0;
+public static WidevinePlugin? widevine_plugin;
 
 public void init() {
 	if (!initialized) {
@@ -29,6 +30,8 @@ public void init() {
 		var subprocess_path = Environment.get_variable("CEF_SUBPROCESS_PATH") ?? (CEF_LIB_DIR + "/CefSubprocess");
 		assert(FileUtils.test(subprocess_path, FileTest.IS_EXECUTABLE));
 		Cef.set_string(&settings.browser_subprocess_path, subprocess_path);
+		widevine_plugin = new WidevinePlugin();
+		widevine_plugin.register(CEF_LIB_DIR);
 		Cef.initialize(main_args, settings, app, null);
 		message_loop_source_id = GLib.Timeout.add(50, () => {
 			Cef.do_message_loop_work();

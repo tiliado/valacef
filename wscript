@@ -161,6 +161,7 @@ def build(ctx):
             'valacefgtk/LoadHandler.vala',
             'valacefgtk/KeyboardHandler.vala',
             'valacefgtk/Keyboard.vala',
+            'valacefgtk/WidevinePlugin.vala',
         ],
         target = 'valacefgtk',
         packages = "valacef valacef_api gtk+-3.0 gdk-x11-3.0 x11",
