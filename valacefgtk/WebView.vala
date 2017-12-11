@@ -88,6 +88,61 @@ public class WebView : Gtk.Widget {
         zoom_level = 0.0;
     }
     
+    public bool edit_cut() {
+        if (browser != null) {
+            var frame = browser.get_focused_frame();
+            if (frame != null) {
+                frame.cut();
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public bool edit_copy() {
+        if (browser != null) {
+            var frame = browser.get_focused_frame();
+            if (frame != null) {
+                frame.copy();
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public bool edit_paste() {
+        if (browser != null) {
+            var frame = browser.get_focused_frame();
+            if (frame != null) {
+                frame.paste();
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public bool edit_undo() {
+        if (browser != null) {
+            var frame = browser.get_focused_frame();
+            if (frame != null) {
+                frame.undo();
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public bool edit_redo() {
+        if (browser != null) {
+            var frame = browser.get_focused_frame();
+            if (frame != null) {
+                frame.redo();
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
         minimum_width = natural_width = 100;
     }
