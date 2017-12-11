@@ -121,6 +121,17 @@ public class WebView : Gtk.Widget {
         return false;
     }
     
+    public bool edit_select_all() {
+        if (browser != null) {
+            var frame = browser.get_focused_frame();
+            if (frame != null) {
+                frame.select_all();
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public bool edit_undo() {
         if (browser != null) {
             var frame = browser.get_focused_frame();

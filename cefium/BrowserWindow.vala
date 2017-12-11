@@ -26,6 +26,8 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         add_button("zoom-out-symbolic", "zoom-out", false).activate.connect(() => web_view.zoom_out());
         add_button("zoom-original-symbolic", "zoom-reset", false).activate.connect(() => web_view.zoom_reset());
         add_button("zoom-in-symbolic", "zoom-in", false).activate.connect(() => web_view.zoom_in());
+        add_button("edit-select-all-symbolic", "edit-select-all", false).activate.connect(
+            () => web_view.edit_select_all());
         add_button("edit-paste-symbolic", "edit-paste", false).activate.connect(() => web_view.edit_paste());
         add_button("edit-copy-symbolic", "edit-copy", false).activate.connect(() => web_view.edit_copy());
         add_button("edit-cut-symbolic", "edit-cut", false).activate.connect(() => web_view.edit_cut());
