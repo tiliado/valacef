@@ -1,4 +1,4 @@
 #!/bin/sh
-export LD_LIBRARY_PATH=@CEF_LIB_DIR@:@OUT@
+export LD_LIBRARY_PATH=@OUT@
 export CEF_SUBPROCESS_PATH="@OUT@/CefSubprocess"
 exec "$@"
