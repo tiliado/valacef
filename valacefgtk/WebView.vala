@@ -8,6 +8,10 @@ public class WebView : Gtk.Widget {
     public bool can_go_forward {get; internal set; default = false;}
     public bool is_loading {get; internal set; default = false;}
     public WebContext web_context {get; private set;}
+    public double zoom_level {
+        get {return (browser != null) ? browser.get_host().get_zoom_level() : 0.0;}
+        set {if (browser != null) {browser.get_host().set_zoom_level(value);}}
+        }
     private Cef.Browser? browser = null;
     private Client? client = null;
     private Gdk.Window? event_window = null;
@@ -70,6 +74,18 @@ public class WebView : Gtk.Widget {
         if (browser != null) {
             browser.stop_load();
         }
+    }
+    
+    public void zoom_in() {
+        zoom_level += 0.5;
+    }
+    
+    public void zoom_out() {
+        zoom_level -= 0.5;
+    }
+    
+    public void zoom_reset() {
+        zoom_level = 0.0;
     }
     
     public override void get_preferred_width(out int minimum_width, out int natural_width) {

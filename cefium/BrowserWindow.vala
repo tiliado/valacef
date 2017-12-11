@@ -23,6 +23,9 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         add_button("go-home-symbolic", "go-home").activate.connect(() => go_home());
         add_button("view-refresh-symbolic", "reload").activate.connect(() => web_view.reload());
         add_button("process-stop-symbolic", "abort").activate.connect(() => web_view.stop_load());
+        add_button("zoom-out-symbolic", "zoom-out", false).activate.connect(() => web_view.zoom_out());
+        add_button("zoom-original-symbolic", "zoom-reset", false).activate.connect(() => web_view.zoom_reset());
+        add_button("zoom-in-symbolic", "zoom-in", false).activate.connect(() => web_view.zoom_in());
         url_bar = new URLBar(null);
         url_bar.hexpand = true;
         url_bar.margin = 5;
@@ -52,13 +55,17 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         web_view.load_uri(home_uri);
     }
     
-    private GLib.SimpleAction add_button(string icon, string action_name) {
+    private GLib.SimpleAction add_button(string icon, string action_name, bool start=true) {
         var action = new GLib.SimpleAction(action_name, null);
         action.set_enabled(true);
         add_action(action);
         var button = new Gtk.Button.from_icon_name(icon);
         button.action_name = "win." + action_name;
-        header_bar.pack_start(button);
+        if (start) {
+            header_bar.pack_start(button);
+        } else {
+            header_bar.pack_end(button);
+        }
         return action;
     }
     
