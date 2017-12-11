@@ -120,6 +120,9 @@ def configure(ctx):
     pkgconfig(ctx, 'x11', 'X11', "0")
     find_python3(ctx, "3.6")
     find_cef(ctx)
+    
+    ctx.env.VALACEF_LIBDIR = "%s/%s" % (ctx.env.LIBDIR, APPNAME)
+    ctx.define("VALACEF_LIBDIR", ctx.env.VALACEF_LIBDIR)
 
 
 def build(ctx):
@@ -183,7 +186,7 @@ def build(ctx):
     
     ctx.program(
         source = ['cefsubprocess/Subprocess.vala'],
-        target = 'CefSubprocess',
+        target = 'ValacefSubprocess',
         use = ['valacef'],
         defines = ['G_LOG_DOMAIN="CefSub"', 'CEF_LIB_DIR="%s"' % ctx.env.CEF_LIB_DIR],
         vapi_dirs = ["vapi"],
@@ -193,7 +196,7 @@ def build(ctx):
         rpath = [ctx.env.CEF_LIB_DIR],
         cflags = ['-O2'], 
         #vala_target_glib = TARGET_GLIB,
-        #install_path = ctx.env.NUVOLA_LIBDIR,
+        install_path = ctx.env.VALACEF_LIBDIR,
     )
     
     ctx.program(

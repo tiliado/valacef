@@ -1,4 +1,5 @@
 extern const string CEF_LIB_DIR;
+extern const string VALACEF_LIBDIR;
 
 namespace CefGtk {
 
@@ -43,7 +44,7 @@ public InitializationResult init(bool enable_widevine_plugin, bool enable_flash_
 	settings.log_severity = Cef.LogSeverity.WARNING;
 	Cef.set_string(&settings.resources_dir_path, CEF_LIB_DIR);
 	Cef.set_string(&settings.locales_dir_path, CEF_LIB_DIR + "/locales");
-	var subprocess_path = Environment.get_variable("CEF_SUBPROCESS_PATH") ?? (CEF_LIB_DIR + "/CefSubprocess");
+	var subprocess_path = Environment.get_variable("CEF_SUBPROCESS_PATH") ?? (VALACEF_LIBDIR + "/ValacefSubprocess");
 	assert(FileUtils.test(subprocess_path, FileTest.IS_EXECUTABLE));
 	Cef.set_string(&settings.browser_subprocess_path, subprocess_path);
 	var widevine_plugin = new WidevinePlugin();
