@@ -114,6 +114,7 @@ def configure(ctx):
     ctx.check_vala(min_version=tuple(int(i) for i in MIN_VALA.split(".")))
     pkgconfig(ctx, 'glib-2.0', 'GLIB', MIN_GLIB)
     pkgconfig(ctx, 'gio-2.0', 'GIO', MIN_GLIB)
+    pkgconfig(ctx, 'gmodule-2.0', 'GMODULE', MIN_GLIB)
     pkgconfig(ctx, 'gio-unix-2.0', 'UNIXGIO', MIN_GLIB)
     pkgconfig(ctx, 'gtk+-3.0', 'GTK', MIN_GTK)
     pkgconfig(ctx, 'gdk-x11-3.0', 'GDKX11', MIN_GTK)
@@ -168,13 +169,14 @@ def build(ctx):
             'valacefgtk/UIEvents.vala',
             'valacefgtk/WidevinePlugin.vala',
             'valacefgtk/FlashPlugin.vala',
+            'valacefgtk/RendererContext.vala',
             'valacefgtk/RenderProcess.vala',
             'valacefgtk/RenderProcessHandler.vala',
             'valacefgtk/RenderSideEventLoop.vala',
         ],
         target = 'valacefgtk',
-        packages = "valacef valacef_api gtk+-3.0 gdk-x11-3.0 x11",
-        uselib = "GTK GDKX11 X11",
+        packages = "valacef valacef_api gtk+-3.0 gdk-x11-3.0 x11 gmodule-2.0",
+        uselib = "GTK GDKX11 X11 GMODULE",
         defines = ['G_LOG_DOMAIN="CefGtk"', 'CEF_LIB_DIR="%s"' % ctx.env.CEF_LIB_DIR],
         vapi_dirs = ["vapi", out],
         includes = include_dirs,
@@ -223,6 +225,25 @@ def build(ctx):
         cflags = ['-O2'], 
         #vala_target_glib = TARGET_GLIB,
         #install_path = ctx.env.NUVOLA_LIBDIR,
+    )
+    
+    ctx.shlib(
+        source = [
+            'cefium/CefiumRendererExtension.vala',
+        ],
+        target = 'cefiumrendererextension',
+        use = ['valacef', 'valacefgtk'],
+        packages = "gtk+-3.0 gdk-x11-3.0 x11 gmodule-2.0",
+        uselib = "GTK GDKX11 X11 GMODULE",
+        defines = ['G_LOG_DOMAIN="Cefium"'],
+        vapi_dirs = ["vapi", out],
+        includes = include_dirs,
+        lib = ['cef'],
+        libpath = [ctx.env.CEF_LIB_DIR],
+        rpath = [ctx.env.CEF_LIB_DIR],
+        cflags = ['-O2'], 
+        #vala_target_glib = TARGET_GLIB,
+        install_path = ctx.env.VALACEF_LIBDIR,
     )
     
     ctx(features = 'subst',

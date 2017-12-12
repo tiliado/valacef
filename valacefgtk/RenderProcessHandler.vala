@@ -10,7 +10,10 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
          * keep a reference to |extra_info| outside of this function.
          */
         /*void*/ vfunc_on_render_thread_created = (self, /*ListValue*/ extra_info) => {
-            ((RenderProcessHandler) self).priv_set("side_eventloop", new RenderSideEventLoop().start());
+            var _this = ((RenderProcessHandler) self);
+            var ctx = new RendererContext(_this);
+            ctx.init(extra_info);
+            _this.priv_set("context", ctx);
         };
     }
 }
