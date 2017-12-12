@@ -26,6 +26,10 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
             return (int) get_ctx(self).message_received(browser, message);
         };
     }
+    
+    private static RendererContext get_ctx(Cef.RenderProcessHandler self) {
+        return ((RenderProcessHandler) self).priv_get<RendererContext>("context");
+    }
 }
 
 } // namespace CefGtk

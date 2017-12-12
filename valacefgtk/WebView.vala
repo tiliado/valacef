@@ -335,6 +335,10 @@ public class WebView : Gtk.Widget {
             browser.send_process_message(Cef.ProcessId.RENDERER, msg);
         }
     }
+    
+     public void load_renderer_extension(string path) {
+         send_message("load_renderer_extension", path);
+     }
 }
 
 } // namespace CefGtk
