@@ -313,6 +313,21 @@ public class WebView : Gtk.Widget {
 		return new Gdk.X11.Window.foreign_for_display(
 			parent_window.get_display() as Gdk.X11.Display, (X.Window) host.get_window_handle());
     }
+    
+    public void send_message(string name, string parameter) {
+        if (browser != null) {
+            Cef.String msg_name = {};
+            Cef.set_string(&msg_name, name);
+            var msg = Cef.process_message_create(&msg_name);
+            var args = msg.get_argument_list();
+            args.set_size(2);
+            args.set_string(0, &msg_name);
+            Cef.String cef_string = {};
+            Cef.set_string(&cef_string, parameter);
+            args.set_string(1, &cef_string);
+            browser.send_process_message(Cef.ProcessId.RENDERER, msg);
+        }
+    }
 }
 
 } // namespace CefGtk

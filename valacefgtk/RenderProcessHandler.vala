@@ -15,6 +15,16 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
             ctx.init(extra_info);
             _this.priv_set("context", ctx);
         };
+        
+        /**
+         * Called when a new message is received from a different process. Return true
+         * (1) if the message was handled or false (0) otherwise. Do not keep a
+         * reference to or attempt to access the message outside of this callback.
+         */
+        /*int*/ vfunc_on_process_message_received = (self, /*Browser*/ browser, /*ProcessId*/ source_process,
+         /*ProcessMessage*/ message) => {
+            return (int) get_ctx(self).message_received(browser, message);
+        };
     }
 }
 
