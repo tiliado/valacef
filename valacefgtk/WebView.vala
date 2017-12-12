@@ -298,6 +298,8 @@ public class WebView : Gtk.Widget {
         window_info.width = clip.width;
         window_info.height = clip.height;
         Cef.BrowserSettings browser_settings = {sizeof(Cef.BrowserSettings)};
+        browser_settings.javascript_access_clipboard = Cef.State.ENABLED;
+        browser_settings.javascript_dom_paste = Cef.State.ENABLED;
         client = new Client(
             new FocusHandler(this),
             new DisplayHandler(this),
