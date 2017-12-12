@@ -211,6 +211,8 @@ class Struct(Type):
         for vfunc in self.virtual_funcs or []:
             params = repo.vala_param_list(vfunc.params, vfunc_of_class=self.c_name)
             ret_type = repo.vala_ret_type(vfunc.ret_type)
+            if ret_type == "StringUserfree":
+                ret_type = "string?"
             if vfunc.comment:
                 buf.extend('    ' + line for line in utils.vala_comment(vfunc.comment, valadoc=True))
             buf.extend([
@@ -342,7 +344,7 @@ class Delegate(Type):
         if self.vfunc_name:
             buf.extend([
                 '%s %s_%s(%s)%s' % (
-                    ret_type,
+                    ret_type if ret_type != 'cef_string_userfree_t' else 'char*',
                     self.vfunc_of_class,
                     self.vfunc_name,
                     ', '.join(params),
@@ -350,15 +352,21 @@ class Delegate(Type):
                 )
             ])
             if body:
-                buf.extend([
-                    '    %sself->%s(%s);' % (
-                        'return ' if ret_type else '',
-                        self.vfunc_name,
-                        ', '.join(p[1] for p in self.params),
-                    ),
-                    '}'
-                ])
-
+                call = 'self->%s(%s);' % (self.vfunc_name, ', '.join(p[1] for p in self.params))
+                if ret_type == 'void':
+                    buf.append('    ' + call)
+                elif ret_type == 'cef_string_userfree_t':
+                    buf.extend([
+                        '    %s __utf16_str__ = %s' % (ret_type, call),
+                        '    if (__utf16_str__ == NULL) return NULL;',
+                        '    cef_string_utf8_t __utf8_str__ = {};',
+                        '    cef_string_utf16_to_utf8(__utf16_str__->str, __utf16_str__->length, &__utf8_str__);',
+                        '    cef_string_userfree_free(__utf16_str__);',
+                        '    return __utf8_str__.str;'
+                    ])
+                else:
+                    buf.append('    return ' + call)
+                buf.append('}')
         return buf
 
     def gen_c_code(self, repo: "Repository") -> List[str]:
