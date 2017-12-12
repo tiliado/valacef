@@ -18,24 +18,34 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         grid.hexpand = grid.vexpand = true;
         add(grid);
         header_bar = new Gtk.HeaderBar();
-        add_button("go-previous-symbolic", "go-back").activate.connect(() => web_view.go_back());
-        add_button("go-next-symbolic", "go-forward").activate.connect(() => web_view.go_forward());
-        add_button("go-home-symbolic", "go-home").activate.connect(() => go_home());
-        add_button("view-refresh-symbolic", "reload").activate.connect(() => web_view.reload());
-        add_button("process-stop-symbolic", "abort").activate.connect(() => web_view.stop_load());
-        add_button("zoom-out-symbolic", "zoom-out", false).activate.connect(() => web_view.zoom_out());
-        add_button("zoom-original-symbolic", "zoom-reset", false).activate.connect(() => web_view.zoom_reset());
-        add_button("zoom-in-symbolic", "zoom-in", false).activate.connect(() => web_view.zoom_in());
-        add_button("edit-select-all-symbolic", "edit-select-all", false).activate.connect(
-            () => web_view.edit_select_all());
-        add_button("edit-paste-symbolic", "edit-paste", false).activate.connect(() => web_view.edit_paste());
-        add_button("edit-copy-symbolic", "edit-copy", false).activate.connect(() => web_view.edit_copy());
-        add_button("edit-cut-symbolic", "edit-cut", false).activate.connect(() => web_view.edit_cut());
-        add_button("edit-redo-symbolic", "edit-redo", false).activate.connect(() => web_view.edit_redo());
-        add_button("edit-undo-symbolic", "edit-undo", false).activate.connect(() => web_view.edit_undo());
+        
+        add_simple_action("go-back").activate.connect(() => web_view.go_back());
+        add_simple_action("go-forward").activate.connect(() => web_view.go_forward());
+        add_simple_action("go-home").activate.connect(() => go_home());
+        add_simple_action("reload").activate.connect(() => web_view.reload());
+        add_simple_action("abort").activate.connect(() => web_view.stop_load());
+        add_simple_action("zoom-out").activate.connect(() => web_view.zoom_out());
+        add_simple_action("zoom-reset").activate.connect(() => web_view.zoom_reset());
+        add_simple_action("zoom-in").activate.connect(() => web_view.zoom_in());
+        add_simple_action("edit-select-all").activate.connect(() => web_view.edit_select_all());
+        add_simple_action("edit-paste").activate.connect(() => web_view.edit_paste());
+        add_simple_action("edit-copy").activate.connect(() => web_view.edit_copy());
+        add_simple_action("edit-cut").activate.connect(() => web_view.edit_cut());
+        add_simple_action("edit-redo").activate.connect(() => web_view.edit_redo());
+        add_simple_action("edit-undo").activate.connect(() => web_view.edit_undo());
+        
+        add_buttons({
+            "(", "go-previous-symbolic|go-back", "go-next-symbolic|go-forward", ")",
+            "(", "go-home-symbolic|go-home", "view-refresh-symbolic|reload", "process-stop-symbolic|abort", ")",
+            "|",
+            "(", "zoom-in-symbolic|zoom-in", "zoom-original-symbolic|zoom-reset", "zoom-out-symbolic|zoom-out", ")",
+            "(", "edit-undo-symbolic|edit-undo", "edit-redo-symbolic|edit-redo", ")",
+            "(", "edit-cut-symbolic|edit-cut", "edit-copy-symbolic|edit-copy",
+            "edit-paste-symbolic|edit-paste", "edit-select-all-symbolic|edit-select-all", ")",
+        });
+        
         url_bar = new URLBar(null);
         url_bar.hexpand = true;
-        url_bar.margin = 5;
         url_bar.response.connect(on_url_bar_response);
         header_bar.custom_title = url_bar;
         status_bar = new Gtk.Label(default_status);
@@ -62,20 +72,47 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         web_view.load_uri(home_uri);
     }
     
-    private GLib.SimpleAction add_button(string icon, string action_name, bool start=true) {
+    private GLib.SimpleAction add_simple_action(string action_name) {
         var action = new GLib.SimpleAction(action_name, null);
         action.set_enabled(true);
         add_action(action);
-        var button = new Gtk.Button.from_icon_name(icon);
-        button.vexpand = false;
-        button.valign = Gtk.Align.CENTER;
-        button.action_name = "win." + action_name;
-        if (start) {
-            header_bar.pack_start(button);
-        } else {
-            header_bar.pack_end(button);
-        }
         return action;
+    }
+    
+    private void add_buttons(string[] buttons) {
+        Gtk.Grid? grid = null;
+        bool start = true;
+        foreach (var entry in buttons) {
+            if (entry == "(") {
+                grid = new Gtk.Grid();
+                grid.orientation = Gtk.Orientation.HORIZONTAL;
+                grid.get_style_context().add_class("linked");
+                grid.hexpand = grid.vexpand = false;
+                grid.halign = grid.valign = Gtk.Align.CENTER;
+                if (start) {
+                    header_bar.pack_start(grid);
+                } else {
+                    header_bar.pack_end(grid);
+                }
+            } else if (entry == ")") {
+                grid = null;
+            } else if (entry == "|") {
+                start = false;
+            } else {
+                var data = entry.split("|");
+                var button = new Gtk.Button.from_icon_name(data[0]);
+                button.vexpand = false;
+                button.valign = Gtk.Align.CENTER;
+                button.action_name = "win." + data[1];
+                if (grid != null) {
+                    grid.add(button);
+                } else if (start) {
+                    header_bar.pack_start(button);
+                } else {
+                    header_bar.pack_end(button);
+                }
+            }
+        }
     }
     
     private void on_web_view_notify(GLib.Object? o, ParamSpec param) {
