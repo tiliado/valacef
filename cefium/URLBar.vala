@@ -47,7 +47,7 @@ public class URLBar: Gtk.Grid {
         entry.activate.connect(on_go_button_clicked);
         entry.show();
         add(entry);
-        go_button = new Gtk.Button.with_label("Go");
+        go_button = new Gtk.Button.from_icon_name("media-playback-start-symbolic");
         go_button.clicked.connect(on_go_button_clicked);
         go_button.show();
         add(go_button);
