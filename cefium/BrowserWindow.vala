@@ -110,6 +110,7 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         return_if_fail(action != null);
         action.set_enabled(enabled);
     }
+    
     private void on_url_bar_response(bool accepted) {
         if (accepted) {
             web_view.load_uri(url_bar.url);
