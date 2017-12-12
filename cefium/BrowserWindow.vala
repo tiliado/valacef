@@ -67,6 +67,8 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         action.set_enabled(true);
         add_action(action);
         var button = new Gtk.Button.from_icon_name(icon);
+        button.vexpand = false;
+        button.valign = Gtk.Align.CENTER;
         button.action_name = "win." + action_name;
         if (start) {
             header_bar.pack_start(button);
