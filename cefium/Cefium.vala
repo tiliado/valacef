@@ -36,7 +36,7 @@ int main(string[] argv) {
     var web_view = new CefGtk.WebView(ctx);
 	var win = new BrowserWindow(web_view, Args.url ?? "https://github.com/tiliado/valacef/wiki", versions);
 	win.delete_event.connect(() => {Gtk.main_quit(); return true;});
-	win.set_default_size(1024, 800);
+	win.set_default_size(1100, 800);
 	win.present();
 	Gtk.main();
 	CefGtk.quit();
