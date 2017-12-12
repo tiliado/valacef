@@ -26,6 +26,8 @@ public class WebView : Gtk.Widget {
         this.web_context = web_context;
     }
     
+    public signal void ready();
+    
     public signal void load_started(Cef.TransitionType transition);
     
     public signal void load_ended(int http_status_code);
@@ -34,6 +36,10 @@ public class WebView : Gtk.Widget {
     
     public virtual signal void console_message(string? source, int line, string? text) {
         message("Console: %s:%d: %s", source, line, text);
+    }
+    
+    public bool is_ready() {
+        return browser != null;
     }
     
     public void load_uri(string? uri) {
@@ -308,6 +314,7 @@ public class WebView : Gtk.Widget {
         Cef.set_string(&url, uri_to_load ?? "about:blank");
         uri_to_load = null;
         browser = Cef.browser_host_create_browser_sync(window_info, client, &url, browser_settings, web_context.request_context);
+        ready();
         var host = browser.get_host();
         host.set_focus(io ? 0 : 1);
 		return new Gdk.X11.Window.foreign_for_display(
