@@ -76,82 +76,79 @@ public class WebView : Gtk.Widget {
         }
     }
     
+    [Signal (action=true)]
     public void zoom_in() {
         zoom_level += 0.5;
     }
     
+    [Signal (action=true)]
     public void zoom_out() {
         zoom_level -= 0.5;
     }
     
+    [Signal (action=true)]
     public void zoom_reset() {
         zoom_level = 0.0;
     }
     
-    public bool edit_cut() {
+    [Signal (action=true)]
+    public void edit_cut() {
         if (browser != null) {
             var frame = browser.get_focused_frame();
             if (frame != null) {
                 frame.cut();
-                return true;
             }
         }
-        return false;
     }
     
-    public bool edit_copy() {
+    [Signal (action=true)]
+    public void edit_copy() {
         if (browser != null) {
             var frame = browser.get_focused_frame();
             if (frame != null) {
                 frame.copy();
-                return true;
             }
         }
-        return false;
     }
     
-    public bool edit_paste() {
+    [Signal (action=true)]
+    public void edit_paste() {
         if (browser != null) {
             var frame = browser.get_focused_frame();
             if (frame != null) {
                 frame.paste();
-                return true;
             }
         }
-        return false;
     }
     
-    public bool edit_select_all() {
+    [Signal (action=true)]
+    public void edit_select_all() {
         if (browser != null) {
             var frame = browser.get_focused_frame();
             if (frame != null) {
                 frame.select_all();
-                return true;
             }
         }
-        return false;
     }
     
-    public bool edit_undo() {
+    [Signal (action=true)]
+    public void edit_undo() {
         if (browser != null) {
             var frame = browser.get_focused_frame();
             if (frame != null) {
                 frame.undo();
-                return true;
             }
         }
-        return false;
     }
     
-    public bool edit_redo() {
+    [Signal (action=true)]
+    public void edit_redo() {
         if (browser != null) {
             var frame = browser.get_focused_frame();
             if (frame != null) {
                 frame.redo();
-                return true;
             }
         }
-        return false;
     }
     
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
