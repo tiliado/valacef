@@ -124,6 +124,7 @@ def configure(ctx):
     
     ctx.env.VALACEF_LIBDIR = "%s/%s" % (ctx.env.LIBDIR, APPNAME)
     ctx.define("VALACEF_LIBDIR", ctx.env.VALACEF_LIBDIR)
+    ctx.define("CEFIUM_LIBDIR", ctx.env.VALACEF_LIBDIR)
 
 
 def build(ctx):

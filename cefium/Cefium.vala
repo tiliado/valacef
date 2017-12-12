@@ -1,5 +1,7 @@
 namespace Cefium {
-	
+
+private extern const string LIBDIR;
+
 struct Args {
 	static bool disable_widevine = false;
 	static bool disable_flash = false;
