@@ -14,15 +14,13 @@ public class WebView : Gtk.Widget {
         }
     private Cef.Browser? browser = null;
     private Client? client = null;
-    private Gdk.Window? event_window = null;
-    private Gdk.Window? cef_window = null;
-    private bool io = true;
+    private Gdk.X11.Window? chromium_window = null;
+    private Gdk.X11.Window? cef_window = null;
     private string? uri_to_load = null;
     
     public WebView(WebContext web_context) {
-        set_has_window(true);
+        set_has_window(false);
 		set_can_focus(true);
-        add_events(Gdk.EventMask.ALL_EVENTS_MASK);
         this.web_context = web_context;
     }
     
@@ -166,113 +164,43 @@ public class WebView : Gtk.Widget {
     }
     
     public override void realize() {
-		cef_window = embed_cef();
-        register_window(cef_window);
-        
-        Gtk.Allocation allocation;
-        Gdk.WindowAttr attributes = {};
-        get_allocation(out allocation);
-        attributes.x = allocation.x;
-        attributes.y = allocation.y;
-        attributes.width = allocation.width;
-        attributes.height = allocation.height;
-        attributes.window_type = Gdk.WindowType.CHILD;
-        attributes.visual = get_visual();
-        attributes.event_mask = get_events()
-                        | Gdk.EventMask.BUTTON_PRESS_MASK
-                        | Gdk.EventMask.BUTTON_RELEASE_MASK
-                        | Gdk.EventMask.KEY_PRESS_MASK
-                        | Gdk.EventMask.KEY_RELEASE_MASK
-                        | Gdk.EventMask.EXPOSURE_MASK
-                        | Gdk.EventMask.ENTER_NOTIFY_MASK
-                        | Gdk.EventMask.LEAVE_NOTIFY_MASK;
-//~       attributes.wclass = Gdk.WindowWindowClass.INPUT_OUTPUT;
-      attributes.wclass = Gdk.WindowWindowClass.INPUT_ONLY;
-      
-        if (io) {
-            event_window = new Gdk.Window(
-                get_parent_window(), attributes,
-                Gdk.WindowAttributesType.X|Gdk.WindowAttributesType.Y/*|Gdk.WindowAttributesType.VISUAL*/);
-            register_window(event_window);
-            event_window.add_filter(() => Gdk.FilterReturn.CONTINUE);  // Necessary!
-        }
-        set_window(io ? event_window : cef_window);
         set_realized(true);
+        base.realize();
+		embed_cef();
     }
     
     public override void grab_focus() {
 		base.grab_focus();
 		message("focus");
-		if (!io && browser != null) {
-            browser.get_host().set_focus(1);   
-        }
-	}
-	
-	public override bool grab_broken_event (Gdk.EventGrabBroken event) {
-		message("Grab broken");
-		return false;
 	}
 
     public override bool focus_in_event(Gdk.EventFocus event) {
 		message("focus_in_event");
 		base.focus_in_event(event);
+        browser.get_host().send_focus_event(1);
 		return false;
 	}
 	
     public override bool focus_out_event(Gdk.EventFocus event) {
 		message("focus_out_event");
 		base.focus_out_event(event);
+        browser.get_host().send_focus_event(0);
 		return false;
 	}
     
-    public override bool button_press_event(Gdk.EventButton event) {
-        message("button_press_event");
-        if (!has_focus) {
-            grab_focus();
-        }
-        send_click_event(event);
-        return false;
-    }
     
-    public override bool button_release_event(Gdk.EventButton event) {
-        message("button_prelease_event");
-        if (!has_focus) {
-            grab_focus();
-        }
-        send_click_event(event);
-        return false;
-    }
     
     public void send_click_event(Gdk.EventButton event) {
         UIEvents.send_click_event(event, browser.get_host());
-    }
-    
-    public override bool scroll_event(Gdk.EventScroll event) {
-        send_scroll_event(event);
-        return false;
     }
     
     public void send_scroll_event(Gdk.EventScroll event) {
         UIEvents.send_scroll_event(event, browser.get_host());
     }
     
-    public override bool key_press_event(Gdk.EventKey event) {
-        send_key_event(event);
-        return false;
-    }
-    
-    public override bool key_release_event(Gdk.EventKey event) {
-        send_key_event(event);
-        return false;
-    }
     
     public void send_key_event(Gdk.EventKey event) {
         UIEvents.send_key_event(event, browser.get_host());
-    }
-    
-    public override bool motion_notify_event(Gdk.EventMotion event) {
-        send_motion_event(event);
-        return false;
     }
     
     public void send_motion_event(Gdk.EventMotion event) {
@@ -281,12 +209,12 @@ public class WebView : Gtk.Widget {
     
     public override void size_allocate(Gtk.Allocation allocation) {
         base.size_allocate(allocation);
-        if (event_window != null && cef_window != null) {
+        if (cef_window != null) {
             cef_window.move_resize(allocation.x, allocation.y, allocation.width, allocation.height);
         }
     }
     
-    private Gdk.X11.Window? embed_cef() {
+    private void embed_cef() {
 		assert(CefGtk.is_initialized());
 		var toplevel = get_toplevel();
 		assert(toplevel.is_toplevel());
@@ -295,7 +223,7 @@ public class WebView : Gtk.Widget {
 		}
         Gtk.Allocation clip;
         get_clip(out clip);
-        var parent_window = get_parent_window() as Gdk.X11.Window;
+        var parent_window = get_window() as Gdk.X11.Window;
         assert(parent_window != null);
         Cef.WindowInfo window_info = {};
         window_info.parent_window = (Cef.WindowHandle) parent_window.get_xid();
@@ -313,12 +241,16 @@ public class WebView : Gtk.Widget {
         Cef.String url = {};
         Cef.set_string(&url, uri_to_load ?? "about:blank");
         uri_to_load = null;
-        browser = Cef.browser_host_create_browser_sync(window_info, client, &url, browser_settings, web_context.request_context);
-        ready();
+        browser = Cef.browser_host_create_browser_sync(
+            window_info, client, &url, browser_settings, web_context.request_context);
         var host = browser.get_host();
-        host.set_focus(io ? 0 : 1);
-		return new Gdk.X11.Window.foreign_for_display(
-			parent_window.get_display() as Gdk.X11.Display, (X.Window) host.get_window_handle());
+		cef_window = wrap_xwindow(
+            parent_window.get_display() as Gdk.X11.Display, (X.Window) host.get_window_handle());
+        register_window(cef_window);
+        chromium_window = find_child_window(cef_window);
+        assert(chromium_window != null);
+        register_window(chromium_window);
+        ready();
     }
     
     public void send_message(string name, string parameter) {

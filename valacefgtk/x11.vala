@@ -29,4 +29,18 @@ public Gdk.Visual get_default_visual() {
     assert_not_reached();
 }
 
+public Gdk.X11.Window? find_child_window(Gdk.X11.Window window) {
+    X.Window root = X.None;
+    X.Window parent = X.None;
+    X.Window[] children = null;
+    var display = window.get_display() as Gdk.X11.Display;
+    display.get_xdisplay().query_tree(window.get_xid(), out root, out parent, out children);
+    return (children != null && children.length > 0) ? wrap_xwindow(display, children[0]) : null;
+}
+
+public Gdk.X11.Window wrap_xwindow(Gdk.X11.Display display, X.Window xwindow) {
+    var window = Gdk.X11.Window.lookup_for_display(display, xwindow);
+    return window != null ? window : new Gdk.X11.Window.foreign_for_display(display, xwindow);
+}
+
 } // namespace CefX11
