@@ -188,7 +188,15 @@ public class WebView : Gtk.Widget {
 		return false;
 	}
     
+    public override bool button_press_event(Gdk.EventButton event) {
+        message("button_press_event %u", event.button);
+        return false;
+    }
     
+    public override bool button_release_event(Gdk.EventButton event) {
+        message("button_prelease_event %u", event.button);
+        return false;
+    }
     
     public void send_click_event(Gdk.EventButton event) {
         UIEvents.send_click_event(event, browser.get_host());
@@ -250,6 +258,8 @@ public class WebView : Gtk.Widget {
         chromium_window = find_child_window(cef_window);
         assert(chromium_window != null);
         register_window(chromium_window);
+        chromium_window.set_events(Gdk.EventMask.BUTTON_PRESS_MASK|Gdk.EventMask.BUTTON_RELEASE_MASK);
+        chromium_window.add_filter(event_filter);
         ready();
     }
     
@@ -270,6 +280,31 @@ public class WebView : Gtk.Widget {
     
      public void load_renderer_extension(string path) {
          send_message("load_renderer_extension", path);
+     }
+     
+     protected virtual Gdk.FilterReturn event_filter(Gdk.XEvent xevent, Gdk.Event event) {
+        X.Event* xev = (X.Event*) xevent;
+        message("event %s", xev.type.to_string());
+        switch (xev.type) {
+        case X.EventType.GenericEvent:
+            message("generic event");
+            // translate Input2 xevent → event
+            break;
+        case X.EventType.ButtonPress:
+            message("button press");
+            // translate xevent → event
+            // button_press_event(event.button);
+            break;
+        case X.EventType.ButtonRelease:
+            message("button release");
+            // translate xevent → event
+            // button_release_event(event.button);
+            break;
+        default:
+            message("other event");
+            break;
+         }
+         return Gdk.FilterReturn.REMOVE;
      }
 }
 
