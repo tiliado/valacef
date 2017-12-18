@@ -27,8 +27,8 @@ int main(string[] argv) {
 		stderr.printf("Error: Option parsing failed: %s\n", e.message);
 		return 1;
 	}
-	var versions = "Cefium browser powered by ValaCEF %s, CEF %s, Chrome %s, GTK+ %u.%u.%u".printf(
-		Cef.get_valacef_version(), Cef.get_cef_version(), Cef.get_chrome_version(),
+	var versions = "Cefium browser powered by ValaCEF %s, CEF %s, Chromium %s, GTK+ %u.%u.%u".printf(
+		Cef.get_valacef_version(), Cef.get_cef_version(), Cef.get_chromium_version(),
 		Gtk.get_major_version(), Gtk.get_minor_version(), Gtk.get_micro_version());
 	message("Versions: %s", versions);
 	unowned string[]? gtk_argv = null;

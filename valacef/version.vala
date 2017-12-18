@@ -19,22 +19,22 @@ public int get_cef_commit() {
 }
 
 
-public int get_chrome_major() {
+public int get_chromium_major() {
 	return version_info(2);
 }
 
 
-public int get_chrome_minor() {
+public int get_chromium_minor() {
 	return version_info(3);
 }
 
 
-public int get_chrome_build() {
+public int get_chromium_build() {
 	return version_info(4);
 }
 
 
-public int get_chrome_patch() {
+public int get_chromium_patch() {
 	return version_info(5);
 }
 
@@ -55,12 +55,12 @@ public string get_valacef_version() {
 
 
 public string get_cef_version() {
-	return "%d.%d.%d".printf(get_cef_major(), get_chrome_build(), get_cef_commit());
+	return "%d.%d.%d".printf(get_cef_major(), get_chromium_build(), get_cef_commit());
 }
 
 
-public string get_chrome_version() {
-	return "%d.%d.%d.%d".printf(get_chrome_major(), get_chrome_minor(), get_chrome_build(), get_chrome_patch());
+public string get_chromium_version() {
+	return "%d.%d.%d.%d".printf(get_chromium_major(), get_chromium_minor(), get_chromium_build(), get_chromium_patch());
 }
 
 }
