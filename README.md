@@ -9,8 +9,8 @@ Vala-CEF 3.0
 Tested Configuration
 ------------------
 
-  * CEF 3.3239.1699
-  * Chrome 63.0.3239.70
+  * CEF 3.3239.1703
+  * Chromium 63.0.3239.109
   * GTK+ 3.22.26
 
 Components
@@ -29,7 +29,7 @@ Dependencies
   * glib-2.0 >= 2.52.0
   * gtk+-3.0 >= 3.22.0
   * x11
-  * CEF 3.3239.1699 (built with GTK+ 3)
+  * CEF 3.3239.1703 (built with GTK+ 3)
 
 Build Instructions
 ----------------
