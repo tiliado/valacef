@@ -1,0 +1,11 @@
+prefix=@PREFIX@
+libdir=@LIBDIR@
+ceflibdir=@CEFLIBDIR@
+includedir=@INCLUDEDIR@
+
+Name: ValaCEF GTK+
+Description: Vala & GTK+ 3 bindings for CEF
+Version: @VERSION@
+Requires.private: glib-2.0 gtk+-3.0 valacef
+Libs: -rpath=${ceflibdir} -L${libdir} -L${ceflibdir} -l@LIBNAME@
+Cflags: -I${includedir}/@APPNAME@-1.0 @PC_CFLAGS@

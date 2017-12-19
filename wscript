@@ -125,6 +125,7 @@ def configure(ctx):
     ctx.env.VALACEF_LIBDIR = "%s/%s" % (ctx.env.LIBDIR, APPNAME)
     ctx.define("VALACEF_LIBDIR", ctx.env.VALACEF_LIBDIR)
     ctx.define("CEFIUM_LIBDIR", ctx.env.VALACEF_LIBDIR)
+    ctx.env.VERSION = VERSION
 
 
 def build(ctx):
@@ -252,5 +253,31 @@ def build(ctx):
         target='launch.sh',
         CEF_LIB_DIR=ctx.env.CEF_LIB_DIR,
         OUT=out
+    )
+    
+    ctx(features = 'subst',
+        source='valacef/valacef.pc.in',
+        target='valacef.pc',
+        install_path='${LIBDIR}/pkgconfig',
+        VERSION=ctx.env.VERSION,
+        PREFIX=ctx.env.PREFIX,
+        INCLUDEDIR = ctx.env.INCLUDEDIR,
+        LIBDIR = ctx.env.LIBDIR,
+        APPNAME=APPNAME,
+        LIBNAME='valacef',
+        CEFLIBDIR=ctx.env.CEF_LIB_DIR,
+    )
+    
+    ctx(features = 'subst',
+        source='valacefgtk/valacefgtk.pc.in',
+        target='valacefgtk.pc',
+        install_path='${LIBDIR}/pkgconfig',
+        VERSION=ctx.env.VERSION,
+        PREFIX=ctx.env.PREFIX,
+        INCLUDEDIR = ctx.env.INCLUDEDIR,
+        LIBDIR = ctx.env.LIBDIR,
+        APPNAME=APPNAME,
+        LIBNAME='valacefgtk',
+        CEFLIBDIR=ctx.env.CEF_LIB_DIR,
     )
 
