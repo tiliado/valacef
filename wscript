@@ -248,9 +248,9 @@ def build(ctx):
     )
     
     ctx(features = 'subst',
-		source='launch.sh.in',
-		target='launch.sh',
-		CEF_LIB_DIR=ctx.env.CEF_LIB_DIR,
+        source='launch.sh.in',
+        target='launch.sh',
+        CEF_LIB_DIR=ctx.env.CEF_LIB_DIR,
         OUT=out
-	)
+    )
 
