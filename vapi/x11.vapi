@@ -319,6 +319,9 @@ namespace X {
 
 		[CCode (cname = "XMatchVisualInfo")]
 		public X.Status match_visual_info (int screen, int depth, int @class, out X.VisualInfo vinfo_return);
+		
+		[CCode (cname = "XSynchronize")]
+		public bool synchronize (bool onoff);
 	}
 
 	[Compact]
