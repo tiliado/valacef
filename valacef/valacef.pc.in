@@ -8,4 +8,4 @@ Description: Vala bindings for CEF
 Version: @VERSION@
 Requires.private: glib-2.0
 Libs: -rpath=${ceflibdir} -L${libdir} -L${ceflibdir} -l@LIBNAME@
-Cflags: -I${includedir}/@APPNAME@-1.0 @PC_CFLAGS@
+Cflags: @INCLUDE_CEF_DIRS@ -I${includedir}/@APPNAME@-1.0 @PC_CFLAGS@

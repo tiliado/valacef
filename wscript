@@ -266,6 +266,7 @@ def build(ctx):
         APPNAME=APPNAME,
         LIBNAME='valacef',
         CEFLIBDIR=ctx.env.CEF_LIB_DIR,
+        INCLUDE_CEF_DIRS="-I%s -I%s" % (ctx.env.CEF_INCLUDE_DIR, os.path.dirname(ctx.env.CEF_INCLUDE_DIR)),
     )
     
     ctx(features = 'subst',
@@ -279,5 +280,6 @@ def build(ctx):
         APPNAME=APPNAME,
         LIBNAME='valacefgtk',
         CEFLIBDIR=ctx.env.CEF_LIB_DIR,
+        INCLUDE_CEF_DIRS="-I%s -I%s" % (ctx.env.CEF_INCLUDE_DIR, os.path.dirname(ctx.env.CEF_INCLUDE_DIR)),
     )
 
