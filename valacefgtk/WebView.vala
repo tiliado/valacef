@@ -210,9 +210,7 @@ public class WebView : Gtk.Widget {
 		assert(CefGtk.is_initialized());
 		var toplevel = get_toplevel();
 		assert(toplevel.is_toplevel());
-		if (toplevel.get_visual() != CefGtk.get_default_visual()) {
-			error("Incompatible window visual. Use `window.set_visual(CefGtk.get_default_visual())`.");
-		}
+        CefGtk.override_system_visual(toplevel.get_visual());
         Gtk.Allocation clip;
         get_clip(out clip);
         var parent_window = get_parent_window() as Gdk.X11.Window;
