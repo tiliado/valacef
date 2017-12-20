@@ -3,6 +3,7 @@ namespace Cefium {
 public class BrowserWindow : Gtk.ApplicationWindow {
     public Gtk.Grid grid;
     private Gtk.HeaderBar header_bar;
+    private Gtk.HeaderBar tool_bar;
     private Gtk.Label status_bar;
     private string? default_status;
     private CefGtk.WebView web_view;
@@ -14,10 +15,14 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         this.default_status = default_status;
         this.web_view = web_view;
         this.home_uri = home_uri;
+        header_bar = new Gtk.HeaderBar();
+        header_bar.show_close_button = true;
+        header_bar.show();
+        set_titlebar(header_bar);
         grid = new Gtk.Grid();
         grid.hexpand = grid.vexpand = true;
         add(grid);
-        header_bar = new Gtk.HeaderBar();
+        tool_bar = new Gtk.HeaderBar();
         
         add_simple_action("go-back").activate.connect(() => web_view.go_back());
         add_simple_action("go-forward").activate.connect(() => web_view.go_forward());
@@ -47,14 +52,14 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         url_bar = new URLBar(null);
         url_bar.hexpand = true;
         url_bar.response.connect(on_url_bar_response);
-        header_bar.custom_title = url_bar;
+        tool_bar.custom_title = url_bar;
         status_bar = new Gtk.Label(default_status);
         status_bar.hexpand = true;
         status_bar.halign = Gtk.Align.START;
         status_bar.margin = 5;
         status_bar.ellipsize = Pango.EllipsizeMode.MIDDLE;
         web_view.hexpand = web_view.vexpand = true;
-        grid.attach(header_bar, 0, 0, 1, 1);
+        grid.attach(tool_bar, 0, 0, 1, 1);
         grid.attach(web_view, 0, 1, 1, 1);
         grid.attach(status_bar, 0, 5, 1, 1);
         grid.show_all();
@@ -90,9 +95,9 @@ public class BrowserWindow : Gtk.ApplicationWindow {
                 grid.hexpand = grid.vexpand = false;
                 grid.halign = grid.valign = Gtk.Align.CENTER;
                 if (start) {
-                    header_bar.pack_start(grid);
+                    tool_bar.pack_start(grid);
                 } else {
-                    header_bar.pack_end(grid);
+                    tool_bar.pack_end(grid);
                 }
             } else if (entry == ")") {
                 grid = null;
@@ -107,9 +112,9 @@ public class BrowserWindow : Gtk.ApplicationWindow {
                 if (grid != null) {
                     grid.add(button);
                 } else if (start) {
-                    header_bar.pack_start(button);
+                    tool_bar.pack_start(button);
                 } else {
-                    header_bar.pack_end(button);
+                    tool_bar.pack_end(button);
                 }
             }
         }
