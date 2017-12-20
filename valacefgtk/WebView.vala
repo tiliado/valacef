@@ -19,7 +19,7 @@ public class WebView : Gtk.Widget {
     private string? uri_to_load = null;
     
     public WebView(WebContext web_context) {
-        set_has_window(false);
+        set_has_window(true);
 		set_can_focus(true);
         this.web_context = web_context;
     }
@@ -164,9 +164,8 @@ public class WebView : Gtk.Widget {
     }
     
     public override void realize() {
-        set_realized(true);
-        base.realize();
 		embed_cef();
+        set_realized(true);
     }
     
     public override void grab_focus() {
@@ -207,13 +206,6 @@ public class WebView : Gtk.Widget {
         UIEvents.send_motion_event(event, browser.get_host()); 
     }
     
-    public override void size_allocate(Gtk.Allocation allocation) {
-        base.size_allocate(allocation);
-        if (cef_window != null) {
-            cef_window.move_resize(allocation.x, allocation.y, allocation.width, allocation.height);
-        }
-    }
-    
     private void embed_cef() {
 		assert(CefGtk.is_initialized());
 		var toplevel = get_toplevel();
@@ -223,7 +215,7 @@ public class WebView : Gtk.Widget {
 		}
         Gtk.Allocation clip;
         get_clip(out clip);
-        var parent_window = get_window() as Gdk.X11.Window;
+        var parent_window = get_parent_window() as Gdk.X11.Window;
         assert(parent_window != null);
         Cef.WindowInfo window_info = {};
         window_info.parent_window = (Cef.WindowHandle) parent_window.get_xid();
@@ -250,6 +242,7 @@ public class WebView : Gtk.Widget {
         chromium_window = find_child_window(cef_window);
         assert(chromium_window != null);
         register_window(chromium_window);
+        set_window(cef_window);
         ready();
     }
     
