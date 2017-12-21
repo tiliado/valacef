@@ -37,7 +37,8 @@ int main(string[] argv) {
     var ctx = new CefGtk.WebContext(GLib.Environment.get_user_config_dir() + "/cefium");
     var web_view = new CefGtk.WebView(ctx);
     web_view.ready.connect((w) => w.load_renderer_extension(
-        Environment.get_variable("CEFIUM_RENDERER_EXTENSION") ?? LIBDIR + "/libcefiumrendererextension.so"));
+        Environment.get_variable("CEFIUM_RENDERER_EXTENSION") ?? LIBDIR + "/libcefiumrendererextension.so",
+        new Variant[]{"hello", 123}));
 	var win = new BrowserWindow(web_view, Args.url ?? "https://github.com/tiliado/valacef/wiki", versions);
 	win.delete_event.connect(() => {Gtk.main_quit(); return true;});
 	win.set_default_size(1100, 800);

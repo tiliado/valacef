@@ -1,6 +1,6 @@
 namespace CefGtk {
 
-public delegate void InitRendererExtensionFunc(RendererContext ctx);
+public delegate void InitRendererExtensionFunc(RendererContext ctx, Variant?[] parameters);
 
 public class RendererContext : GLib.Object {
     public RenderProcessHandler handler {get; construct;}
@@ -14,7 +14,7 @@ public class RendererContext : GLib.Object {
         event_loop.start();
     }
     
-    public void load_renderer_extension(string path) {
+    public void load_renderer_extension(string path, Variant?[] parameters) {
         assert(Module.supported());
         var module = Module.open(path, ModuleFlags.BIND_LAZY);
         if (module == null) {
@@ -26,17 +26,17 @@ public class RendererContext : GLib.Object {
                 warning("renderer Extension '%s' does not contain init_renderer_extension() function.", path);
             } else {
                 InitRendererExtensionFunc init_renderer_extension = (InitRendererExtensionFunc) function;
-                init_renderer_extension(this);
+                init_renderer_extension(this, parameters);
             }
         }
     }
     
     public bool message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
-        var args = msg.get_argument_list();
+        var args = Utils.convert_list_to_variant(msg.get_argument_list());
         var name = msg.get_name();
         if (name == "load_renderer_extension") {
-            var extension = args.get_string(0);
-            event_loop.add_idle(() => {load_renderer_extension(extension); return false;});
+            var extension = args[0].get_string();
+            event_loop.add_idle(() => {load_renderer_extension(extension, args); return false;});
         } else {
             message("Message received: '%s'", name);
         }

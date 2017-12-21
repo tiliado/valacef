@@ -251,8 +251,18 @@ public class WebView : Gtk.Widget {
         }
     }
     
-     public void load_renderer_extension(string path) {
-         send_message("load_renderer_extension", {new Variant.string(path)});
+     public void load_renderer_extension(string path, Variant?[]? parameters=null) {
+         Variant?[] args;
+         if (parameters != null && parameters.length > 0) {
+             args = new Variant?[parameters.length + 1];
+             for (var i = 0; i < parameters.length; i++) {
+                 args[i + 1] = parameters[i];
+             }
+         } else {
+             args = new Variant?[1];
+         }
+         args[0] = new Variant.string(path);
+         send_message("load_renderer_extension", args);
      }
 }
 

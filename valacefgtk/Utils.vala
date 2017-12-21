@@ -83,4 +83,47 @@ public void set_list_from_variant(Cef.ListValue list, Variant?[] values) {
     }
 }
 
+/**
+ * Convert CEF list to Variant values.
+ * 
+ * @param list    CEF list to convert.
+ * @return Variant values.
+ */
+public Variant?[] convert_list_to_variant(Cef.ListValue list) {
+    var size = list.get_size();
+    if (size == 0) {
+        return {};
+    }
+    var result = new Variant?[size];
+    for (var index = 0; index < size; index++) {
+        var type = list.get_type(index);
+        switch (type) {
+        case Cef.ValueType.NULL:
+            result[index] = null;
+            break;
+        case Cef.ValueType.BOOL:
+            result[index] = new Variant.boolean(list.get_bool(index) > 0);
+            break;
+        case Cef.ValueType.INT:
+            result[index] = new Variant.int64(list.get_int(index));
+            break;
+        case Cef.ValueType.DOUBLE:
+            result[index] = new Variant.double(list.get_double(index));
+            break;
+        case Cef.ValueType.STRING:
+            result[index] = new Variant.string(list.get_string(index));
+            break;
+        case Cef.ValueType.INVALID:
+        case Cef.ValueType.BINARY:
+        case Cef.ValueType.DICTIONARY:
+        case Cef.ValueType.LIST:
+        default:
+            critical("Unsupported type %s at index %d.", type.to_string(), index);
+            result[index] = null;
+            break;
+        }
+    }
+    return result;
+}
+
 } // CefGtk.Utils
