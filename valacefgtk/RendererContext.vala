@@ -23,6 +23,18 @@ public class RendererContext : GLib.Object {
         send_message(browser, MsgId.BROWSER_DESTROYED, {browser.get_identifier()});
     }
     
+    public virtual signal void js_context_created(Cef.Browser browser, Cef.Frame frame, Cef.V8context context) {
+        if (frame.is_main() > 0) {
+            message("JS Context created %d", browser.get_identifier());
+        }
+    }
+    
+    public virtual signal void js_context_released(Cef.Browser browser, Cef.Frame frame, Cef.V8context context) {
+        if (frame.is_main() > 0) {
+            message("JS Context released: %d", browser.get_identifier());
+        }
+    }
+    
     public void load_renderer_extension(Cef.Browser browser, string path, owned Variant?[] parameters) {
         assert(GLib.Module.supported());
         var module = GLib.Module.open(path, 0);

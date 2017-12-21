@@ -41,6 +41,26 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
         /*void*/ vfunc_on_browser_destroyed = (self, /*Browser*/ browser) => {
             get_ctx(self).browser_destroyed(browser);
         };
+        
+         /**
+         * Called immediately after the V8 context for a frame has been created. To
+         * retrieve the JavaScript 'window' object use the
+         * cef_v8context_t::get_global() function. V8 handles can only be accessed
+         * from the thread on which they are created. A task runner for posting tasks
+         * on the associated thread can be retrieved via the
+         * cef_v8context_t::get_task_runner() function.
+         */
+        /*void*/ vfunc_on_context_created = (self, /*Browser*/ browser, /*Frame*/ frame, /*V8context*/ context) => {
+            get_ctx(self).js_context_created(browser, frame, context);
+        };
+
+        /**
+         * Called immediately before the V8 context for a frame is released. No
+         * references to the context should be kept after this function is called.
+         */
+        /*void*/ vfunc_on_context_released = (self, /*Browser*/ browser, /*Frame*/ frame, /*V8context*/ context) => {
+            get_ctx(self).js_context_released(browser, frame, context);
+        };
     }
     
     private static RendererContext get_ctx(Cef.RenderProcessHandler self) {
