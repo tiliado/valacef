@@ -6,3 +6,4 @@ build
 .lock*
 .waf*
 cefium_data
+tmp
