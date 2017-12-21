@@ -5,8 +5,8 @@ public class RenderSideEventLoop : GLib.Object {
     public MainContext context;
     public Thread<void*> thread;
     
-    public RenderSideEventLoop() {
-        context = new MainContext();
+    public RenderSideEventLoop(MainContext? main_context=null) {
+        context = main_context ?? new MainContext();
     }
     
     public RenderSideEventLoop start() {
