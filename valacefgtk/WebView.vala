@@ -187,8 +187,6 @@ public class WebView : Gtk.Widget {
 		return false;
 	}
     
-    
-    
     public void send_click_event(Gdk.EventButton event) {
         UIEvents.send_click_event(event, browser.get_host());
     }
@@ -196,7 +194,6 @@ public class WebView : Gtk.Widget {
     public void send_scroll_event(Gdk.EventScroll event) {
         UIEvents.send_scroll_event(event, browser.get_host());
     }
-    
     
     public void send_key_event(Gdk.EventKey event) {
         UIEvents.send_key_event(event, browser.get_host());
@@ -251,7 +248,7 @@ public class WebView : Gtk.Widget {
         }
     }
     
-     public void load_renderer_extension(string path, Variant?[]? parameters=null) {
+    public void load_renderer_extension(string path, Variant?[]? parameters=null) {
          Variant?[] args;
          if (parameters != null && parameters.length > 0) {
              args = new Variant?[parameters.length + 1];

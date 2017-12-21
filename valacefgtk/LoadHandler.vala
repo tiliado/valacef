@@ -68,7 +68,6 @@ public class LoadHandler : Cef.LoadHandlerRef {
                 get_web_view(self).load_error(error_code, Cef.get_string(error_text), Cef.get_string(failed_url));
             }
         };
-    
     }
     
     private static unowned WebView get_web_view(Cef.LoadHandler self) {
