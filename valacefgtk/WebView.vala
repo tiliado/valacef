@@ -45,6 +45,14 @@ public class WebView : Gtk.Widget {
         message("Message received from renderer: '%s'", name);
     }
     
+    public virtual signal void renderer_created() {
+        message("Renderer created.");
+    }
+    
+    public virtual signal void renderer_destroyed() {
+        message("Renderer destroyed.");
+    }
+    
     public bool is_ready() {
         return browser != null;
     }
@@ -274,9 +282,19 @@ public class WebView : Gtk.Widget {
      
      internal bool on_message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
         return_val_if_fail(browser != this.browser, false);
-        var args = Utils.convert_list_to_variant(msg.get_argument_list());
         var name = msg.get_name();
-        message_received(name, args);
+        switch (name) {
+        case MsgId.BROWSER_CREATED:
+            renderer_created();
+            break;
+        case MsgId.BROWSER_DESTROYED:
+            renderer_destroyed();
+            break;
+        default:
+            var args = Utils.convert_list_to_variant(msg.get_argument_list());
+            message_received(name, args);
+            break;
+        }
         return true;
     }
 }

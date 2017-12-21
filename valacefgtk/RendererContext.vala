@@ -15,6 +15,14 @@ public class RendererContext : GLib.Object {
         event_loop.start();
     }
     
+    public virtual signal void browser_created(Cef.Browser browser) {
+        send_message(browser, MsgId.BROWSER_CREATED, {browser.get_identifier()});
+    }
+    
+    public virtual signal void browser_destroyed(Cef.Browser browser) {
+        send_message(browser, MsgId.BROWSER_DESTROYED, {browser.get_identifier()});
+    }
+    
     public void load_renderer_extension(string path, owned Variant?[] parameters) {
         assert(GLib.Module.supported());
         var module = GLib.Module.open(path, 0);

@@ -25,6 +25,22 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
          /*ProcessMessage*/ message) => {
             return (int) get_ctx(self).message_received(browser, message);
         };
+        
+        /**
+         * Called after a browser has been created. When browsing cross-origin a new
+         * browser will be created before the old browser with the same identifier is
+         * destroyed.
+         */
+        /*void*/ vfunc_on_browser_created = (self, /*Browser*/ browser) => {
+            get_ctx(self).browser_created(browser);
+        };
+
+        /**
+         * Called before a browser is destroyed.
+         */
+        /*void*/ vfunc_on_browser_destroyed = (self, /*Browser*/ browser) => {
+            get_ctx(self).browser_destroyed(browser);
+        };
     }
     
     private static RendererContext get_ctx(Cef.RenderProcessHandler self) {
