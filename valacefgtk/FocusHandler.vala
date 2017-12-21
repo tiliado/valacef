@@ -21,7 +21,7 @@ public class FocusHandler : Cef.FocusHandlerRef {
          */
         vfunc_on_set_focus = (self, /*Browser*/ browser, /*FocusSource*/ source) => {
             message("on_set_focus");
-            return 0;
+            return source == Cef.FocusSource.NAVIGATION ? 1 : 0;
         };
 
         /**
