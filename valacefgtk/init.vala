@@ -70,9 +70,10 @@ public InitializationResult? get_init_result() {
 }
 
 public void quit() {
-	assert (is_initialized());
-	Source.remove(message_loop_source_id);
-	Cef.shutdown();
+	if (is_initialized()) {
+        Source.remove(message_loop_source_id);
+        Cef.shutdown();
+    }
 }
 
 } // namespace CefGtk
