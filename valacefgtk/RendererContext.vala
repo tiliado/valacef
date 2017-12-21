@@ -33,6 +33,11 @@ public class RendererContext : GLib.Object {
         }
     }
     
+    public void send_message(Cef.Browser browser, string name, Variant?[] parameters) {
+        var msg = Utils.create_process_message(name, parameters);
+        browser.send_process_message(Cef.ProcessId.RENDERER, msg);
+    }
+    
     public bool message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
         var args = Utils.convert_list_to_variant(msg.get_argument_list());
         var name = msg.get_name();

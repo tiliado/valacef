@@ -41,6 +41,10 @@ public class WebView : Gtk.Widget {
         message("Console: %s:%d: %s", source, line, text);
     }
     
+    public virtual signal void message_received(string name, Variant?[]? parameters) {
+        message("Message received from renderer: '%s'", name);
+    }
+    
     public bool is_ready() {
         return browser != null;
     }
@@ -227,6 +231,7 @@ public class WebView : Gtk.Widget {
         browser_settings.javascript_access_clipboard = Cef.State.ENABLED;
         browser_settings.javascript_dom_paste = Cef.State.ENABLED;
         client = new Client(
+            this,
             new FocusHandler(this),
             new DisplayHandler(this),
             new LoadHandler(this));
@@ -266,6 +271,14 @@ public class WebView : Gtk.Widget {
          args[0] = new Variant.string(path);
          send_message(MsgId.LOAD_RENDERER_EXTENSION, args);
      }
+     
+     internal bool on_message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
+        return_val_if_fail(browser != this.browser, false);
+        var args = Utils.convert_list_to_variant(msg.get_argument_list());
+        var name = msg.get_name();
+        message_received(name, args);
+        return true;
+    }
 }
 
 } // namespace CefGtk

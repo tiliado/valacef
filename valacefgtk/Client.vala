@@ -1,11 +1,14 @@
 namespace CefGtk {
 
 public class Client : Cef.ClientRef {
-    public Client(FocusHandler focus_handler, DisplayHandler display_handler, LoadHandler load_handler) {
+    public Client(WebView web_view, FocusHandler focus_handler, DisplayHandler display_handler,
+    LoadHandler load_handler) {
         base();
+        priv_set<unowned WebView>("web_view", web_view);
         priv_set("focus_handler", focus_handler);
         priv_set("display_handler", display_handler);
         priv_set("load_handler", load_handler);
+        
         /**
          * Return the handler for context menus. If no handler is provided the default
          * implementation will be used.
@@ -123,9 +126,8 @@ public class Client : Cef.ClientRef {
          * reference to or attempt to access the message outside of this callback.
          */
         vfunc_on_process_message_received = (self, browser, source_process, msg) => {
-            // owned Browser? browser, ProcessId source_process, owned ProcessMessage? message)
-            message("on_process_message_received");
-            return 0;
+            return (int) ((Cef.ClientRef?) self).priv_get<unowned WebView>("web_view").on_message_received(
+                browser, msg);
         };
     }
 }
