@@ -36,7 +36,7 @@ public class RendererContext : GLib.Object {
     public bool message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
         var args = Utils.convert_list_to_variant(msg.get_argument_list());
         var name = msg.get_name();
-        if (name == "load_renderer_extension") {
+        if (name == MsgId.LOAD_RENDERER_EXTENSION) {
             var extension = args[0].get_string();
             load_renderer_extension(extension, args);
         } else {

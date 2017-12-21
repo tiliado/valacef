@@ -176,6 +176,7 @@ def build(ctx):
             'valacefgtk/RenderProcessHandler.vala',
             'valacefgtk/RenderSideEventLoop.vala',
             'valacefgtk/Utils.vala',
+            'valacefgtk/MsgId.vala',
         ],
         target = 'valacefgtk',
         packages = "valacef valacef_api gtk+-3.0 gdk-x11-3.0 x11 gmodule-2.0",

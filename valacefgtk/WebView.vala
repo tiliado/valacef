@@ -264,7 +264,7 @@ public class WebView : Gtk.Widget {
              args = new Variant?[1];
          }
          args[0] = new Variant.string(path);
-         send_message("load_renderer_extension", args);
+         send_message(MsgId.LOAD_RENDERER_EXTENSION, args);
      }
 }
 
