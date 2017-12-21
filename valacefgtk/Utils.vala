@@ -65,11 +65,7 @@ public void set_list_from_variant(Cef.ListValue list, Variant?[] values) {
                 list.set_double(index, variant.get_double());
             } else if (variant.is_of_type(VariantType.INT32)) {
                 list.set_int(index, (int) variant.get_int32());
-            } else if (variant.is_of_type(VariantType.INT32)) {
-                list.set_int(index, (int) variant.get_int32());
             } else if (variant.is_of_type(VariantType.UINT32)) {
-                list.set_int(index, (int) variant.get_int32());
-            } else if (variant.is_of_type(VariantType.INT32)) {
                 list.set_int(index, (int) variant.get_uint32());
             } else if (variant.is_of_type(VariantType.INT64)) {
                 list.set_int(index, (int) variant.get_int64());
