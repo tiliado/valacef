@@ -9,9 +9,10 @@ public class WebView : Gtk.Widget {
     public bool is_loading {get; internal set; default = false;}
     public WebContext web_context {get; private set;}
     public double zoom_level {
-        get {return (browser != null) ? browser.get_host().get_zoom_level() : 0.0;}
-        set {if (browser != null) {browser.get_host().set_zoom_level(value);}}
+        get {return (browser != null) ? browser.get_host().get_zoom_level() : _zoom_level;}
+        set {if (browser != null) {browser.get_host().set_zoom_level(value);} else {_zoom_level = value;}}
         }
+    private double _zoom_level = 0.0;
     private Cef.Browser? browser = null;
     private Client? client = null;
     private Gdk.X11.Window? chromium_window = null;
@@ -24,7 +25,11 @@ public class WebView : Gtk.Widget {
         this.web_context = web_context;
     }
     
-    public signal void ready();
+    public virtual signal void ready() {
+        if (zoom_level != _zoom_level) {
+            zoom_level = _zoom_level;
+        }
+    }
     
     public signal void load_started(Cef.TransitionType transition);
     
