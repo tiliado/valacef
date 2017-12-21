@@ -244,23 +244,15 @@ public class WebView : Gtk.Widget {
         ready();
     }
     
-    public void send_message(string name, string parameter) {
+    public void send_message(string name, Variant?[] parameters) {
         if (browser != null) {
-            Cef.String msg_name = {};
-            Cef.set_string(&msg_name, name);
-            var msg = Cef.process_message_create(&msg_name);
-            var args = msg.get_argument_list();
-            args.set_size(2);
-            args.set_string(0, &msg_name);
-            Cef.String cef_string = {};
-            Cef.set_string(&cef_string, parameter);
-            args.set_string(1, &cef_string);
+            var msg = Utils.create_process_message(name, parameters);
             browser.send_process_message(Cef.ProcessId.RENDERER, msg);
         }
     }
     
      public void load_renderer_extension(string path) {
-         send_message("load_renderer_extension", path);
+         send_message("load_renderer_extension", {new Variant.string(path)});
      }
 }
 

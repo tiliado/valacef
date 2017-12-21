@@ -133,7 +133,7 @@ public class BrowserWindow : Gtk.ApplicationWindow {
             break;
         case "uri":
             url_bar.url = web_view.uri ?? "";
-            web_view.send_message("uri", url_bar.url);
+            web_view.send_message("uri", {new Variant.string(url_bar.url)});
             break;
         case "status-message":
             status_bar.label = web_view.status_message ?? default_status ?? "";

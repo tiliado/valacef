@@ -33,12 +33,12 @@ public class RendererContext : GLib.Object {
     
     public bool message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
         var args = msg.get_argument_list();
-        var name = args.get_string(0);
-        var parameter = args.get_string(1);
-        if (name == "load_renderer_extension" && parameter != null) {
-            event_loop.add_idle(() => {load_renderer_extension(parameter); return false;});
+        var name = msg.get_name();
+        if (name == "load_renderer_extension") {
+            var extension = args.get_string(0);
+            event_loop.add_idle(() => {load_renderer_extension(extension); return false;});
         } else {
-            message("Message received: '%s' '%s'", name, parameter);
+            message("Message received: '%s'", name);
         }
         return true;
     }
