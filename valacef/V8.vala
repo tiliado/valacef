@@ -66,6 +66,17 @@ public V8value? get_value(V8value object, string key) {
     return object.get_value_bykey(&_key);
 }
 
+public string? string_or_null(V8value? value) {
+    if (value == null) {
+        return null;
+    } else if (value.is_string() > 0) {
+        return value.get_string_value();
+    }
+    return null;
+    // TODO: why this fails to return a valid string.
+    // return value == null ? null : (value.is_string() != 0 ? value.get_string_value() : null);
+}
+
 public string format_exception(Cef.V8exception exception) {
     var buf = new StringBuilder("");
     buf.append_printf("%s:%d: %s\n%s\n",
