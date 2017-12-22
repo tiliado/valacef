@@ -124,8 +124,12 @@ class Parser:
         for member in properties["public"]:
             c_name = member["name"]
             c_type = member["type"]
-            if utils.is_func_pointer(c_type):
-                ret_type, params = utils.parse_c_func_pointer(c_type)
+            if member['function_pointer']:
+                if utils.is_func_pointer(c_type):
+                    ret_type, params = utils.parse_c_func_pointer(c_type)
+                else:
+                    ret_type = member['type']
+                    params = [(struct_name + '*', 'self')]
                 vala_type = self.naming.delegate(struct_name, c_name)
                 # Delegates (pointers to functions) are not type-defined in CEF C headers.
                 self.add_c_glue(Delegate(
@@ -156,6 +160,7 @@ class Parser:
                     params=params,
                     comment=member.get('doxygen')))
             else:
+                assert not member['function_pointer'] and not utils.is_func_pointer(c_type), member
                 struct_members.append(StructMember(
                     c_type=utils.normalize_pointer(c_type),
                     c_name=c_name,
