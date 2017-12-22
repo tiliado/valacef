@@ -209,7 +209,7 @@ class Struct(Type):
         for method in self.methods:
             buf.extend('    ' + line for line in method.gen_vala_code(repo))
         for vfunc in self.virtual_funcs or []:
-            params = repo.vala_param_list(vfunc.params, vfunc_of_class=self.c_name)
+            params = repo.vala_param_list(vfunc.params[1:], vfunc_of_class=self.c_name)
             ret_type = repo.vala_ret_type(vfunc.ret_type)
             if ret_type == "StringUserfree":
                 ret_type = "string?"
@@ -217,7 +217,7 @@ class Struct(Type):
                 buf.extend('    ' + line for line in utils.vala_comment(vfunc.comment, valadoc=True))
             buf.extend([
                 '    [CCode (cname="%s", cheader_filename="valacef_api.h")]' % vfunc.c_name,
-                '    public %s %s(%s);' % (ret_type, vfunc.vala_name, ', '.join(params[1:])),
+                '    public %s %s(%s);' % (ret_type, vfunc.vala_name, ', '.join(params)),
             ])
         buf.append('}')
         return buf
@@ -471,7 +471,7 @@ class Repository:
             for i, (p_type, p_name) in enumerate(params):
                 i -= skipped_params
                 if p_type == "size_t" and p_name.lower().endswith("count"):
-                    array_size = (i - 0.1, p_type, p_name)
+                    array_size = (i + 1 - 0.1, p_type, p_name)
                     skipped_params += 1
                     continue
 
