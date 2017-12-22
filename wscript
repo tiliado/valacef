@@ -145,6 +145,8 @@ def build(ctx):
             cef_vala, valacef_api_c,
             'valacef/version.vala',
             'valacef/V8.vala',
+            'valacef/SimpleInterceptor.vala',
+            'valacef/SimpleAccessor.vala',
         ],
         target = 'valacef',
         packages = "valacef_api",
