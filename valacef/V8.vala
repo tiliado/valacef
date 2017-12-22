@@ -73,6 +73,19 @@ public class SimpleAccessor : V8accessorRef {
 	}
 }
 
+public string format_exception(Cef.V8exception exception) {
+    var buf = new StringBuilder("");
+    buf.append_printf("%s:%d: %s\n%s\n",
+        exception.get_script_resource_name(), exception.get_line_number(), exception.get_message(),
+        exception.get_source_line());
+    var start = exception.get_start_column();
+    var end = exception.get_end_column();
+    for (var i = 0; i <= end; i++) {
+        buf.append_c(i < start ? ' ' : '^');
+    }
+    return buf.str;
+}
+
 public class SimpleInterceptor : V8interceptorRef {
 	public SimpleInterceptor(){
 		base();
