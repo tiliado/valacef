@@ -1,5 +1,13 @@
 namespace Cef.V8 {
 
+public V8value create_string(string? value) {
+    String _value = {};
+    if (value != null) {
+        Cef.set_string(&_value, value);
+    }
+    return v8value_create_string(&_value);
+}
+
 public bool set_value(V8value object, string key, V8value? value) {
     Cef.String _key = {};
     Cef.set_string(&_key, key);
@@ -71,6 +79,28 @@ public string format_exception(Cef.V8exception exception) {
     return buf.str;
 }
 
-
+public V8value? parse_json(V8context context, string json, out string? error) {
+    error = null;
+    var object = Cef.V8.get_object(context.get_global(), "JSON");
+    if (object == null) {
+        error = "Cannot find window.JSON object in the given V8 context.";
+        return null;
+    }
+    object.ref();
+    var func = Cef.V8.get_function(object, "parse");
+    if (func == null) {
+        error = "Cannot find window.JSON.parse function in the given V8 context.";
+        return null;
+    }
+    var _json = create_string(json == "" ? "{}" : json);
+    _json.ref();
+    var result = func.execute_function(object, {_json});
+    if (result == null) {
+        error = format_exception(func.get_exception());
+        return null;
+    } else {
+        return result;
+    }
+}
 
 } // namespace Cef.V8
