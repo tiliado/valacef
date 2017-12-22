@@ -52,7 +52,8 @@ public class SimpleAccessor : V8accessorRef {
          * exception that will be thrown. Return true (1) if accessor retrieval was
          * handled.
          */
-        /*int*/ vfunc_get = (self, /*String*/ name, /*V8value*/ object, /*V8value*/ retval, /*String*/ exception) => {
+        /*int*/ vfunc_get = (self, /*String*/ name, /*V8value*/ object, /*V8value*/ out retval,
+        /*String*/ exception) => {
 			message("SimpleV8accessor.set");
 			return 0;
 		};
@@ -64,7 +65,8 @@ public class SimpleAccessor : V8accessorRef {
          * exception that will be thrown. Return true (1) if accessor assignment was
          * handled.
          */
-        /*int*/ vfunc_set = (self, /*String*/ name, /*V8value*/ object, /*V8value*/ value, /*String*/ exception) => {
+        /*int*/ vfunc_set = (self, /*String*/ name, /*V8value*/ object, /*V8value*/ value,
+        /*String*/ exception) => {
 			message("SimpleV8accessor.set");
 			return 0;
 		};
@@ -83,7 +85,7 @@ public class SimpleInterceptor : V8interceptorRef {
          * accessor, it will be called only if you don't set |retval|. Return true (1)
          * if interceptor retrieval was handled, false (0) otherwise.
          */
-        /*int*/ vfunc_get_byname = (self, /*String*/ name, /*V8value*/ object, /*V8value*/ retval,
+        /*int*/ vfunc_get_byname = (self, /*String*/ name, /*V8value*/ object, /*V8value*/ out retval,
         /*String*/ exception) => {
 			message("SimpleV8interceptor.get_byname");
 			return 0;
@@ -97,7 +99,7 @@ public class SimpleInterceptor : V8interceptorRef {
          * |exception| to the exception that will be thrown. Return true (1) if
          * interceptor retrieval was handled, false (0) otherwise.
          */
-        /*int*/ vfunc_get_byindex = (self, /*int*/ index, /*V8value*/ object, /*V8value*/ retval,
+        /*int*/ vfunc_get_byindex = (self, /*int*/ index, /*V8value*/ object, /*V8value*/ out retval,
          /*String*/ exception) => {
 			message("SimpleV8interceptor.get_byindex");
 			return 0;

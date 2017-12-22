@@ -476,10 +476,8 @@ class Repository:
                     param = ""
                     if type_info.ref:
                         param += 'ref '
-                        type_info.pointer = False
                     elif type_info.out:
                         param += 'out '
-                        type_info.pointer = False
                     else:
                         try:
                             # CEF reference counting: When passing a struct to delegate/function,

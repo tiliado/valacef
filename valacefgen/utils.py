@@ -70,10 +70,11 @@ def parse_c_type(c_type: str) -> TypeInfo:
     if c_type in ('void*', 'void**'):
         return TypeInfo(c_type, False, const, volatile, False, False)
     pointer = c_type.endswith('*')
+    out = c_type.endswith('**')
     c_type = c_type.rstrip('*')
 
     c_type = lstrip(c_type, 'struct _')
-    return TypeInfo(c_type, pointer, const, volatile, False, False)
+    return TypeInfo(c_type, pointer, const, volatile, False, out)
 
 
 def vala_comment(lines: Iterable[str], valadoc: bool = False) -> Iterable[str]:
