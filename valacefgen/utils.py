@@ -52,7 +52,8 @@ def parse_c_func_pointer(c_type: str) -> Tuple[str, List[Tuple[str, str]]]:
 
 class TypeInfo:
     def __init__(self, c_type: str, pointer: bool = False, const: bool = False, volatile: bool = False,
-                 ref: bool = False, out: bool = False):
+                 ref: bool = False, out: bool = False, array: bool = False):
+        self.array = array
         self.c_type = c_type
         self.pointer = pointer
         self.const = const

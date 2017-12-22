@@ -466,15 +466,33 @@ class Repository:
                         generics: List[str] = None) -> List[str]:
         vala_params = []
         if params is not None:
-            for p_type, p_name in params:
+            array_size = None
+            skipped_params = 0
+            for i, (p_type, p_name) in enumerate(params):
+                i -= skipped_params
+                if p_type == "size_t" and p_name.lower().endswith("count"):
+                    array_size = (i - 0.1, p_type, p_name)
+                    skipped_params += 1
+                    continue
+
                 if generics and p_type in generics:
                     param = "owned " + p_type
+                    assert not array_size
                 else:
                     type_info = utils.parse_c_type(p_type)
                     if name:
                         self.override_param(name, p_name, type_info)
                     param = ""
-                    if type_info.ref:
+                    if array_size:
+                        if type_info.out:
+                            type_info.out = False
+                        elif type_info.pointer:
+                            type_info.pointer = False
+                        type_info.array = True
+                        param = '[CCode(array_length_pos=%s, array_length_type="%s")] ' % array_size[0:2]
+                        assert p_name == array_size[2][:-5], (p_name, array_size[2])
+                        array_size = None
+                    elif type_info.ref:
                         param += 'ref '
                     elif type_info.out:
                         param += 'out '
@@ -496,6 +514,8 @@ class Repository:
                         param += vala_type
                         if type_info.pointer:
                             param += "?"
+                        if type_info.array:
+                            param += "[]"
                 param += ' ' + p_name
                 vala_params.append(param)
         return vala_params
