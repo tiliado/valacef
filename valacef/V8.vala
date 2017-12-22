@@ -42,6 +42,22 @@ public bool set_double(V8value object, string key, double value) {
     return set_value(object, key, v8value_create_double( value));
 }
 
+public V8value? get_function(V8value object, string key) {
+    var value = get_value(object, key);
+    return (value != null && value.is_function() != 0) ? value : null;
+}
+
+public V8value? get_object(V8value object, string key) {
+    var value = get_value(object, key);
+    return (value != null && value.is_object() != 0) ? value : null;
+}
+
+public V8value? get_value(V8value object, string key) {
+    Cef.String _key = {};
+    Cef.set_string(&_key, key);
+    return object.get_value_bykey(&_key);
+}
+
 public class SimpleAccessor : V8accessorRef {
 	public SimpleAccessor() {
 		base();
