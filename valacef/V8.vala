@@ -93,6 +93,59 @@ public int any_int(V8value? value) {
     return 0;
 }
 
+public Variant? variant_from_value(V8value? val, out string? exception) {
+    exception = null;
+	if (val.is_null() != 0) {
+		return new Variant("mv", null);
+    }
+	if (val.is_string() != 0) {
+        var str = val.get_string_value();
+		return new Variant.string(str ?? "");
+	}
+	if (val.is_double() != 0) {
+		return new Variant.double(val.get_double_value());
+	}
+	if (val.is_int() != 0) {
+		return new Variant.int32((int32) val.get_int_value());
+	}
+	if (val.is_uint() != 0) {
+		return new Variant.uint32((uint32) val.get_uint_value());
+	}
+	if (val.is_bool() != 0) {
+		return new Variant.boolean((bool) val.get_bool_value());
+    }
+	if (val.is_array() != 0) {
+        VariantBuilder builder = new VariantBuilder(new VariantType ("av"));
+		int size = val.get_array_length();
+		for (int i = 0; i < size; i++) {
+            var member = variant_from_value(val.get_value_byindex(i), out exception);
+            if (member == null) {
+                return null;
+            }
+			builder.add("v", member);
+        }
+		return builder.end();
+    }
+    if (val.is_object() != 0) {
+        var properties = new Cef.StringList();
+        val.get_keys(properties);
+        var size = properties.size();
+		var builder = new VariantBuilder(new VariantType("a{smv}"));
+		for (size_t i = 0; i < size; i++) {
+            Cef.String key = {};
+            properties.value(i, &key);
+			var member = variant_from_value(val.get_value_bykey(&key), out exception);
+            if (member == null) {
+                return null;
+            }
+			builder.add("{smv}", Cef.get_string(&key), member);
+		}
+		return builder.end();
+    }
+	exception = val.is_undefined() != 0 ? "Refusing to convert undefined value." : "Unsupported type.";
+    return null;
+}
+
 public string format_exception(Cef.V8exception exception) {
     var buf = new StringBuilder("");
     buf.append_printf("%s:%d: %s\n%s\n",
