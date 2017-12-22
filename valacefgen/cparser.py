@@ -4,7 +4,7 @@ from typing import Set, Dict, Any, List, Tuple
 from CppHeaderParser import CppHeader
 
 from valacefgen.types import Repository, EnumValue, Enum, Struct, Typedef, StructMember, Delegate, Function, Type, \
-    StructVirtualFunc
+    StructVirtualFunc, OpaqueClass
 from valacefgen.utils import find_prefix, lstrip, rstrip, camel_case
 from valacefgen import utils
 
@@ -69,12 +69,20 @@ class Parser:
                 self.parse_typedef(c_include_path, alias, c_type)
 
     def parse_typedef(self, c_include_path: str, alias: str, c_type: str):
-        bare_c_type = utils.bare_c_type(c_type)
-        self.repo.add_typedef(Typedef(
-            c_name=alias,
-            vala_name=self.naming.typedef(alias),
-            c_type=bare_c_type,
-            c_header=c_include_path))
+        if c_type in ("void*", "void *"):
+            self.repo.add_opaque_class(OpaqueClass(
+                basename=rstrip(alias, 't'),
+                c_name=alias,
+                vala_name=self.naming.struct(alias),
+                c_header=c_include_path,
+                c_type='void'))
+        else:
+            bare_c_type = utils.bare_c_type(c_type)
+            self.repo.add_typedef(Typedef(
+                c_name=alias,
+                vala_name=self.naming.typedef(alias),
+                c_type=bare_c_type,
+                c_header=c_include_path))
 
     def parse_functions(self, c_include_path: str, functions):
         for func in functions:
@@ -83,13 +91,19 @@ class Parser:
                 self.parse_function(c_include_path, name, func)
 
     def parse_function(self, c_include_path: str, func_name: str, func: Dict[str, Any]):
-        self.repo.add_function(Function(
+        function = Function(
             c_name=func_name,
             vala_name=self.naming.function(func_name),
             c_header=c_include_path,
             ret_type=func['rtnType'],
             params=[(p['type'], p['name']) for p in func['parameters']],
-            comment=func.get('doxygen')))
+            comment=func.get('doxygen'))
+        for basename, klass in self.repo.basenames.items():
+            if func_name.startswith(basename):
+                klass.add_method(function)
+                break
+        else:
+            self.repo.add_function(function)
 
     def parse_enums(self, c_include_path: str, enums):
         for enum in enums:

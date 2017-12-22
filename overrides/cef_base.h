@@ -37,7 +37,6 @@ typedef cef_string_utf16_t cef_string_t;
 typedef unsigned long cef_window_handle_t;
 typedef cef_string_utf16_t* cef_string_userfree_utf16_t;
 typedef cef_string_userfree_utf16_t cef_string_userfree_t;
-typedef void* cef_string_list_t;
 typedef void* cef_string_map_t;
 typedef void* cef_string_multimap_t;
 

@@ -23,6 +23,7 @@ header_files = [
     ('%s/overrides/cef_string.h' % TOP, 'capi/cef_base_capi.h'),
     'internal/cef_types_linux.h',
     'internal/cef_types.h',
+    'internal/cef_string_list.h',
     'capi/cef_app_capi.h',
     'capi/cef_base_capi.h',
     'internal/cef_time.h',

@@ -130,6 +130,56 @@ class Function(Type):
         return False
 
 
+class OpaqueClass(Type):
+    def __init__(self, basename: str, c_type: str, c_name: str, vala_name: str, c_header: str, comment: str = None):
+        super().__init__(c_name, vala_name, c_header, comment)
+        self.basename = basename
+        self.c_type = c_type
+        self.create_func = None
+        self.free_func = basename + "free"
+        self.copy_func = basename + "copy"
+        self.methods = []
+
+    def is_simple_type(self, repo: "Repository") -> bool:
+        return False
+
+    def add_method(self, func: "Function"):
+        if self.c_name == func.ret_type and not func.params:
+            self.create_func = func.c_name
+        elif func.params[0][0] == self.c_name:
+            self.methods.append(func)
+        else:
+            raise NotImplementedError(func)
+
+    def gen_vala_code(self, repo: "Repository") -> List[str]:
+        buf = []
+        if self.comment:
+            buf.extend(utils.vala_comment(self.comment, valadoc=True))
+        ccode = {
+            'cname': '"%s"' % self.c_type,
+            'cheader_filename': '"%s"' % self.c_header,
+            'has_type_id': 'false',
+        }
+        if self.free_func:
+            ccode['free_function'] = '"%s"' % self.free_func
+        if self.copy_func:
+            ccode['copy_function'] = '"%s"' % self.copy_func
+        buf.append('[CCode (%s)]' % ', '.join('%s=%s' % e for e in ccode.items()))
+        buf.append('[Compact]')
+        buf.append('public class %s {' % self.vala_name)
+        if self.create_func:
+            buf.append('    [CCode (cname="%s")]' % self.create_func)
+            buf.append('    public %s();' % self.vala_name)
+        if self.methods:
+            for method in self.methods:
+                del method.params[0]
+                method.vala_name = method.vala_name[len(self.basename)-4:]
+                for line in method.gen_vala_code(repo):
+                    buf.append("    " + line)
+        buf.append('}')
+        return buf
+
+
 class Struct(Type):
     def __init__(self, c_name: str, vala_name: str, c_header: str, members: List["StructMember"], comment: str = None,
                  virtual_funcs: List["StructVirtualFunc"] = None):
@@ -390,10 +440,12 @@ class Repository:
         self.vala_namespace = vala_namespace
         self.enums: Dict[str, Enum] = {}
         self.structs: Dict[str, Struct] = {}
+        self.opaque_classes: Dict[str, OpaqueClass] = {}
         self.typedefs: Dict[str, Typedef] = {}
         self.delegates: Dict[str, Delegate] = {}
         self.functions: Dict[str, Function] = {}
         self.c_types: Dict[str, Type] = {}
+        self.basenames = {}
 
     def add_enum(self, enum: Enum):
         self.enums[enum.c_name] = enum
@@ -403,6 +455,12 @@ class Repository:
         for struct in structs:
             self.structs[struct.c_name] = struct
             self.c_types[struct.c_name] = struct
+
+    def add_opaque_class(self, *classes: OpaqueClass):
+        for klass in classes:
+            self.opaque_classes[klass.c_name] = klass
+            self.c_types[klass.c_name] = klass
+            self.basenames[klass.basename] = klass
 
     def add_typedef(self, typedef: Typedef):
         self.typedefs[typedef.c_name] = typedef
@@ -438,7 +496,7 @@ class Repository:
 
     def gen_vala_code(self):
         buf = ['namespace %s {\n' % self.vala_namespace]
-        entries = self.enums, self.delegates, self.functions, self.typedefs, self.structs
+        entries = self.enums, self.delegates, self.functions, self.typedefs, self.opaque_classes, self.structs
         for entry in chain.from_iterable(e.values() for e in entries):
             for line in entry.gen_vala_code(self):
                 buf.extend(('    ', line, '\n'))
