@@ -77,6 +77,22 @@ public string? string_or_null(V8value? value) {
     // return value == null ? null : (value.is_string() != 0 ? value.get_string_value() : null);
 }
 
+public int any_int(V8value? value) {
+    if (value == null) {
+        return 0;
+    }
+    if (value.is_int() != 0) {
+        return value.get_int_value();
+    }
+    if (value.is_uint() != 0) {
+        return (int) value.get_uint_value();
+    }
+    if (value.is_double() != 0) {
+        return (int) value.get_double_value();
+    }
+    return 0;
+}
+
 public string format_exception(Cef.V8exception exception) {
     var buf = new StringBuilder("");
     buf.append_printf("%s:%d: %s\n%s\n",
