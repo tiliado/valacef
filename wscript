@@ -122,6 +122,12 @@ def configure(ctx):
     find_python3(ctx, "3.6")
     find_cef(ctx)
     
+    ctx.env.append_unique("VALAFLAGS", "-v")
+    ctx.env.append_unique('CFLAGS', ['-w', '-Wno-incompatible-pointer-types'])
+    ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
+    ctx.env.append_unique('CFLAGS', '-O2')
+    ctx.env.append_unique('CFLAGS', '-g3')
+        
     ctx.env.VALACEF_LIBDIR = "%s/%s" % (ctx.env.LIBDIR, APPNAME)
     ctx.define("VALACEF_LIBDIR", ctx.env.VALACEF_LIBDIR)
     ctx.define("CEFIUM_LIBDIR", ctx.env.VALACEF_LIBDIR)
