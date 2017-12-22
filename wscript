@@ -141,7 +141,11 @@ def build(ctx):
     )
     
     ctx.shlib(
-        source = [cef_vala, valacef_api_c, 'valacef/version.vala'],
+        source = [
+            cef_vala, valacef_api_c,
+            'valacef/version.vala',
+            'valacef/V8.vala',
+        ],
         target = 'valacef',
         packages = "valacef_api",
         defines = ['G_LOG_DOMAIN="Cef"'],
