@@ -146,6 +146,73 @@ public Variant? variant_from_value(V8value? val, out string? exception) {
     return null;
 }
 
+public V8value? value_from_variant(Variant? variant, out string? exception) {
+    exception = null;
+	if (variant == null) {
+		return v8value_create_null();
+	}
+	var type = variant.get_type();
+	if (variant.is_of_type(VariantType.VARIANT)) {
+		return value_from_variant(variant.get_variant(), out exception);
+	}
+	if (type.is_subtype_of(VariantType.MAYBE)) {
+		Variant? maybe = null;
+		variant.get("m*", &maybe);
+		return  (maybe == null) ? v8value_create_null(): value_from_variant(maybe, out exception);
+	}
+	var object_type = new VariantType("a{s*}");
+	if (type.is_subtype_of(object_type)) {
+		var object = v8value_create_object(null, null);
+		VariantIter iter = null;
+		variant.get("a{s*}", &iter);
+		string key = null;
+		Variant value = null;
+		while (iter.next("{s*}", &key, &value)) {
+            var member = value_from_variant(value, out exception);
+            if (member == null) {
+                return null;
+            }
+            set_value(object, key, member);
+        }
+		return object;
+	}
+	if (variant.is_of_type(VariantType.STRING)) {
+		return create_string(variant.get_string());
+	}
+	if (variant.is_of_type(VariantType.BOOLEAN)) {
+		return v8value_create_bool((int) variant.get_boolean());
+    }
+	if (variant.is_of_type(VariantType.DOUBLE)) {
+		return v8value_create_double(variant.get_double());
+	}
+	if (variant.is_of_type(VariantType.INT32)) {
+		return v8value_create_int((int) variant.get_int32());
+    }
+	if (variant.is_of_type(VariantType.UINT32)) {
+		return v8value_create_uint((uint) variant.get_uint32());
+	}
+	if (variant.is_of_type(VariantType.INT64)) {
+		return v8value_create_int((int) variant.get_int64());
+	}
+	if (variant.is_of_type(VariantType.UINT64)) {
+		return v8value_create_uint((uint) variant.get_uint64());
+	}
+	if (variant.is_container()) {
+		var size = variant.n_children();
+        var array = v8value_create_array((int) size);
+		for (var i = 0; i < size; i++) {
+            var member = value_from_variant(variant.get_child_value(i), out exception);
+            if (member == null) {
+                return null;
+            }
+            array.set_value_byindex(i, member);
+        }
+		return array;
+	}
+	exception = "Unsupported type '%s'. Content: %s".printf(variant.get_type_string(), variant.print(true));
+    return null;
+}
+
 public string format_exception(Cef.V8exception exception) {
     var buf = new StringBuilder("");
     buf.append_printf("%s:%d: %s\n%s\n",
