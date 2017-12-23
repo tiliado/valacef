@@ -180,6 +180,7 @@ def build(ctx):
             'valacefgtk/DisplayHandler.vala',
             'valacefgtk/LoadHandler.vala',
             'valacefgtk/KeyboardHandler.vala',
+            'valacefgtk/JsdialogHandler.vala',
             'valacefgtk/UIEvents.vala',
             'valacefgtk/WidevinePlugin.vala',
             'valacefgtk/FlashPlugin.vala',

@@ -18,6 +18,9 @@ public class WebView : Gtk.Widget {
     private Gdk.X11.Window? chromium_window = null;
     private Gdk.X11.Window? cef_window = null;
     private string? uri_to_load = null;
+    private Gtk.MessageDialog? js_dialog = null;
+    private Cef.JsdialogCallback? js_dialog_callback = null;
+    private Cef.JsdialogType js_dialog_type = Cef.JsdialogType.ALERT;
     
     public WebView(WebContext web_context) {
         set_has_window(true);
@@ -52,6 +55,36 @@ public class WebView : Gtk.Widget {
     public virtual signal void renderer_destroyed() {
         message("Renderer destroyed.");
     }
+    
+    public virtual signal void discard_js_dialogs() {
+        if (js_dialog != null) {
+            js_dialog.response.disconnect(on_js_dialog_response);
+            js_dialog.destroy();
+            js_dialog = null;
+            js_dialog_callback = null;
+        }
+    }
+    
+    public virtual signal void alert_dialog(ref bool handled, string? url, string? message_text,
+    Cef.JsdialogCallback callback) {
+        if (!handled && js_dialog == null) {
+            js_dialog_callback = callback;
+            js_dialog = new Gtk.MessageDialog(
+                get_toplevel() as Gtk.Window,
+                Gtk.DialogFlags.MODAL, Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE,
+                "The web page '%s' says:\n\n%s", url, message_text);
+            handled = true;
+            js_dialog_type = Cef.JsdialogType.ALERT;
+            js_dialog.response.connect(on_js_dialog_response);
+            js_dialog.show();
+        }
+    }
+    
+    public signal void confirm_dialog(ref bool handled, string? url, string? message_text,
+    Cef.JsdialogCallback callback);
+    
+    public signal void prompt_dialog(ref bool handled, string? url, string? message_text, string? default_prompt_text,
+    Cef.JsdialogCallback callback);
     
     public bool is_ready() {
         return browser != null;
@@ -242,7 +275,8 @@ public class WebView : Gtk.Widget {
             this,
             new FocusHandler(this),
             new DisplayHandler(this),
-            new LoadHandler(this));
+            new LoadHandler(this),
+            new JsdialogHandler(this));
         Cef.String url = {};
         Cef.set_string(&url, uri_to_load ?? "about:blank");
         uri_to_load = null;
@@ -296,6 +330,21 @@ public class WebView : Gtk.Widget {
             break;
         }
         return true;
+    }
+    
+    private void on_js_dialog_response(Gtk.Dialog dialog, int response_id) {
+        dialog.response.disconnect(on_js_dialog_response);
+        Cef.String user_input = {};
+        switch (js_dialog_type) {
+        case Cef.JsdialogType.ALERT:
+            js_dialog.destroy();
+            js_dialog = null;
+            js_dialog_callback.cont(1, &user_input);
+            js_dialog_callback = null;
+            break;
+        default:
+            assert_not_reached();
+        }
     }
 }
 
