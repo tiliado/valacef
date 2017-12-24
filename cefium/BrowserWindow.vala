@@ -38,11 +38,13 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         add_simple_action("edit-cut").activate.connect(() => web_view.edit_cut());
         add_simple_action("edit-redo").activate.connect(() => web_view.edit_redo());
         add_simple_action("edit-undo").activate.connect(() => web_view.edit_undo());
+        add_simple_action("open-developer-tools").activate.connect(() => web_view.open_developer_tools());
         
         add_buttons({
             "(", "go-previous-symbolic|go-back", "go-next-symbolic|go-forward", ")",
             "(", "go-home-symbolic|go-home", "view-refresh-symbolic|reload", "process-stop-symbolic|abort", ")",
             "|",
+            "preferences-other-symbolic|open-developer-tools",
             "(", "zoom-in-symbolic|zoom-in", "zoom-original-symbolic|zoom-reset", "zoom-out-symbolic|zoom-out", ")",
             "(", "edit-undo-symbolic|edit-undo", "edit-redo-symbolic|edit-redo", ")",
             "(", "edit-cut-symbolic|edit-cut", "edit-copy-symbolic|edit-copy",

@@ -205,6 +205,39 @@ public class WebView : Gtk.Widget {
         }
     }
     
+    public void open_developer_tools() {
+        if (browser != null) {
+            var host = browser.get_host();
+            if (host.has_dev_tools() != 1) {
+                Cef.WindowInfo window_info = {};
+                window_info.parent_window = 0;
+                window_info.x = 100;
+                window_info.y = 100;
+                window_info.width = 500;
+                window_info.height = 500;
+                Cef.BrowserSettings browser_settings = {sizeof(Cef.BrowserSettings)};
+                browser_settings.javascript_access_clipboard = Cef.State.ENABLED;
+                browser_settings.javascript_dom_paste = Cef.State.ENABLED;
+                host.show_dev_tools(window_info, new Cef.ClientRef(), browser_settings, null);   
+            } else {
+                host.show_dev_tools(null, null, null, null);   
+            }
+        }
+    }
+    
+    public void close_developer_tools() {
+        if (browser != null) {
+            var host = browser.get_host();
+            if (host.has_dev_tools() == 1) {
+                host.close_dev_tools();   
+            }
+        }
+    }
+    
+    public void has_developer_tools() {
+        return browser == null ? null : (bool) browser.get_host().has_dev_tools();
+    }
+    
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
         minimum_width = natural_width = 100;
     }
