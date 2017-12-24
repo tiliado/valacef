@@ -29,7 +29,7 @@ Dependencies
   * glib-2.0 >= 2.52.0
   * gtk+-3.0 >= 3.22.0
   * x11
-  * CEF 3.3239.1703 (built with GTK+ 3)
+  * CEF 3.3239.1703 (built with GTK+ 3) -- see [BUILDING_CEF.md](./BUILDING_CEF.md)
 
 Build Instructions
 ----------------
