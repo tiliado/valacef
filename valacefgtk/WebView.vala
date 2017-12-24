@@ -234,8 +234,8 @@ public class WebView : Gtk.Widget {
         }
     }
     
-    public void has_developer_tools() {
-        return browser == null ? null : (bool) browser.get_host().has_dev_tools();
+    public bool has_developer_tools() {
+        return browser == null ? false : (bool) browser.get_host().has_dev_tools();
     }
     
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
