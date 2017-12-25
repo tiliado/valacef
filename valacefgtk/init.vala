@@ -19,7 +19,8 @@ public class InitializationResult {
 	}
 }
 
-public InitializationResult init(bool enable_widevine_plugin, bool enable_flash_plugin) {
+public InitializationResult init(bool enable_widevine_plugin=true, bool enable_flash_plugin=true,
+string? user_agent=null, string? product_version=null) {
 	assert (initialization_result == null);
 	set_x11_error_handlers();
 	Cef.String cef_path = {};
@@ -51,6 +52,11 @@ public InitializationResult init(bool enable_widevine_plugin, bool enable_flash_
 	if (enable_widevine_plugin) {
 		widevine_plugin.register(CEF_LIB_DIR);
 	}
+    if (user_agent != null) {
+        Cef.set_string(&settings.user_agent, user_agent);
+    } else if (product_version != null) {
+        Cef.set_string(&settings.product_version, product_version);
+    }
 	
 	Cef.initialize(main_args, settings, app, null);
 	message_loop_source_id = GLib.Timeout.add(20, () => {
