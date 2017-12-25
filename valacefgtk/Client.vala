@@ -2,13 +2,14 @@ namespace CefGtk {
 
 public class Client : Cef.ClientRef {
     public Client(WebView web_view, FocusHandler focus_handler, DisplayHandler display_handler,
-    LoadHandler load_handler, JsdialogHandler js_dialog_handler) {
+    LoadHandler load_handler, JsdialogHandler js_dialog_handler, DownloadHandler download_handler) {
         base();
         priv_set<unowned WebView>("web_view", web_view);
         priv_set("focus_handler", focus_handler);
         priv_set("display_handler", display_handler);
         priv_set("load_handler", load_handler);
         priv_set("js_dialog_handler", js_dialog_handler);
+        priv_set("download_handler", download_handler);
         
         /**
          * Return the handler for context menus. If no handler is provided the default
@@ -40,8 +41,7 @@ public class Client : Cef.ClientRef {
          * will not be allowed.
          */
         vfunc_get_download_handler = (self) => {
-            message("get_download_handler");
-            return null;
+            return ((Cef.ClientRef?)self).priv_get<Cef.DownloadHandler?>("download_handler");
         };
 
         /**

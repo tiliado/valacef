@@ -8,6 +8,7 @@ public class WebView : Gtk.Widget {
     public bool can_go_forward {get; internal set; default = false;}
     public bool is_loading {get; internal set; default = false;}
     public WebContext web_context {get; private set;}
+    public DownloadManager download_manager {get; private set;}
     public double zoom_level {
         get {return (browser != null) ? browser.get_host().get_zoom_level() : _zoom_level;}
         set {if (browser != null) {browser.get_host().set_zoom_level(value);} else {_zoom_level = value;}}
@@ -26,6 +27,7 @@ public class WebView : Gtk.Widget {
         set_has_window(true);
 		set_can_focus(true);
         this.web_context = web_context;
+        this.download_manager = new DownloadManager(this);
     }
     
     public virtual signal void ready() {
@@ -98,6 +100,20 @@ public class WebView : Gtk.Widget {
         } else {
             uri_to_load = uri;
         }
+    }
+    
+    public bool start_download(string uri) {
+        if (browser != null) {
+            Cef.String _uri = {};
+            Cef.set_string(&_uri, uri);
+            browser.get_host().start_download(&_uri);
+            return true;
+        }
+        return false;
+    }
+    
+    public async bool download_file(string uri, string destination, Cancellable? cancellable=null) {
+        return yield download_manager.download_file(uri, destination, cancellable);
     }
     
     public void go_back() {
@@ -307,7 +323,8 @@ public class WebView : Gtk.Widget {
             new FocusHandler(this),
             new DisplayHandler(this),
             new LoadHandler(this),
-            new JsdialogHandler(this));
+            new JsdialogHandler(this),
+            new DownloadHandler(download_manager));
         Cef.String url = {};
         Cef.set_string(&url, uri_to_load ?? "about:blank");
         uri_to_load = null;
