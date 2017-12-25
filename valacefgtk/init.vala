@@ -29,9 +29,12 @@ string? user_agent=null, string? product_version=null) {
 	Cef.override_path(Cef.PathKey.DIR_EXE, &cef_path);
 	
 	Cef.MainArgs main_args = {0, null};
-	var flash_plugin = new FlashPlugin();
-	if (enable_flash_plugin && !flash_plugin.register(CEF_LIB_DIR + "/PepperFlash")) {
-		warning("Failed to register Flash plugin: %s", flash_plugin.registration_error);
+	FlashPlugin? flash_plugin = null; 
+	if (enable_flash_plugin) {
+        flash_plugin = new FlashPlugin();
+        if (!flash_plugin.register(CEF_LIB_DIR + "/PepperFlash")) {
+            warning("Failed to register Flash plugin: %s", flash_plugin.registration_error);
+        }
 	}
 	var app = new BrowserProcess(flash_plugin);
 	var code = Cef.execute_process(main_args, app, null);
@@ -48,8 +51,9 @@ string? user_agent=null, string? product_version=null) {
 	var subprocess_path = Environment.get_variable("CEF_SUBPROCESS_PATH") ?? (VALACEF_LIBDIR + "/ValacefSubprocess");
 	assert(FileUtils.test(subprocess_path, FileTest.IS_EXECUTABLE));
 	Cef.set_string(&settings.browser_subprocess_path, subprocess_path);
-	var widevine_plugin = new WidevinePlugin();
+	WidevinePlugin? widevine_plugin = null;
 	if (enable_widevine_plugin) {
+        widevine_plugin = new WidevinePlugin();
 		widevine_plugin.register(CEF_LIB_DIR);
 	}
     if (user_agent != null) {

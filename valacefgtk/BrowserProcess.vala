@@ -1,7 +1,7 @@
 namespace CefGtk {
 
 public class BrowserProcess : Cef.AppRef {
-    public BrowserProcess(FlashPlugin flash_plugin) {
+    public BrowserProcess(FlashPlugin? flash_plugin) {
         base();
         priv_set("bph", new BrowserProcessHandler());
         priv_set("flash_plugin", flash_plugin);
@@ -43,8 +43,8 @@ public class BrowserProcess : Cef.AppRef {
          */
         /*void*/ vfunc_on_before_command_line_processing = (self, /*String*/ process_type, /*CommandLine*/ command_line
         ) => {
-            var flash = ((BrowserProcess) self).priv_get<FlashPlugin>("flash_plugin");
-            if (flash.available) {
+            var flash = ((BrowserProcess) self).priv_get<FlashPlugin?>("flash_plugin");
+            if (flash != null && flash.available) {
                 Cef.String name = {};
                 Cef.String value = {};
                 Cef.set_string(&name, "ppapi-flash-path");
