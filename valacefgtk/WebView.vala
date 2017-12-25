@@ -252,19 +252,17 @@ public class WebView : Gtk.Widget {
     }
     
     public override void grab_focus() {
-		base.grab_focus();
-		message("focus");
+        browser.get_host().send_focus_event(1);
+        base.grab_focus();
 	}
-
+    
     public override bool focus_in_event(Gdk.EventFocus event) {
-		message("focus_in_event");
 		base.focus_in_event(event);
         browser.get_host().send_focus_event(1);
 		return false;
 	}
 	
     public override bool focus_out_event(Gdk.EventFocus event) {
-		message("focus_out_event");
 		base.focus_out_event(event);
         browser.get_host().send_focus_event(0);
 		return false;
