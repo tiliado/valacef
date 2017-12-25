@@ -301,4 +301,7 @@ def build(ctx):
         CEFLIBDIR=ctx.env.CEF_LIB_DIR,
         INCLUDE_CEF_DIRS="-I%s -I%s" % (ctx.env.CEF_INCLUDE_DIR, os.path.dirname(ctx.env.CEF_INCLUDE_DIR)),
     )
+    
+    ctx.install_files('${PREFIX}/share/vala/vapi', ['valacef_api.vapi'])
+    ctx.install_files('${PREFIX}/include/valacef-1.0', ['valacef_api.h'])
 
