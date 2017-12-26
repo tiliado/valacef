@@ -20,7 +20,6 @@ public class FocusHandler : Cef.FocusHandlerRef {
          * focus to be set or true (1) to cancel setting the focus.
          */
         vfunc_on_set_focus = (self, /*Browser*/ browser, /*FocusSource*/ source) => {
-            message("on_set_focus");
             return source == Cef.FocusSource.NAVIGATION ? 1 : 0;
         };
 
@@ -28,7 +27,6 @@ public class FocusHandler : Cef.FocusHandlerRef {
          * Called when the browser component has received focus.
          */
         vfunc_on_got_focus = (self, /*Browser*/ browser) => {
-            message("on_got_focus");
             ((FocusHandler) self).priv_get<unowned WebView>("web_view").grab_focus();
         };
     }
