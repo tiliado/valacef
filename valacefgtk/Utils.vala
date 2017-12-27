@@ -43,10 +43,11 @@ public Variant? unpack_variant(Variant? variant) {
  * @param list      CEF list to populate.
  * @param values    Variant values.
  */
-public void set_list_from_variant(Cef.ListValue list, Variant?[] values) {
-    list.set_size(values.length);
-    for (var index = 0; index < values.length; index++) {
-        var variant = unpack_variant(values[index]);
+public void set_list_from_variant(Cef.ListValue list, Variant?[] values, int offset=0) {
+    list.set_size(values.length + offset);
+    for (var i = 0; i < values.length; i++) {
+        var index = offset + i;
+        var variant = unpack_variant(values[i]);
         if (variant == null) {
             list.set_null(index);
         } else {
