@@ -33,7 +33,9 @@ public class BrowserProcessHandler : Cef.BrowserProcessHandlerRef {
          * cef_render_process_handler_t::on_render_thread_created() in the render
          * process. Do not keep a reference to |extra_info| outside of this function.
          */
-        /*void*/ vfunc_on_render_process_thread_created = (self, /*ListValue*/ extra_info) => {};
+        /*void*/ vfunc_on_render_process_thread_created = (self, /*ListValue*/ extra_info) => {
+            WebContext.notify_render_process_created(extra_info);
+        };
 
         /**
          * Return the handler for printing on Linux. If a print handler is not

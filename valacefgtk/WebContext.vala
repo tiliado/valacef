@@ -1,14 +1,27 @@
 namespace CefGtk {
 
 public class WebContext : GLib.Object {
+    private static SList<WeakRef<WebContext>> all_contexts = null;
     public string? user_data_path {get; construct;}
     internal Cef.RequestContext request_context;
     internal Cef.RequestContextHandlerRef context_handler;
     internal Cef.CookieManager cookie_manager;
     
+    public static void notify_render_process_created(Cef.ListValue extra_info) {
+        foreach (unowned WeakRef<WebContext> weakref in all_contexts) {
+            var ctx = weakref.get();
+            if (ctx != null) {
+                ctx.render_process_created(extra_info);
+            }
+        }
+    }
+    
     public WebContext(string? user_data_path) {
         GLib.Object(user_data_path: user_data_path);
+        all_contexts.append(new WeakRef<WebContext>(this));
     }
+    
+    public signal void render_process_created(Cef.ListValue extra_info);
     
     construct {
         assert(CefGtk.is_initialized());
