@@ -35,6 +35,7 @@ public class WebView : Gtk.Widget {
     private Gtk.MessageDialog? js_dialog = null;
     private Cef.JsdialogCallback? js_dialog_callback = null;
     private Cef.JsdialogType js_dialog_type = Cef.JsdialogType.ALERT;
+    private SList<RendererExtension> autoloaded_renderer_extensions = null;
     
     public WebView(WebContext web_context) {
         set_has_window(true);
@@ -418,12 +419,25 @@ public class WebView : Gtk.Widget {
          send_message(MsgId.LOAD_RENDERER_EXTENSION, args);
      }
      
+     public RendererExtension add_autoloaded_renderer_extension(string path, Variant?[]? parameters=null) {
+         var extension = new RendererExtension(path, parameters);
+         autoloaded_renderer_extensions.append(extension);
+         return extension;
+     }
+     
+     private void autoload_renderer_extensions() {
+         foreach (var extension in autoloaded_renderer_extensions) {
+             load_renderer_extension(extension.path, extension.parameters);
+         }
+     }
+     
      internal bool on_message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
         return_val_if_fail(browser != this.browser, false);
         var name = msg.get_name();
         var args = Utils.convert_list_to_variant(msg.get_argument_list());
         switch (name) {
         case MsgId.BROWSER_CREATED:
+            autoload_renderer_extensions();
             renderer_created((uint) args[0].get_int64());
             break;
         case MsgId.BROWSER_DESTROYED:
@@ -450,6 +464,16 @@ public class WebView : Gtk.Widget {
         default:
             assert_not_reached();
         }
+    }
+}
+
+public class RendererExtension {
+    public string path {get; private set;}
+    public Variant?[] parameters {get; private set;}
+    
+    public RendererExtension(string path, Variant?[] parameters) {
+        this.path = path;
+        this.parameters = parameters;
     }
 }
 
