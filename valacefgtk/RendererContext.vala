@@ -6,6 +6,7 @@ public class RendererContext : GLib.Object {
     public RenderProcessHandler handler {get; construct;}
     public RenderSideEventLoop event_loop {get; construct;}
     private SList<RendererExtension> renderer_extensions = null;
+    private SList<RendererExtensionInfo> autoloaded_renderer_extensions = null;
     
     public RendererContext(RenderProcessHandler handler) {
         GLib.Object(handler: handler, event_loop: new RenderSideEventLoop(GLib.MainContext.@default()));
@@ -14,11 +15,35 @@ public class RendererContext : GLib.Object {
     public void init(Cef.ListValue? extra_info) {
         Cef.assert_renderer_thread();
         event_loop.start();
+        if (extra_info != null) {
+            var size = extra_info.get_size();
+            for (var i = 0; i < size; i++) {
+                var type = extra_info.get_type(i);
+                switch (type) {
+                case Cef.ValueType.LIST:
+                    var list = extra_info.get_list(i);
+                    if (list.get_size() == 3 && list.get_type(0) == Cef.ValueType.STRING
+                    && list.get_type(1) == Cef.ValueType.INT && list.get_type(2) == Cef.ValueType.LIST) {
+                        var name = list.get_string(0);
+                        assert(name == MsgId.AUTOLOAD_EXTENSION);
+                        var browser_id = list.get_int(1);
+                        var parameters = Utils.convert_list_to_variant(list.get_list(2));
+                        var path = parameters[0].get_string();
+                        autoloaded_renderer_extensions.append(
+                            new RendererExtensionInfo(browser_id, path, parameters));
+                    }
+                    break;
+                default: 
+                    break;
+                }
+            }
+        }
     }
     
     public virtual signal void browser_created(Cef.Browser browser) {
         Cef.assert_renderer_thread();
         send_message(browser, MsgId.BROWSER_CREATED, {browser.get_identifier()});
+        autoload_renderer_extensions(browser);
     }
     
     public virtual signal void browser_destroyed(Cef.Browser browser) {
@@ -77,6 +102,14 @@ public class RendererContext : GLib.Object {
             message("Message received: '%s'", name);
         }
         return true;
+    }
+    
+    private void autoload_renderer_extensions(Cef.Browser browser) {
+         foreach (var extension in autoloaded_renderer_extensions) {
+             if (browser.get_identifier() == extension.browser_id) {
+                load_renderer_extension(browser, extension.path, extension.parameters);
+            }
+         }
     }
     
     private class RendererExtension {

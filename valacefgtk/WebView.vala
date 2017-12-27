@@ -35,12 +35,13 @@ public class WebView : Gtk.Widget {
     private Gtk.MessageDialog? js_dialog = null;
     private Cef.JsdialogCallback? js_dialog_callback = null;
     private Cef.JsdialogType js_dialog_type = Cef.JsdialogType.ALERT;
-    private SList<RendererExtension> autoloaded_renderer_extensions = null;
+    private SList<RendererExtensionInfo> autoloaded_renderer_extensions = null;
     
     public WebView(WebContext web_context) {
         set_has_window(true);
 		set_can_focus(true);
         this.web_context = web_context;
+        web_context.render_process_created.connect(on_render_process_created);
         this.download_manager = new DownloadManager(this);
     }
     
@@ -419,17 +420,39 @@ public class WebView : Gtk.Widget {
          send_message(MsgId.LOAD_RENDERER_EXTENSION, args);
      }
      
-     public RendererExtension add_autoloaded_renderer_extension(string path, Variant?[]? parameters=null) {
-         var extension = new RendererExtension(path, parameters);
+     public RendererExtensionInfo add_autoloaded_renderer_extension(string path, Variant?[]? parameters=null) {
+         var extension = new RendererExtensionInfo(browser == null ? -1 : browser.get_identifier(), path, parameters);
          autoloaded_renderer_extensions.append(extension);
          return extension;
      }
      
-     private void autoload_renderer_extensions() {
-         foreach (var extension in autoloaded_renderer_extensions) {
-             load_renderer_extension(extension.path, extension.parameters);
-         }
-     }
+    private void on_render_process_created(Cef.ListValue extra_info) {
+        foreach (var extension in autoloaded_renderer_extensions) {
+            var n_params = extension.parameters == null ? 0 : extension.parameters.length;
+            var list = Cef.list_value_create();
+            list.set_size(3);
+            Cef.String cef_string = {};
+            Cef.set_string(&cef_string, MsgId.AUTOLOAD_EXTENSION);
+            list.set_string(0, &cef_string);
+            list.set_int(1, extension.browser_id != -1 ? extension.browser_id: browser.get_identifier());
+            
+            var params = Cef.list_value_create();
+            if (n_params > 0) {
+                Utils.set_list_from_variant(params, extension.parameters, 1);
+            } else {
+                params.set_size(1);
+            }
+            Cef.set_string(&cef_string, extension.path);
+            params.set_string(0, &cef_string);
+            params.ref();
+            list.set_list(2, params);
+            
+            var index = extra_info.get_size();
+            extra_info.set_size(index + 1);
+            list.ref();
+            extra_info.set_list(index, list);
+        }
+    }
      
      internal bool on_message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
         return_val_if_fail(browser != this.browser, false);
@@ -437,7 +460,6 @@ public class WebView : Gtk.Widget {
         var args = Utils.convert_list_to_variant(msg.get_argument_list());
         switch (name) {
         case MsgId.BROWSER_CREATED:
-            autoload_renderer_extensions();
             renderer_created((uint) args[0].get_int64());
             break;
         case MsgId.BROWSER_DESTROYED:
@@ -467,11 +489,13 @@ public class WebView : Gtk.Widget {
     }
 }
 
-public class RendererExtension {
+public class RendererExtensionInfo {
+    public int browser_id {get; private set;}
     public string path {get; private set;}
     public Variant?[] parameters {get; private set;}
     
-    public RendererExtension(string path, Variant?[] parameters) {
+    public RendererExtensionInfo(int browser_id, string path, Variant?[] parameters) {
+        this.browser_id = browser_id;
         this.path = path;
         this.parameters = parameters;
     }
