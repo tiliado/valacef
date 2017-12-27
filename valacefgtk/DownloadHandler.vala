@@ -13,6 +13,7 @@ public class DownloadHandler : Cef.DownloadHandlerRef {
          */
         /*void*/ vfunc_on_before_download = (self, /*Browser*/ browser, /*DownloadItem*/ download_item,
         /*String*/ suggested_name, /*BeforeDownloadCallback*/ callback) => {
+            Cef.assert_browser_ui_thread();
             ((Cef.DownloadHandlerRef) self).priv_get<DownloadManager>("manager").on_before_download(
                 download_item, Cef.get_string(suggested_name), callback);
         };
@@ -26,6 +27,7 @@ public class DownloadHandler : Cef.DownloadHandlerRef {
          */
         /*void*/ vfunc_on_download_updated = (self, /*Browser*/ browser, /*DownloadItem*/ download_item,
         /*DownloadItemCallback*/ callback) => {
+            Cef.assert_browser_ui_thread();
             ((Cef.DownloadHandlerRef) self).priv_get<DownloadManager>("manager").on_download_updated(
                 download_item, callback);
         };

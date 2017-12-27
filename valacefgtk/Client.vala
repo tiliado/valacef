@@ -16,6 +16,7 @@ public class Client : Cef.ClientRef {
          * implementation will be used.
          */
         vfunc_get_context_menu_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             message("vfunc_get_context_menu_handler");
             return null;
         };
@@ -25,6 +26,7 @@ public class Client : Cef.ClientRef {
          * implementation will be used.
          */
         vfunc_get_dialog_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             message("get_dialog_handler");
             return null;
         };
@@ -33,6 +35,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for browser display state events.
          */
         vfunc_get_display_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             return ((Cef.ClientRef?)self).priv_get<Cef.DisplayHandler?>("display_handler");
         };
 
@@ -41,6 +44,7 @@ public class Client : Cef.ClientRef {
          * will not be allowed.
          */
         vfunc_get_download_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             return ((Cef.ClientRef?)self).priv_get<Cef.DownloadHandler?>("download_handler");
         };
 
@@ -48,6 +52,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for drag events.
          */
         vfunc_get_drag_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             message("get_drag_handler");
             return null;
         };
@@ -56,6 +61,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for find result events.
          */
         vfunc_get_find_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             message("get_find_handler");
             return null;
         };
@@ -64,6 +70,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for focus events.
          */
         vfunc_get_focus_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             return ((Cef.ClientRef?)self).priv_get<Cef.FocusHandler?>("focus_handler");
         };
 
@@ -72,6 +79,7 @@ public class Client : Cef.ClientRef {
          * provided geolocation access will be denied by default.
          */
         vfunc_get_geolocation_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             message("get_geolocation_handler");
             return null;
         };
@@ -81,6 +89,7 @@ public class Client : Cef.ClientRef {
          * default implementation will be used.
          */
         vfunc_get_jsdialog_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             return ((Cef.ClientRef?)self).priv_get<Cef.JsdialogHandler?>("js_dialog_handler");
         };
 
@@ -88,6 +97,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for keyboard events.
          */
         vfunc_get_keyboard_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             return new KeyboardHandler();
         };
 
@@ -95,6 +105,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for browser life span events.
          */
         vfunc_get_life_span_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             message("get_life_span_handler");
             return null;
         };
@@ -103,6 +114,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for browser load status events.
          */
         vfunc_get_load_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             return ((Cef.ClientRef?)self).priv_get<Cef.LoadHandler?>("load_handler");
         };
 
@@ -110,6 +122,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for off-screen rendering events.
          */
         vfunc_get_render_handler = (self) => {
+            Cef.assert_browser_ui_thread();
             message("get_render_handler");
             return null;
         };
@@ -118,6 +131,7 @@ public class Client : Cef.ClientRef {
          * Return the handler for browser request events.
          */
         vfunc_get_request_handler = (self) => {
+            assert(Cef.currently_on(Cef.ThreadId.UI) + Cef.currently_on(Cef.ThreadId.IO) == 1);
             return null;
         };
         /**
@@ -126,6 +140,7 @@ public class Client : Cef.ClientRef {
          * reference to or attempt to access the message outside of this callback.
          */
         vfunc_on_process_message_received = (self, browser, source_process, msg) => {
+            Cef.assert_browser_ui_thread();
             return (int) ((Cef.ClientRef?) self).priv_get<unowned WebView>("web_view").on_message_received(
                 browser, msg);
         };

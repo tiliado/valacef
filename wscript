@@ -150,6 +150,7 @@ def build(ctx):
         source = [
             cef_vala, valacef_api_c,
             'valacef/version.vala',
+            'valacef/Checks.vala',
             'valacef/V8.vala',
             'valacef/SimpleInterceptor.vala',
             'valacef/SimpleAccessor.vala',

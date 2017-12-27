@@ -43,6 +43,7 @@ public class BrowserProcess : Cef.AppRef {
          */
         /*void*/ vfunc_on_before_command_line_processing = (self, /*String*/ process_type, /*CommandLine*/ command_line
         ) => {
+            assert(!CefGtk.is_initialized());
             var flash = ((BrowserProcess) self).priv_get<FlashPlugin?>("flash_plugin");
             if (flash != null && flash.available) {
                 Cef.String name = {};

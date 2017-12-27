@@ -25,6 +25,7 @@ public class JsdialogHandler: Cef.JsdialogHandlerRef {
         /*int*/ vfunc_on_jsdialog = (self, /*Browser*/ browser, /*String*/ url, /*JsdialogType*/ dialog_type,
         /*String*/ message_text, /*String*/ default_prompt_text, /*JsdialogCallback*/ callback,
         /*int?*/ suppress_message) => {
+            Cef.assert_browser_ui_thread();
             message("Show JS dialog for %s", dialog_type.to_string());
             var _web_view = get_web_view(self);
             var _handled = false;
@@ -55,7 +56,11 @@ public class JsdialogHandler: Cef.JsdialogHandlerRef {
          * dialog is dismissed.
          */
         /*int*/ vfunc_on_before_unload_dialog = (self, /*Browser*/ browser, /*String*/ message_text, /*int*/ is_reload,
-        /*JsdialogCallback*/ callback) => {callback.cont(1, null); return 1;};
+        /*JsdialogCallback*/ callback) => {
+            Cef.assert_browser_ui_thread();
+            callback.cont(1, null);
+            return 1;
+        };
 
         /**
          * Called to cancel any pending dialogs and reset any saved dialog state. Will
@@ -63,6 +68,7 @@ public class JsdialogHandler: Cef.JsdialogHandlerRef {
          * dialogs are currently pending.
          */
         /*void*/ vfunc_on_reset_dialog_state = (self, /*Browser*/ browser) => {
+            Cef.assert_browser_ui_thread();
             get_web_view(self).discard_js_dialogs();
         };
 

@@ -65,6 +65,7 @@ public class BrowserProcessHandler : Cef.BrowserProcessHandlerRef {
     }
     
     private static bool do_cef_work_now() {
+        Cef.assert_browser_ui_thread();
         Cef.do_message_loop_work();
         return false;
     }

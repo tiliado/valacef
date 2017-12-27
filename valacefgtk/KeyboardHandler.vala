@@ -15,6 +15,7 @@ public class KeyboardHandler : Cef.KeyboardHandlerRef {
     }
     
     private static int handle(Cef.KeyboardHandler self, Cef.Browser? browser, Cef.KeyEvent key, Cef.EventHandle? os_event, int? is_keyboard_shortcut) {
+        Cef.assert_browser_ui_thread();
 //~         message("Pre key: type=%d, modifiers=%d, windows_key_code=%u, native_key_code=%u, character=%u/%u",
 //~         (int) key.type, (int) key.modifiers, (uint) key.windows_key_code, (uint)key.native_key_code,
 //~         (uint)key.character, (uint)key.unmodified_character);

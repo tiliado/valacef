@@ -11,6 +11,7 @@ public class FocusHandler : Cef.FocusHandlerRef {
          * false (0) if the browser is giving focus to the previous component.
          */
         vfunc_on_take_focus = (self, /*Browser*/ browser, /*int*/ next) => {
+            Cef.assert_browser_ui_thread();
             message("on_take_focus %d", next);
         };
 
@@ -20,6 +21,7 @@ public class FocusHandler : Cef.FocusHandlerRef {
          * focus to be set or true (1) to cancel setting the focus.
          */
         vfunc_on_set_focus = (self, /*Browser*/ browser, /*FocusSource*/ source) => {
+            Cef.assert_browser_ui_thread();
             return source == Cef.FocusSource.NAVIGATION ? 1 : 0;
         };
 
@@ -27,6 +29,7 @@ public class FocusHandler : Cef.FocusHandlerRef {
          * Called when the browser component has received focus.
          */
         vfunc_on_got_focus = (self, /*Browser*/ browser) => {
+            Cef.assert_browser_ui_thread();
             ((FocusHandler) self).priv_get<unowned WebView>("web_view").grab_focus();
         };
     }

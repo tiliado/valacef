@@ -12,6 +12,7 @@ public class WebContext : GLib.Object {
     
     construct {
         assert(CefGtk.is_initialized());
+        Cef.assert_browser_ui_thread();
         Cef.RequestContextSettings request_settings = {sizeof(Cef.RequestContextSettings)};
         if (user_data_path != null) {
             Cef.set_string(&request_settings.cache_path, user_data_path);
@@ -50,6 +51,7 @@ public class WebContext : GLib.Object {
              * cef_request_tContext::get_default_cookie_manager() will be used.
              */
             /*CookieManager*/ vfunc_get_cookie_manager = (self) => {
+                Cef.assert_browser_io_thread();
                 var cm = ((Cef.RequestContextHandlerRef) self).priv_get<unowned Cef.CookieManager>(
                     "cookie_manager");
                 assert(cm != null);

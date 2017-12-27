@@ -12,30 +12,36 @@ public class RendererContext : GLib.Object {
     }
     
     public void init(Cef.ListValue? extra_info) {
+        Cef.assert_renderer_thread();
         event_loop.start();
     }
     
     public virtual signal void browser_created(Cef.Browser browser) {
+        Cef.assert_renderer_thread();
         send_message(browser, MsgId.BROWSER_CREATED, {browser.get_identifier()});
     }
     
     public virtual signal void browser_destroyed(Cef.Browser browser) {
+        Cef.assert_renderer_thread();
         send_message(browser, MsgId.BROWSER_DESTROYED, {browser.get_identifier()});
     }
     
     public virtual signal void js_context_created(Cef.Browser browser, Cef.Frame frame, Cef.V8context context) {
+        Cef.assert_renderer_thread();
         if (frame.is_main() > 0) {
             message("JS Context created %d", browser.get_identifier());
         }
     }
     
     public virtual signal void js_context_released(Cef.Browser browser, Cef.Frame frame, Cef.V8context context) {
+        Cef.assert_renderer_thread();
         if (frame.is_main() > 0) {
             message("JS Context released: %d", browser.get_identifier());
         }
     }
     
     public void load_renderer_extension(Cef.Browser browser, string path, owned Variant?[] parameters) {
+        Cef.assert_renderer_thread();
         assert(GLib.Module.supported());
         var module = GLib.Module.open(path, 0);
         if (module == null) {
@@ -55,11 +61,13 @@ public class RendererContext : GLib.Object {
     }
     
     public void send_message(Cef.Browser browser, string name, Variant?[] parameters) {
+        Cef.assert_renderer_thread();
         var msg = Utils.create_process_message(name, parameters);
         browser.send_process_message(Cef.ProcessId.RENDERER, msg);
     }
     
     public bool message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
+        Cef.assert_renderer_thread();
         var args = Utils.convert_list_to_variant(msg.get_argument_list());
         var name = msg.get_name();
         if (name == MsgId.LOAD_RENDERER_EXTENSION) {

@@ -11,6 +11,7 @@ public class WidevinePlugin: GLib.Object {
     }
     
     public void register(string path) {
+        assert(!CefGtk.is_initialized());
         Cef.String cef_path = {};
 		Cef.set_string(&cef_path, path);
         Cef.register_widevine_cdm(&cef_path, new RegisterCallback(this));
@@ -33,6 +34,7 @@ public class WidevinePlugin: GLib.Object {
             base();
             priv_set("plugin", plugin);
             vfunc_on_cdm_registration_complete = (self, /*CdmRegistrationError*/ result, /*String*/ error_message) => {
+                Cef.assert_browser_ui_thread();
                 ((Cef.RegisterCdmCallbackRef) self).priv_get<WidevinePlugin>("plugin").registration_finished(
                     result, Cef.get_string(error_message));
             };

@@ -11,10 +11,12 @@ public class DownloadManager : GLib.Object {
     }
     
     public bool start_download(string uri) {
+        Cef.assert_browser_ui_thread();
         return web_view.start_download(uri);
     }
     
     public async bool download_file(string uri, string destination, Cancellable? cancellable=null) {
+        Cef.assert_browser_ui_thread();
         string id_uri = null;
         uint id = 0;
         do {
@@ -32,6 +34,7 @@ public class DownloadManager : GLib.Object {
     
     internal void on_before_download(Cef.DownloadItem item, string? suggested_name,
     Cef.BeforeDownloadCallback handler) {
+        Cef.assert_browser_ui_thread();
         var download_id = item.get_id();
         var uri = item.get_original_url();
         assert(!(download_id_str(download_id) in tasks));
@@ -50,6 +53,7 @@ public class DownloadManager : GLib.Object {
     }
     
     internal void on_download_updated(Cef.DownloadItem item, Cef.DownloadItemCallback handler) {
+        Cef.assert_browser_ui_thread();
         var download_id = download_id_str(item.get_id());
         var task = tasks[download_id];
         if (task != null) {
@@ -100,6 +104,7 @@ public class DownloadManager : GLib.Object {
         }
         
         public void finished(bool result) {
+            Cef.assert_browser_ui_thread();
             this.result = result;
             Idle.add((owned) callback);
             callback = null;

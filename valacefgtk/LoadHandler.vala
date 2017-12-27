@@ -14,6 +14,7 @@ public class LoadHandler : Cef.LoadHandlerRef {
          */
         /*void*/ vfunc_on_loading_state_change = (self, /*Browser*/ browser, /*int*/ is_loading, /*int*/ can_go_back,
         /*int*/ can_go_forward) => {
+            Cef.assert_browser_ui_thread();
             var web = get_web_view(self);
             web.can_go_back = (bool) can_go_back;
             web.can_go_forward = (bool) can_go_forward;
@@ -34,6 +35,7 @@ public class LoadHandler : Cef.LoadHandlerRef {
          */
         /*void*/ vfunc_on_load_start = (self, /*Browser*/ browser, /*Frame*/ frame, /*TransitionType*/ transition_type
         ) => {
+            Cef.assert_browser_ui_thread();
             if (frame.is_main() == 1) {
                 get_web_view(self).load_started(transition_type);
             }
@@ -50,6 +52,7 @@ public class LoadHandler : Cef.LoadHandlerRef {
          * instead.
          */
         /*void*/ vfunc_on_load_end = (self, /*Browser*/ browser, /*Frame*/ frame, /*int*/ http_status_code) => {
+            Cef.assert_browser_ui_thread();
             if (frame.is_main() == 1) {
                 get_web_view(self).load_ended(http_status_code);
             }
@@ -64,6 +67,7 @@ public class LoadHandler : Cef.LoadHandlerRef {
          */
         /*void*/ vfunc_on_load_error = (self, /*Browser*/ browser, /*Frame*/ frame, /*Errorcode*/ error_code,
         /*String*/ error_text, /*String*/ failed_url) => {
+            Cef.assert_browser_ui_thread();
             if (frame.is_main() == 1) {
                 get_web_view(self).load_error(error_code, Cef.get_string(error_text), Cef.get_string(failed_url));
             }

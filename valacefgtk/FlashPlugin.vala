@@ -12,6 +12,7 @@ public class FlashPlugin: GLib.Object {
     }
     
     public bool register(string plugin_directory) {
+        assert(!CefGtk.is_initialized());
         var path = "%s/%s".printf(plugin_directory, FILENAME);
         if (FileUtils.test(path, FileTest.IS_REGULAR)) {
             this.plugin_path = path;

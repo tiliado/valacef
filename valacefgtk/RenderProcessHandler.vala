@@ -10,6 +10,7 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
          * keep a reference to |extra_info| outside of this function.
          */
         /*void*/ vfunc_on_render_thread_created = (self, /*ListValue*/ extra_info) => {
+            Cef.assert_renderer_thread();
             var _this = ((RenderProcessHandler) self);
             var ctx = new RendererContext(_this);
             ctx.init(extra_info);
@@ -23,6 +24,7 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
          */
         /*int*/ vfunc_on_process_message_received = (self, /*Browser*/ browser, /*ProcessId*/ source_process,
          /*ProcessMessage*/ message) => {
+             Cef.assert_renderer_thread();
             return (int) get_ctx(self).message_received(browser, message);
         };
         
@@ -32,6 +34,7 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
          * destroyed.
          */
         /*void*/ vfunc_on_browser_created = (self, /*Browser*/ browser) => {
+            Cef.assert_renderer_thread();
             get_ctx(self).browser_created(browser);
         };
 
@@ -39,6 +42,7 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
          * Called before a browser is destroyed.
          */
         /*void*/ vfunc_on_browser_destroyed = (self, /*Browser*/ browser) => {
+            Cef.assert_renderer_thread();
             get_ctx(self).browser_destroyed(browser);
         };
         
@@ -51,6 +55,7 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
          * cef_v8context_t::get_task_runner() function.
          */
         /*void*/ vfunc_on_context_created = (self, /*Browser*/ browser, /*Frame*/ frame, /*V8context*/ context) => {
+            Cef.assert_renderer_thread();
             get_ctx(self).js_context_created(browser, frame, context);
         };
 
@@ -59,6 +64,7 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
          * references to the context should be kept after this function is called.
          */
         /*void*/ vfunc_on_context_released = (self, /*Browser*/ browser, /*Frame*/ frame, /*V8context*/ context) => {
+            Cef.assert_renderer_thread();
             get_ctx(self).js_context_released(browser, frame, context);
         };
     }

@@ -5,6 +5,7 @@ public class Function {
     out Cef.V8value? retval, out string? exception);
     
     public static Cef.V8value create(string name, owned HandlerFunc handler) {
+        Cef.assert_renderer_thread();
         Cef.String _name = {};
         Cef.set_string(&_name, name);
         var _handler = new Handler(new Function((owned) handler));
@@ -14,6 +15,7 @@ public class Function {
     private HandlerFunc handler;
     
     private Function(owned HandlerFunc handler) {
+        Cef.assert_renderer_thread();
         this.handler = (owned) handler;
     }
     
@@ -35,6 +37,7 @@ public class Function {
              */
             /*int*/ vfunc_execute = (self, /*String*/ name, /*V8value*/ object, /*V8value?[]*/ arguments,
             out /*V8value*/ retval, /*String*/ exception) => {
+                Cef.assert_renderer_thread();
                 string? _exception = null;
                 assert ((int)((void*) object) != 0x2);
                 ((Cef.V8handlerRef) self).priv_get<Function>("function").run(
