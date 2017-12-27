@@ -455,7 +455,9 @@ public class WebView : Gtk.Widget {
     }
      
     internal bool on_message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
-        assert(browser.get_identifier() == this.browser.get_identifier());
+        if (browser.get_identifier() != this.browser.get_identifier()) {
+            return false;
+        }
         var name = msg.get_name();
         var args = Utils.convert_list_to_variant(msg.get_argument_list());
         switch (name) {
