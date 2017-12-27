@@ -88,7 +88,17 @@ public class RendererContext : GLib.Object {
     public void send_message(Cef.Browser browser, string name, Variant?[] parameters) {
         Cef.assert_renderer_thread();
         var msg = Utils.create_process_message(name, parameters);
-        browser.send_process_message(Cef.ProcessId.RENDERER, msg);
+        send_cef_message(browser, name, msg);
+    }
+    
+    private bool send_cef_message(Cef.Browser browser, string name, Cef.ProcessMessage msg) {
+        if (browser.send_process_message(Cef.ProcessId.BROWSER, msg) == 0) {
+            Task.schedule(Cef.ThreadId.RENDERER, 50, () => {
+                send_cef_message(browser, name, msg);
+            });
+            return false;
+        }
+        return true;
     }
     
     public bool message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
