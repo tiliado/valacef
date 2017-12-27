@@ -63,12 +63,12 @@ public class WebView : Gtk.Widget {
         message("Message received from renderer: '%s'", name);
     }
     
-    public virtual signal void renderer_created() {
-        message("Renderer created.");
+    public virtual signal void renderer_created(uint id) {
+        message("Renderer #%u created.", id);
     }
     
-    public virtual signal void renderer_destroyed() {
-        message("Renderer destroyed.");
+    public virtual signal void renderer_destroyed(uint id) {
+        message("Renderer #%u destroyed.", id);
     }
     
     public virtual signal void discard_js_dialogs() {
@@ -421,15 +421,15 @@ public class WebView : Gtk.Widget {
      internal bool on_message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
         return_val_if_fail(browser != this.browser, false);
         var name = msg.get_name();
+        var args = Utils.convert_list_to_variant(msg.get_argument_list());
         switch (name) {
         case MsgId.BROWSER_CREATED:
-            renderer_created();
+            renderer_created((uint) args[0].get_int64());
             break;
         case MsgId.BROWSER_DESTROYED:
-            renderer_destroyed();
+            renderer_destroyed((uint) args[0].get_int64());
             break;
         default:
-            var args = Utils.convert_list_to_variant(msg.get_argument_list());
             message_received(name, args);
             break;
         }
