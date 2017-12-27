@@ -172,6 +172,7 @@ def build(ctx):
         source = [
             'valacefgtk/init.vala',
             'valacefgtk/x11.vala',
+            'valacefgtk/WeakRef.vala',
             'valacefgtk/WebView.vala',
             'valacefgtk/WebContext.vala',
             'valacefgtk/DownloadManager.vala',
