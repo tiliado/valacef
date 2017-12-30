@@ -44,7 +44,8 @@ string? user_agent=null, string? product_version=null) {
 	settings.no_sandbox = 1;
 	/* Even if we use a fixed 50 ms timer (see bellow),
 	 * turning the external_message_pump on decreases CPU usage rapidly. */
-	settings.external_message_pump = 1;
+    // But clipboard paste does not work: tiliado/valacef#2
+	settings.external_message_pump = 0;
 	settings.log_severity = Cef.LogSeverity.WARNING;
 	Cef.set_string(&settings.resources_dir_path, CEF_LIB_DIR);
 	Cef.set_string(&settings.locales_dir_path, CEF_LIB_DIR + "/locales");
