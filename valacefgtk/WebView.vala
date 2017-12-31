@@ -32,6 +32,7 @@ public class WebView : Gtk.Widget {
     private Gdk.X11.Window? chromium_window = null;
     private Gdk.X11.Window? cef_window = null;
     private string? uri_to_load = null;
+    private string? string_to_load = null;
     private Gtk.MessageDialog? js_dialog = null;
     private Cef.JsdialogCallback? js_dialog_callback = null;
     private Cef.JsdialogType js_dialog_type = Cef.JsdialogType.ALERT;
@@ -108,14 +109,33 @@ public class WebView : Gtk.Widget {
         return browser != null;
     }
     
-    public void load_uri(string? uri) {
+    public void load_uri(string uri) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             Cef.String cef_uri = {};
             Cef.set_string(&cef_uri, uri);
             browser.get_main_frame().load_url(&cef_uri);
+            uri_to_load = null;
+            string_to_load = null;
         } else {
             uri_to_load = uri;
+            string_to_load = null;
+        }
+    }
+    
+    public void load_html(owned string code, string fake_url) {
+        if (browser != null) {
+            Cef.assert_browser_ui_thread();
+            Cef.String _fake_url = {};
+            Cef.set_string(&_fake_url, fake_url);
+            Cef.String _code = {};
+            Cef.set_string(&_code, code);
+            browser.get_main_frame().load_string(&_code, &_fake_url);
+            uri_to_load = null;
+            string_to_load = null;
+        } else {
+            uri_to_load = fake_url;
+            string_to_load = (owned) code;
         }
     }
     
@@ -383,10 +403,15 @@ public class WebView : Gtk.Widget {
             new JsdialogHandler(this),
             new DownloadHandler(download_manager));
         Cef.String url = {};
-        Cef.set_string(&url, uri_to_load ?? "about:blank");
-        uri_to_load = null;
+        Cef.set_string(&url, "about:blank");
         browser = Cef.browser_host_create_browser_sync(
             window_info, client, &url, browser_settings, web_context.request_context);
+        if (string_to_load != null) {
+            load_html(string_to_load, uri_to_load);
+        } else if (uri_to_load != null) {
+            load_uri(uri_to_load);
+        }
+        
         var host = browser.get_host();
 		cef_window = wrap_xwindow(
             parent_window.get_display() as Gdk.X11.Display, (X.Window) host.get_window_handle());
