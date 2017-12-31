@@ -64,10 +64,15 @@ string? user_agent=null, string? product_version=null) {
     }
 	
 	Cef.initialize(main_args, settings, app, null);
-	message_loop_source_id = GLib.Timeout.add(20, () => {
+	var source = new TimeoutSource(20);
+	source.set_priority(GLib.Priority.DEFAULT_IDLE);
+	source.set_callback(() => {
 		Cef.do_message_loop_work();
 		return true;
 	});
+	source.set_can_recurse(false);
+	message_loop_source_id =  source.attach(MainContext.ref_thread_default());
+    
 	initialization_result = new InitializationResult(CEF_LIB_DIR, widevine_plugin, flash_plugin);
 	return initialization_result;
 }
