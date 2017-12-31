@@ -80,7 +80,7 @@ public class RendererContext : GLib.Object {
                 var extension = new RendererExtension(
                     this, browser.get_identifier(), (owned) module, function, (owned) parameters);
                 renderer_extensions.prepend(extension);
-                event_loop.add_idle(extension.idle_callback);
+                extension.init();
             }
         }
     }
@@ -138,11 +138,10 @@ public class RendererContext : GLib.Object {
             this.parameters = (owned) parameters;
         }
         
-        public bool idle_callback() {
+        public void init() {
             InitRendererExtensionFunc init_renderer_extension = (InitRendererExtensionFunc) init_function;
             init_renderer_extension(ctx, browser, parameters);
             parameters = null;
-            return false;
         }
     }
 }
