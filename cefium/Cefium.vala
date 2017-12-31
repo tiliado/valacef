@@ -43,15 +43,6 @@ int main(string[] argv) {
 	win.delete_event.connect(() => {Gtk.main_quit(); return true;});
 	win.set_default_size(1100, 800);
 	win.present();
-    Timeout.add_seconds(2, () => {
-        web_view.download_file.begin(
-            "http://www.magpcss.org/ceforum/styles/prosilver/imageset/site_logo.gif",
-            "/tmp/logo.gif", null, (o, res) => {
-                var result = web_view.download_file.end(res);
-                message("Download result: %s", result.to_string());
-            });
-            return false;
-        });
 	Gtk.main();
 	CefGtk.quit();
 	return 0;
