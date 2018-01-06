@@ -11,7 +11,6 @@ public class BrowserWindow : Gtk.ApplicationWindow {
     private string home_uri;
     
     public BrowserWindow(CefGtk.WebView web_view, string home_uri, string? default_status) {
-        set_visual(CefGtk.get_default_visual());
         this.default_status = default_status;
         this.web_view = web_view;
         this.home_uri = home_uri;
