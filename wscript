@@ -1,14 +1,36 @@
 APPNAME = 'valacef'
-VERSION = '3.0'
+VERSION = '3.3239.0'
 MIN_VALA = "0.34.7"
 MIN_GLIB = "2.52.0"
 MIN_GTK = "3.22.0"
-VERSION_MAJOR, VERSION_MINOR = [int(s) for s in VERSION.split('.')]
+
 top = '.'
 out = 'build'
 
 import os
 import waflib
+
+REVISION_SNAPSHOT = "snapshot"
+
+
+def get_git_version():
+	import os
+	import subprocess
+	if os.path.isdir(".git"):
+		output = subprocess.check_output(["git", "describe", "--tags", "--long"])
+		return output.decode("utf-8").strip().split("-")
+	return VERSION, "0", REVISION_SNAPSHOT
+
+def add_version_info(ctx):
+	bare_version, n_commits, revision_id = get_git_version()
+	if revision_id != REVISION_SNAPSHOT:
+		revision_id = "{}-{}".format(n_commits, revision_id)
+	versions = list(int(i) for i in bare_version.split("."))
+	versions[2] += int(n_commits)
+	version = "{}.{}.{}".format(*versions)
+	ctx.env.VERSION = version
+	ctx.env.VERSIONS = versions
+	ctx.env.REVISION_ID = revision_id
 
 def find_cef(ctx, lib_dirs=None, incude_dirs=None):
     ctx.start_msg("Checking for 'libcef.so' dir")
@@ -131,15 +153,17 @@ def configure(ctx):
     ctx.env.VALACEF_LIBDIR = "%s/%s" % (ctx.env.LIBDIR, APPNAME)
     ctx.define("VALACEF_LIBDIR", ctx.env.VALACEF_LIBDIR)
     ctx.define("CEFIUM_LIBDIR", ctx.env.VALACEF_LIBDIR)
-    ctx.env.VERSION = VERSION
+    
+    add_version_info(ctx)
 
 
 def build(ctx):
     include_dirs = [".", ctx.env.CEF_INCLUDE_DIR, os.path.dirname(ctx.env.CEF_INCLUDE_DIR), out]
     cef_vala, valacef_api_vapi, valacef_api_h, valacef_api_c = [ctx.path.find_or_declare(i) for i in (
         'cef.vala', 'valacef_api.vapi', 'valacef_api.h', 'valacef_api.c')]
-    ctx.define('VALACEF_VERSION_MAJOR', VERSION_MAJOR)
-    ctx.define('VALACEF_VERSION_MINOR', VERSION_MINOR)
+    ctx.define('VALACEF_VERSION_MAJOR', ctx.env.VERSIONS[0])
+    ctx.define('VALACEF_VERSION_MINOR', ctx.env.VERSIONS[1])
+    ctx.define('VALACEF_VERSION_MICRO', ctx.env.VERSIONS[2])
     ctx(
         rule='${PYTHON3} ../genvalacef.py ${CEF_INCLUDE_DIR} .. .',
         source=[ctx.path.find_node('genvalacef.py')] + ctx.path.ant_glob('valacefgen/*.py'),

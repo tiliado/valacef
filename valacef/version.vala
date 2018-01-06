@@ -9,6 +9,9 @@ private extern const int VALACEF_VERSION_MAJOR;
 [CCode (cname="VALACEF_VERSION_MINOR")]
 private extern const int VALACEF_VERSION_MINOR;
 
+[CCode (cname="VALACEF_VERSION_MICRO")]
+private extern const int VALACEF_VERSION_MICRO;
+
 public int get_cef_major() {
 	return version_info(0);
 }
@@ -48,9 +51,13 @@ public int get_valacef_minor() {
 	return VALACEF_VERSION_MINOR;
 }
 
+public int get_valacef_micro() {
+	return VALACEF_VERSION_MICRO;
+}
+
 
 public string get_valacef_version() {
-	return "%d.%d".printf(get_valacef_major(), get_valacef_minor());
+	return "%d.%d.%d".printf(get_valacef_major(), get_valacef_minor(), get_valacef_micro());
 }
 
 
