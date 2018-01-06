@@ -71,7 +71,7 @@ string? user_agent=null, string? product_version=null) {
 		return true;
 	});
 	source.set_can_recurse(false);
-	message_loop_source_id =  source.attach(MainContext.ref_thread_default());
+	message_loop_source_id = source.attach(MainContext.ref_thread_default());
     
 	initialization_result = new InitializationResult(CEF_LIB_DIR, widevine_plugin, flash_plugin);
 	return initialization_result;
@@ -85,9 +85,28 @@ public InitializationResult? get_init_result() {
 	return initialization_result;
 }
 
-public void quit() {
+public void run_main_loop() {
+    if (is_initialized()) {
+        if (message_loop_source_id > 0) {
+            Source.remove(message_loop_source_id);
+            message_loop_source_id = 0;
+        }
+        Cef.run_message_loop();
+    }
+}
+
+public void quit_main_loop() {
+    if (is_initialized()) {
+        Cef.quit_message_loop();
+    }
+}
+
+public void shutdown() {
 	if (is_initialized()) {
-        Source.remove(message_loop_source_id);
+        if (message_loop_source_id > 0) {
+            Source.remove(message_loop_source_id);
+            message_loop_source_id = 0;
+        }
         Cef.shutdown();
     }
 }
