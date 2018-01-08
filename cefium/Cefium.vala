@@ -17,6 +17,8 @@ struct Args {
 }
 
 int main(string[] argv) {
+    Environment.set_variable("GDK_BACKEND", "x11", true);
+    
     try {
 		var opt_context = new OptionContext("- Cefium %s".printf(Cef.get_valacef_version()));
 		opt_context.set_help_enabled(true);
