@@ -401,7 +401,8 @@ public class WebView : Gtk.Widget {
             new DisplayHandler(this),
             new LoadHandler(this),
             new JsdialogHandler(this),
-            new DownloadHandler(download_manager));
+            new DownloadHandler(download_manager),
+            new KeyboardHandler(this));
         Cef.String url = {};
         Cef.set_string(&url, "about:blank");
         browser = Cef.browser_host_create_browser_sync(
@@ -497,6 +498,20 @@ public class WebView : Gtk.Widget {
             break;
         }
         return true;
+    }
+    
+    internal bool handle_key_event(Cef.KeyEvent key) {
+        if (key.type != Cef.KeyEventType.RAWKEYDOWN) {
+            return false;
+        }
+        var window = get_toplevel() as Gtk.Window;
+        if (window == null) {
+            return false;
+        }
+        var event = new Gdk.Event(Gdk.EventType.BUTTON_PRESS);
+        event.key.hardware_keycode = (uint16) key.native_key_code;
+        event.key.state = CefGtk.UIEvents.get_gdk_state_modifiers(key.modifiers);
+        return window.activate_key(event.key);
     }
     
     private void on_js_dialog_response(Gtk.Dialog dialog, int response_id) {

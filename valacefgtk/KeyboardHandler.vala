@@ -1,8 +1,9 @@
 namespace CefGtk {
 
 public class KeyboardHandler : Cef.KeyboardHandlerRef {
-    public KeyboardHandler() {
+    public KeyboardHandler(WebView web_view) {
         base();
+        priv_set<unowned WebView>("web_view", web_view);
         
         /**
          * Called before a keyboard event is sent to the renderer. |event| contains
@@ -14,12 +15,11 @@ public class KeyboardHandler : Cef.KeyboardHandlerRef {
         /*int*/ vfunc_on_pre_key_event = (Cef.KeyboardHandlerOnPreKeyEventFunc) handle;
     }
     
-    private static int handle(Cef.KeyboardHandler self, Cef.Browser? browser, Cef.KeyEvent key, Cef.EventHandle? os_event, int? is_keyboard_shortcut) {
+    private static int handle(Cef.KeyboardHandler self, Cef.Browser? browser, Cef.KeyEvent key,
+    Cef.EventHandle? os_event, int? is_keyboard_shortcut) {
         Cef.assert_browser_ui_thread();
-//~         message("Pre key: type=%d, modifiers=%d, windows_key_code=%u, native_key_code=%u, character=%u/%u",
-//~         (int) key.type, (int) key.modifiers, (uint) key.windows_key_code, (uint)key.native_key_code,
-//~         (uint)key.character, (uint)key.unmodified_character);
-        return 0;
+        return (int) ((Cef.KeyboardHandlerRef) self).priv_get<unowned WebView>("web_view").handle_key_event(key);
     }
 }
+
 } // namespace CefGtk

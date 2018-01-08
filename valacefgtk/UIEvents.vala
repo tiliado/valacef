@@ -26,6 +26,32 @@ public int get_cef_state_modifiers(uint state) {
     return modifiers;
 }
 
+public Gdk.ModifierType get_gdk_state_modifiers(uint state) {
+    Gdk.ModifierType modifiers = 0;
+    if ((state & Cef.EventFlags.SHIFT_DOWN) != 0) {
+        modifiers |= Gdk.ModifierType.SHIFT_MASK;
+    }
+    if ((state & Cef.EventFlags.CAPS_LOCK_ON) != 0) {
+        modifiers |= Gdk.ModifierType.LOCK_MASK;
+    }
+    if ((state & Cef.EventFlags.CONTROL_DOWN) != 0) {
+        modifiers |= Gdk.ModifierType.CONTROL_MASK;
+    }
+    if ((state & Cef.EventFlags.ALT_DOWN) != 0) {
+        modifiers |= Gdk.ModifierType.MOD1_MASK;
+    }
+    if ((state & Cef.EventFlags.LEFT_MOUSE_BUTTON) != 0) {
+        modifiers |= Gdk.ModifierType.BUTTON1_MASK;
+    }
+    if ((state & Cef.EventFlags.MIDDLE_MOUSE_BUTTON) != 0) {
+        modifiers |= Gdk.ModifierType.BUTTON2_MASK;
+    }
+    if ((state & Cef.EventFlags.RIGHT_MOUSE_BUTTON) != 0) {
+        modifiers |= Gdk.ModifierType.BUTTON3_MASK;
+    }
+    return modifiers;
+}
+
 // From ui/events/keycodes/keyboard_codes_posix.h.
 public enum KeyboardCode {
     VKEY_BACK = 0x08,

@@ -2,7 +2,8 @@ namespace CefGtk {
 
 public class Client : Cef.ClientRef {
     public Client(WebView web_view, FocusHandler focus_handler, DisplayHandler display_handler,
-    LoadHandler load_handler, JsdialogHandler js_dialog_handler, DownloadHandler download_handler) {
+    LoadHandler load_handler, JsdialogHandler js_dialog_handler, DownloadHandler download_handler,
+    KeyboardHandler keyboard_handler) {
         base();
         priv_set<unowned WebView>("web_view", web_view);
         priv_set("focus_handler", focus_handler);
@@ -10,6 +11,7 @@ public class Client : Cef.ClientRef {
         priv_set("load_handler", load_handler);
         priv_set("js_dialog_handler", js_dialog_handler);
         priv_set("download_handler", download_handler);
+        priv_set("keyboard_handler", keyboard_handler);
         
         /**
          * Return the handler for context menus. If no handler is provided the default
@@ -98,7 +100,7 @@ public class Client : Cef.ClientRef {
          */
         vfunc_get_keyboard_handler = (self) => {
             Cef.assert_browser_ui_thread();
-            return new KeyboardHandler();
+            return ((Cef.ClientRef?)self).priv_get<Cef.KeyboardHandler?>("keyboard_handler");
         };
 
         /**
