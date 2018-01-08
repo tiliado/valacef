@@ -72,7 +72,10 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         update("can-go-back");
         update("can-go-forward");
         go_home();
+        delete_event.connect(() => {hide(); quit(); return true;});
     }
+    
+    public signal void quit();
     
     public void go_home() {
         web_view.load_uri(home_uri);

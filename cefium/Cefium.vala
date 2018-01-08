@@ -32,20 +32,11 @@ int main(string[] argv) {
 		Gtk.get_major_version(), Gtk.get_minor_version(), Gtk.get_micro_version());
 	message("Versions: %s", versions);
 	unowned string[]? gtk_argv = null;
-	Gtk.init(ref gtk_argv);
     CefGtk.init(!Args.disable_widevine, !Args.disable_flash);
-    var ctx = new CefGtk.WebContext(GLib.Environment.get_user_config_dir() + "/cefium");
-    var web_view = new CefGtk.WebView(ctx);
-    web_view.add_autoloaded_renderer_extension(
-        Environment.get_variable("CEFIUM_RENDERER_EXTENSION") ?? LIBDIR + "/libcefiumrendererextension.so",
-        new Variant[]{"hello", 123});
-	var win = new BrowserWindow(web_view, Args.url ?? "https://github.com/tiliado/valacef/wiki", versions);
-	win.delete_event.connect(() => {CefGtk.quit_main_loop(); return true;});
-	win.set_default_size(1100, 800);
-	win.present();
-	CefGtk.run_main_loop();
+	var app = new Application(versions);
+    var result = app.run(gtk_argv);
 	CefGtk.shutdown();
-	return 0;
+	return result;
 }
 
 } // namespace Cefium

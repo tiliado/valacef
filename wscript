@@ -256,6 +256,7 @@ def build(ctx):
     ctx.program(
         source = [
             'cefium/Cefium.vala',
+            'cefium/Application.vala',
             'cefium/BrowserWindow.vala',
             'cefium/URLBar.vala',
             ],
