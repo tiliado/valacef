@@ -9,8 +9,10 @@ public class BrowserWindow : Gtk.ApplicationWindow {
     private CefGtk.WebView web_view;
     private URLBar url_bar;
     private string home_uri;
+    private unowned Gtk.Application app;
     
-    public BrowserWindow(CefGtk.WebView web_view, string home_uri, string? default_status) {
+    public BrowserWindow(Gtk.Application app, CefGtk.WebView web_view, string home_uri, string? default_status) {
+        this.app = app;
         this.default_status = default_status;
         this.web_view = web_view;
         this.home_uri = home_uri;
@@ -23,21 +25,21 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         add(grid);
         tool_bar = new Gtk.HeaderBar();
         
-        add_simple_action("go-back").activate.connect(() => web_view.go_back());
-        add_simple_action("go-forward").activate.connect(() => web_view.go_forward());
-        add_simple_action("go-home").activate.connect(() => go_home());
-        add_simple_action("reload").activate.connect(() => web_view.reload());
-        add_simple_action("abort").activate.connect(() => web_view.stop_load());
-        add_simple_action("zoom-out").activate.connect(() => web_view.zoom_out());
-        add_simple_action("zoom-reset").activate.connect(() => web_view.zoom_reset());
-        add_simple_action("zoom-in").activate.connect(() => web_view.zoom_in());
-        add_simple_action("edit-select-all").activate.connect(() => web_view.edit_select_all());
+        add_simple_action("go-back", "<Alt>Left").activate.connect(() => web_view.go_back());
+        add_simple_action("go-forward", "<Alt>Right").activate.connect(() => web_view.go_forward());
+        add_simple_action("go-home", "<Alt>Home").activate.connect(() => go_home());
+        add_simple_action("reload", "<Control>r").activate.connect(() => web_view.reload());
+        add_simple_action("abort", "Escape").activate.connect(() => web_view.stop_load());
+        add_simple_action("zoom-out", "<Control>minus").activate.connect(() => web_view.zoom_out());
+        add_simple_action("zoom-reset", "<Control>0").activate.connect(() => web_view.zoom_reset());
+        add_simple_action("zoom-in", "<Control>plus").activate.connect(() => web_view.zoom_in());
+        add_simple_action("edit-select-all", "<Control>A").activate.connect(() => web_view.edit_select_all());
         add_simple_action("edit-paste").activate.connect(() => web_view.edit_paste());
         add_simple_action("edit-copy").activate.connect(() => web_view.edit_copy());
         add_simple_action("edit-cut").activate.connect(() => web_view.edit_cut());
         add_simple_action("edit-redo").activate.connect(() => web_view.edit_redo());
         add_simple_action("edit-undo").activate.connect(() => web_view.edit_undo());
-        add_simple_action("open-developer-tools").activate.connect(() => web_view.open_developer_tools());
+        add_simple_action("open-developer-tools", "<Control><Shift>c").activate.connect(() => web_view.open_developer_tools());
         
         add_buttons({
             "(", "go-previous-symbolic|go-back", "go-next-symbolic|go-forward", ")",
@@ -81,10 +83,13 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         web_view.load_uri(home_uri);
     }
     
-    private GLib.SimpleAction add_simple_action(string action_name) {
+    private GLib.SimpleAction add_simple_action(string action_name, string? accelerator=null) {
         var action = new GLib.SimpleAction(action_name, null);
         action.set_enabled(true);
         add_action(action);
+        if (accelerator != null) {
+            app.add_accelerator(accelerator, "win." + action_name, null);
+        }
         return action;
     }
     

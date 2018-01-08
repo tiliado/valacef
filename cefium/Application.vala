@@ -33,7 +33,7 @@ public class Application : Gtk.Application {
             web_view.add_autoloaded_renderer_extension(
                 Environment.get_variable("CEFIUM_RENDERER_EXTENSION") ?? LIBDIR + "/libcefiumrendererextension.so",
                 new Variant[]{"hello", 123});
-            var win = new BrowserWindow(web_view, Args.url ?? "https://github.com/tiliado/valacef/wiki", versions);
+            var win = new BrowserWindow(this, web_view, Args.url ?? "https://github.com/tiliado/valacef/wiki", versions);
             win.quit.connect(() => {CefGtk.quit_main_loop(); quit();});
             win.set_default_size(1100, 800);
             main_window = win;
