@@ -9,6 +9,7 @@ public class WebView : Gtk.Widget {
     public bool is_loading {get; internal set; default = false;}
     public WebContext web_context {get; private set;}
     public DownloadManager download_manager {get; private set;}
+    public bool fullscreen {get; private set; default = false;}
     public double zoom_level {
         get {
             if (browser == null) {
@@ -508,10 +509,26 @@ public class WebView : Gtk.Widget {
         if (window == null) {
             return false;
         }
+        
+        if (fullscreen) {
+            uint keyval = 0;
+            var success = Gdk.Keymap.get_default().translate_keyboard_state(
+                (uint) key.native_key_code, CefGtk.UIEvents.get_gdk_state_modifiers(key.modifiers), 0,
+                out keyval, null, null, null);
+            if (success && keyval == Gdk.Key.Escape) {
+                toggle_fullscreen(false);
+                return true;
+            }
+        }
+        
         var event = new Gdk.Event(Gdk.EventType.BUTTON_PRESS);
         event.key.hardware_keycode = (uint16) key.native_key_code;
         event.key.state = CefGtk.UIEvents.get_gdk_state_modifiers(key.modifiers);
         return window.activate_key(event.key);
+    }
+    
+    internal void toggle_fullscreen(bool fullscreen) {
+        this.fullscreen = fullscreen;
     }
     
     private void on_js_dialog_response(Gtk.Dialog dialog, int response_id) {

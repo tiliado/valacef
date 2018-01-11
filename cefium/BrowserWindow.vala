@@ -157,6 +157,17 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         case "can-go-forward":
             set_action_enabled("go-forward", web_view.can_go_forward);
             break;
+        case "fullscreen":
+            if (web_view.fullscreen) {
+                this.tool_bar.hide();
+                this.status_bar.hide();
+                fullscreen();
+            } else {
+                unfullscreen();
+                this.tool_bar.show();
+                this.status_bar.show();
+            }
+            break;
         }
     }
     

@@ -36,7 +36,9 @@ public class DisplayHandler : Cef.DisplayHandlerRef {
          * automatically return to its original size and position. The client is
          * responsible for resizing the browser if desired.
          */
-        /*void*/ vfunc_on_fullscreen_mode_change = (self, /*Browser*/ browser, /*int*/ fullscreen) => {};
+        /*void*/ vfunc_on_fullscreen_mode_change = (self, /*Browser*/ browser, /*int*/ fullscreen) => {
+            get_web_view(self).toggle_fullscreen((bool) fullscreen);
+        };
 
         /**
          * Called when the browser is about to display a tooltip. |text| contains the
