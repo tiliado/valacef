@@ -85,6 +85,9 @@ In the directory of an extracted minimal CEF distribution:
     mkdir -p /usr/local/include/cef
     cp -r include /usr/local/include/cef
     mkdir -p /usr/local/lib/cef
-    cp Release/* /usr/local/lib/cef
+    cp -r Release/* /usr/local/lib/cef
     cp build/libcef_dll_wrapper/libcef_dll_wrapper.a /usr/local/lib/cef/libcef_dll_wrapper.a
     cp -r Resources/* /usr/local/lib/cef
+
+If you use a non-standard prefix (i.e. different than `/usr`, `/usr/local`, `/app`), use `CEF_PREFIX=/myprefix`
+to build ValaCEF.

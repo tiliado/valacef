@@ -142,7 +142,12 @@ def configure(ctx):
     pkgconfig(ctx, 'gdk-x11-3.0', 'GDKX11', MIN_GTK)
     pkgconfig(ctx, 'x11', 'X11', "0")
     find_python3(ctx, "3.6")
-    find_cef(ctx)
+
+    CEF_PREFIX = os.environ.get("CEF_PREFIX")
+    if CEF_PREFIX:
+        find_cef(ctx, [CEF_PREFIX + '/lib/cef'], [CEF_PREFIX + '/include/cef/include'])
+    else:
+        find_cef(ctx)
     
     ctx.env.append_unique("VALAFLAGS", "-v")
     ctx.env.append_unique('CFLAGS', ['-w', '-Wno-incompatible-pointer-types'])
