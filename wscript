@@ -163,6 +163,10 @@ def configure(ctx):
 
 
 def build(ctx):
+    vapi_dirs = ["vapi", out]
+    env_vapi_dir = os.environ.get("VAPIDIR")
+    if env_vapi_dir:
+        vapi_dirs.extend(os.path.relpath(path) for path in env_vapi_dir.split(":"))
     include_dirs = [".", ctx.env.CEF_INCLUDE_DIR, os.path.dirname(ctx.env.CEF_INCLUDE_DIR), out]
     cef_vala, valacef_api_vapi, valacef_api_h, valacef_api_c = [ctx.path.find_or_declare(i) for i in (
         'cef.vala', 'valacef_api.vapi', 'valacef_api.h', 'valacef_api.c')]
@@ -187,7 +191,7 @@ def build(ctx):
         target = 'valacef',
         packages = "valacef_api",
         defines = ['G_LOG_DOMAIN="Cef"'],
-        vapi_dirs = ["vapi", out],
+        vapi_dirs = vapi_dirs,
         includes = include_dirs,
         lib = ['cef'],
         libpath = [ctx.env.CEF_LIB_DIR],
@@ -230,7 +234,7 @@ def build(ctx):
         packages = "valacef valacef_api gtk+-3.0 gdk-x11-3.0 x11 gmodule-2.0",
         uselib = "GTK GDKX11 X11 GMODULE",
         defines = ['G_LOG_DOMAIN="CefGtk"', 'CEF_LIB_DIR="%s"' % ctx.env.CEF_LIB_DIR],
-        vapi_dirs = ["vapi", out],
+        vapi_dirs = vapi_dirs,
         includes = include_dirs,
         use = ['valacef'],
         lib = ['cef'],
@@ -248,7 +252,7 @@ def build(ctx):
         uselib = "GTK GDKX11 X11",
         use = ['valacef', 'valacefgtk'],
         defines = ['G_LOG_DOMAIN="CefSub"', 'CEF_LIB_DIR="%s"' % ctx.env.CEF_LIB_DIR],
-        vapi_dirs = ["vapi"],
+        vapi_dirs = vapi_dirs,
         includes = include_dirs,
         lib = ['cef'],
         libpath = [ctx.env.CEF_LIB_DIR],
@@ -270,7 +274,7 @@ def build(ctx):
         packages = "gtk+-3.0 gdk-x11-3.0 x11",
         uselib = "GTK GDKX11 X11",
         defines = ['G_LOG_DOMAIN="Cefium"'],
-        vapi_dirs = ["vapi"],
+        vapi_dirs = vapi_dirs,
         includes = include_dirs,
         lib = ['cef'],
         libpath = [ctx.env.CEF_LIB_DIR],
@@ -289,7 +293,7 @@ def build(ctx):
         packages = "gtk+-3.0 gdk-x11-3.0 x11 gmodule-2.0",
         uselib = "GTK GDKX11 X11 GMODULE",
         defines = ['G_LOG_DOMAIN="Cefium"'],
-        vapi_dirs = ["vapi", out],
+        vapi_dirs = vapi_dirs,
         includes = include_dirs,
         lib = ['cef'],
         libpath = [ctx.env.CEF_LIB_DIR],
