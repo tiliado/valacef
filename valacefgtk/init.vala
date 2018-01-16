@@ -1,4 +1,3 @@
-extern const string CEF_LIB_DIR;
 extern const string VALACEF_LIBDIR;
 
 namespace CefGtk {
@@ -24,7 +23,7 @@ string? user_agent=null, string? product_version=null) {
 	assert (initialization_result == null);
 	set_x11_error_handlers();
 	Cef.String cef_path = {};
-	Cef.set_string(&cef_path, CEF_LIB_DIR);
+	Cef.set_string(&cef_path, Cef.get_cef_lib_dir());
 	Cef.override_path(Cef.PathKey.DIR_MODULE, &cef_path);
 	Cef.override_path(Cef.PathKey.DIR_EXE, &cef_path);
 	
@@ -32,7 +31,7 @@ string? user_agent=null, string? product_version=null) {
 	FlashPlugin? flash_plugin = null; 
 	if (enable_flash_plugin) {
         flash_plugin = new FlashPlugin();
-        if (!flash_plugin.register(CEF_LIB_DIR + "/PepperFlash")) {
+        if (!flash_plugin.register(Cef.get_cef_lib_dir() + "/PepperFlash")) {
             warning("Failed to register Flash plugin: %s", flash_plugin.registration_error);
         }
 	}
@@ -47,15 +46,15 @@ string? user_agent=null, string? product_version=null) {
     // But clipboard paste does not work: tiliado/valacef#2
 	settings.external_message_pump = (int) ((Environment.get_variable("CEF_EXTERNAL_MESSAGE_PUMP") ?? "no") == "yes");
 	settings.log_severity = Cef.LogSeverity.WARNING;
-	Cef.set_string(&settings.resources_dir_path, CEF_LIB_DIR);
-	Cef.set_string(&settings.locales_dir_path, CEF_LIB_DIR + "/locales");
+	Cef.set_string(&settings.resources_dir_path, Cef.get_cef_lib_dir());
+	Cef.set_string(&settings.locales_dir_path, Cef.get_cef_lib_dir() + "/locales");
 	var subprocess_path = Environment.get_variable("CEF_SUBPROCESS_PATH") ?? (VALACEF_LIBDIR + "/ValacefSubprocess");
 	assert(FileUtils.test(subprocess_path, FileTest.IS_EXECUTABLE));
 	Cef.set_string(&settings.browser_subprocess_path, subprocess_path);
 	WidevinePlugin? widevine_plugin = null;
 	if (enable_widevine_plugin) {
         widevine_plugin = new WidevinePlugin();
-		widevine_plugin.register(CEF_LIB_DIR);
+		widevine_plugin.register(Cef.get_cef_lib_dir());
 	}
     if (user_agent != null) {
         Cef.set_string(&settings.user_agent, user_agent);
@@ -73,7 +72,7 @@ string? user_agent=null, string? product_version=null) {
 	source.set_can_recurse(false);
 	message_loop_source_id = source.attach(MainContext.ref_thread_default());
     
-	initialization_result = new InitializationResult(CEF_LIB_DIR, widevine_plugin, flash_plugin);
+	initialization_result = new InitializationResult(Cef.get_cef_lib_dir(), widevine_plugin, flash_plugin);
 	return initialization_result;
 }
 

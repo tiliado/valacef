@@ -1,10 +1,8 @@
-extern const string CEF_LIB_DIR;
-
 namespace CefGtk {
 
 int main(string[] argv) {
 	Cef.String cef_path = {};
-	Cef.set_string(&cef_path, CEF_LIB_DIR);
+	Cef.set_string(&cef_path, Cef.get_cef_lib_dir());
 	Cef.override_path(Cef.PathKey.DIR_MODULE, &cef_path);
 	Cef.override_path(Cef.PathKey.DIR_EXE, &cef_path);
 	var app = new CefGtk.RenderProcess();
