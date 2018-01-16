@@ -14,23 +14,23 @@ REVISION_SNAPSHOT = "snapshot"
 
 
 def get_git_version():
-	import os
-	import subprocess
-	if os.path.isdir(".git"):
-		output = subprocess.check_output(["git", "describe", "--tags", "--long"])
-		return output.decode("utf-8").strip().split("-")
-	return VERSION, "0", REVISION_SNAPSHOT
+    import os
+    import subprocess
+    if os.path.isdir(".git"):
+        output = subprocess.check_output(["git", "describe", "--tags", "--long"])
+        return output.decode("utf-8").strip().split("-")
+    return VERSION, "0", REVISION_SNAPSHOT
 
 def add_version_info(ctx):
-	bare_version, n_commits, revision_id = get_git_version()
-	if revision_id != REVISION_SNAPSHOT:
-		revision_id = "{}-{}".format(n_commits, revision_id)
-	versions = list(int(i) for i in bare_version.split("."))
-	versions[2] += int(n_commits)
-	version = "{}.{}.{}".format(*versions)
-	ctx.env.VERSION = version
-	ctx.env.VERSIONS = versions
-	ctx.env.REVISION_ID = revision_id
+    bare_version, n_commits, revision_id = get_git_version()
+    if revision_id != REVISION_SNAPSHOT:
+        revision_id = "{}-{}".format(n_commits, revision_id)
+    versions = list(int(i) for i in bare_version.split("."))
+    versions[2] += int(n_commits)
+    version = "{}.{}.{}".format(*versions)
+    ctx.env.VERSION = version
+    ctx.env.VERSIONS = versions
+    ctx.env.REVISION_ID = revision_id
 
 def find_cef(ctx, lib_dirs=None, incude_dirs=None):
     ctx.start_msg("Checking for 'libcef.so' dir")
