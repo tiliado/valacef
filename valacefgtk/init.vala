@@ -21,6 +21,7 @@ public class InitializationResult {
 public InitializationResult init(bool enable_widevine_plugin=true, bool enable_flash_plugin=true,
 string? user_agent=null, string? product_version=null) {
 	assert (initialization_result == null);
+    Cef.enable_highdpi_support();
 	set_x11_error_handlers();
 	Cef.String cef_path = {};
 	Cef.set_string(&cef_path, Cef.get_cef_lib_dir());
