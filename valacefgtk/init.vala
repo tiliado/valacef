@@ -9,17 +9,21 @@ public class InitializationResult {
 	public string cef_lib_dir {get; private set;}
 	public WidevinePlugin? widevine_plugin {get; private set;}
 	public FlashPlugin? flash_plugin {get; private set;}
+    public BrowserProcess app {get; private set;}
 	
-	public InitializationResult(string cef_lib_dir, WidevinePlugin? widevine_plugin,
+	public InitializationResult(BrowserProcess app, string cef_lib_dir, WidevinePlugin? widevine_plugin,
 	FlashPlugin? flash_plugin) {
 		this.cef_lib_dir = cef_lib_dir;
 		this.widevine_plugin = widevine_plugin;
 		this.flash_plugin = flash_plugin;
+        this.app = app;
 	}
 }
 
-public InitializationResult init(bool enable_widevine_plugin=true, bool enable_flash_plugin=true,
-string? user_agent=null, string? product_version=null) {
+public InitializationResult init(
+    double scale_factor,
+    bool enable_widevine_plugin=true, bool enable_flash_plugin=true,
+    string? user_agent=null, string? product_version=null) {
 	assert (initialization_result == null);
     Cef.enable_highdpi_support();
 	set_x11_error_handlers();
@@ -36,7 +40,7 @@ string? user_agent=null, string? product_version=null) {
             warning("Failed to register Flash plugin: %s", flash_plugin.registration_error);
         }
 	}
-	var app = new BrowserProcess(flash_plugin);
+	var app = new BrowserProcess(flash_plugin, scale_factor);
 	var code = Cef.execute_process(main_args, app, null);
 	assert(code < 0);
 	
@@ -73,7 +77,7 @@ string? user_agent=null, string? product_version=null) {
 	source.set_can_recurse(false);
 	message_loop_source_id = source.attach(MainContext.ref_thread_default());
     
-	initialization_result = new InitializationResult(Cef.get_cef_lib_dir(), widevine_plugin, flash_plugin);
+	initialization_result = new InitializationResult(app, Cef.get_cef_lib_dir(), widevine_plugin, flash_plugin);
 	return initialization_result;
 }
 

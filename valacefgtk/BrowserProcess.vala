@@ -1,10 +1,11 @@
 namespace CefGtk {
 
 public class BrowserProcess : Cef.AppRef {
-    public BrowserProcess(FlashPlugin? flash_plugin) {
+    public BrowserProcess(FlashPlugin? flash_plugin, double scale_factor) {
         base();
         priv_set("bph", new BrowserProcessHandler());
         priv_set("flash_plugin", flash_plugin);
+        priv_set<Variant>("scale_factor", scale_factor); 
         
         /**
          * Provides an opportunity to register custom schemes. Do not keep a reference
@@ -44,10 +45,11 @@ public class BrowserProcess : Cef.AppRef {
         /*void*/ vfunc_on_before_command_line_processing = (self, /*String*/ process_type, /*CommandLine*/ command_line
         ) => {
             assert(!CefGtk.is_initialized());
-            var flash = ((BrowserProcess) self).priv_get<FlashPlugin?>("flash_plugin");
+            var _this = ((BrowserProcess) self);
+            Cef.String name = {};
+            Cef.String value = {};
+            var flash = _this.priv_get<FlashPlugin?>("flash_plugin");
             if (flash != null && flash.available) {
-                Cef.String name = {};
-                Cef.String value = {};
                 Cef.set_string(&name, "ppapi-flash-path");
                 Cef.set_string(&value, flash.plugin_path);
                 command_line.append_switch_with_value(&name, &value);
@@ -58,8 +60,25 @@ public class BrowserProcess : Cef.AppRef {
                 Cef.set_string(&value, "allow");
                 command_line.append_switch_with_value(&name, &value);
             }
+            
+            double _scale_factor = _this.get_scale_factor();
+            if (_scale_factor > 0.0) {
+                Cef.set_string(&name, "force-device-scale-factor");
+                Cef.set_string(&value, _scale_factor.to_string());
+                command_line.append_switch_with_value(&name, &value);
+            }
         };
     }
+
+    /**
+     * Get current scaling factor.
+     *
+     * @return The current scaling factor.
+     */
+    public double get_scale_factor() {
+        return priv_get<Variant>("scale_factor").get_double(); 
+    }
+    
 }
 
 } // namespace CefGtk

@@ -34,7 +34,12 @@ int main(string[] argv) {
 		Gtk.get_major_version(), Gtk.get_minor_version(), Gtk.get_micro_version());
 	message("Versions: %s", versions);
 	unowned string[]? gtk_argv = null;
-    CefGtk.init(!Args.disable_widevine, !Args.disable_flash);
+    Gtk.init(ref gtk_argv);
+    var window = new Gtk.Window();
+    window.show();
+    CefGtk.init(window.scale_factor * 1.0, !Args.disable_widevine, !Args.disable_flash);
+    window.destroy();
+    window = null;
 	var app = new Application(versions);
     var result = app.run(gtk_argv);
 	CefGtk.shutdown();
