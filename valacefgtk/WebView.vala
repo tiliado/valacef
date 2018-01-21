@@ -10,6 +10,7 @@ public class WebView : Gtk.Widget {
     public WebContext web_context {get; private set;}
     public DownloadManager download_manager {get; private set;}
     public bool fullscreen {get; private set; default = false;}
+    public double scaling_factor {get; private set; default = 1.0;}
     public double zoom_level {
         get {
             if (browser == null) {
@@ -28,11 +29,18 @@ public class WebView : Gtk.Widget {
     }
 
     private double translate_cef_zoom_to_percentage(double cef_zoom) {
-        return Math.pow(1.2, cef_zoom);
+        return Math.pow(1.2, cef_zoom) / scaling_factor;
     }
 
     private double translate_percentage_zoom_to_cef(double percentage_zoom) {
-        return Math.log(percentage_zoom) / Math.log(1.2);
+        return Math.log(percentage_zoom * scaling_factor) / Math.log(1.2);
+    }
+
+    private void update_dpi() {
+        int dpi = Gtk.Settings.get_default().gtk_xft_dpi;
+        double current_zoom_level = this.zoom_level;
+        scaling_factor = dpi > 0 ? (1.0 * dpi / 1024 / 96) : 1.0;
+        this.zoom_level = current_zoom_level;
     }
     
     private double _zoom_level = 0.0;
@@ -48,6 +56,8 @@ public class WebView : Gtk.Widget {
     private SList<RendererExtensionInfo> autoloaded_renderer_extensions = null;
     
     public WebView(WebContext web_context) {
+        update_dpi();
+        Gtk.Settings.get_default().notify["gtk-xft-dpi"].connect_after(update_dpi);
         set_has_window(true);
 		set_can_focus(true);
         this.web_context = web_context;
