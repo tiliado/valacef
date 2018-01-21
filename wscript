@@ -238,7 +238,7 @@ def build(ctx):
         vapi_dirs = vapi_dirs,
         includes = include_dirs,
         use = ['valacef'],
-        lib = ['cef'],
+        lib = ['cef', 'm'],
         libpath = [ctx.env.CEF_LIB_DIR],
         rpath = [ctx.env.CEF_LIB_DIR],
         cflags = ['-O2'], 

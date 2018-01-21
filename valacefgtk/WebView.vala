@@ -16,17 +16,25 @@ public class WebView : Gtk.Widget {
                 return _zoom_level;
             }
             Cef.assert_browser_ui_thread();
-            return browser.get_host().get_zoom_level();
+            return translate_cef_zoom_to_percentage(browser.get_host().get_zoom_level());
         }
         set {
-            if (browser == null) {
-                _zoom_level = value;
-            } else {
+            _zoom_level = double.max(0.1, value);
+            if (browser != null) {
                 Cef.assert_browser_ui_thread();
-                browser.get_host().set_zoom_level(value);
+                browser.get_host().set_zoom_level(translate_percentage_zoom_to_cef(_zoom_level));
             }
         }
     }
+
+    private double translate_cef_zoom_to_percentage(double cef_zoom) {
+        return Math.pow(1.2, cef_zoom);
+    }
+
+    private double translate_percentage_zoom_to_cef(double percentage_zoom) {
+        return Math.log(percentage_zoom) / Math.log(1.2);
+    }
+    
     private double _zoom_level = 0.0;
     private Cef.Browser? browser = null;
     private Client? client = null;
@@ -192,17 +200,17 @@ public class WebView : Gtk.Widget {
     
     [Signal (action=true)]
     public void zoom_in() {
-        zoom_level += 0.5;
+        zoom_level += 0.1;
     }
     
     [Signal (action=true)]
     public void zoom_out() {
-        zoom_level -= 0.5;
+        zoom_level -= 0.1;
     }
     
     [Signal (action=true)]
     public void zoom_reset() {
-        zoom_level = 0.0;
+        zoom_level = 1.0;
     }
     
     [Signal (action=true)]
