@@ -22,7 +22,7 @@ public class InitializationResult {
 
 public InitializationResult init(
     double scale_factor,
-    bool enable_widevine_plugin=true, bool enable_flash_plugin=true,
+    string? widevine_plugin_dir=null, bool enable_flash_plugin=true,
     string? user_agent=null, string? product_version=null) {
 	assert (initialization_result == null);
     Cef.enable_highdpi_support();
@@ -57,10 +57,31 @@ public InitializationResult init(
 	assert(FileUtils.test(subprocess_path, FileTest.IS_EXECUTABLE));
 	Cef.set_string(&settings.browser_subprocess_path, subprocess_path);
 	WidevinePlugin? widevine_plugin = null;
-	if (enable_widevine_plugin) {
-        widevine_plugin = new WidevinePlugin();
-		widevine_plugin.register(Cef.get_cef_lib_dir());
-	}
+	if (widevine_plugin_dir != null) {
+        File base_dir = File.new_for_path(widevine_plugin_dir);
+        File libwidevine = base_dir.get_child("libwidevinecdm.so");
+        File adapter = base_dir.get_child("libwidevinecdmadapter.so");
+        File manifest = base_dir.get_child("manifest.json");
+        if (libwidevine.query_exists()) {
+            File cef_lib_dir = File.new_for_path(Cef.get_cef_lib_dir());
+            try {
+                if (!adapter.query_exists()) {
+                    adapter.make_symbolic_link(cef_lib_dir.get_child("libwidevinecdmadapter.so").get_path(), null);
+                }
+                if (!manifest.query_exists()) {
+                    manifest.make_symbolic_link(cef_lib_dir.get_child("manifest.json").get_path(), null);
+                }
+            } catch (GLib.Error e) {
+                warning("Failed to set up Widevine adapter/manifest symlinks. %s", e.message);
+            }
+            widevine_plugin = new WidevinePlugin();
+            widevine_plugin.register(widevine_plugin_dir);
+        } else {
+            warning("%s does not exist.", libwidevine.get_path());
+        }
+	} else {
+        debug("No widevine plugin dir.");
+    }
     if (user_agent != null) {
         Cef.set_string(&settings.user_agent, user_agent);
     } else if (product_version != null) {

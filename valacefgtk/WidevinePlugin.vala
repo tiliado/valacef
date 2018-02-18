@@ -12,6 +12,7 @@ public class WidevinePlugin: GLib.Object {
     
     public void register(string path) {
         assert(!CefGtk.is_initialized());
+        debug("Widevine path: %s", path);
         Cef.String cef_path = {};
 		Cef.set_string(&cef_path, path);
         Cef.register_widevine_cdm(&cef_path, new RegisterCallback(this));

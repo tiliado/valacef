@@ -37,7 +37,7 @@ int main(string[] argv) {
     Gtk.init(ref gtk_argv);
     var window = new Gtk.Window();
     window.show();
-    CefGtk.init(window.scale_factor * 1.0, !Args.disable_widevine, !Args.disable_flash);
+    CefGtk.init(window.scale_factor * 1.0, Args.disable_widevine? null : Cef.get_cef_lib_dir(), !Args.disable_flash);
     window.destroy();
     window = null;
 	var app = new Application(versions);
