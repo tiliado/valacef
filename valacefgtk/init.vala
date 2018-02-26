@@ -23,7 +23,8 @@ public class InitializationResult {
 public InitializationResult init(
     double scale_factor,
     string? widevine_plugin_dir=null, bool enable_flash_plugin=true,
-    string? user_agent=null, string? product_version=null) {
+    string? user_agent=null, string? product_version=null,
+    ProxyType proxy_type=ProxyType.SYSTEM, string? proxy_server=null, uint proxy_port=0) {
 	assert (initialization_result == null);
     Cef.enable_highdpi_support();
 	set_x11_error_handlers();
@@ -40,7 +41,7 @@ public InitializationResult init(
             warning("Failed to register Flash plugin: %s", flash_plugin.registration_error);
         }
 	}
-	var app = new BrowserProcess(flash_plugin, scale_factor);
+	var app = new BrowserProcess(flash_plugin, scale_factor, new ProxySettings(proxy_type, proxy_server, proxy_port));
 	var code = Cef.execute_process(main_args, app, null);
 	assert(code < 0);
 	

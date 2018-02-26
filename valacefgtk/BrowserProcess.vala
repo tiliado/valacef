@@ -1,10 +1,11 @@
 namespace CefGtk {
 
 public class BrowserProcess : Cef.AppRef {
-    public BrowserProcess(FlashPlugin? flash_plugin, double scale_factor) {
+    public BrowserProcess(FlashPlugin? flash_plugin, double scale_factor, owned ProxySettings proxy) {
         base();
         priv_set("bph", new BrowserProcessHandler());
         priv_set("flash_plugin", flash_plugin);
+        priv_set("proxy", (owned) proxy);
         priv_set<Variant>("scale_factor", scale_factor); 
         
         /**
@@ -66,6 +67,19 @@ public class BrowserProcess : Cef.AppRef {
                 Cef.set_string(&name, "force-device-scale-factor");
                 Cef.set_string(&value, _scale_factor.to_string());
                 command_line.append_switch_with_value(&name, &value);
+            }
+
+            unowned ProxySettings? _proxy = _this.priv_get<unowned ProxySettings?>("proxy");
+            if (_proxy != null && _proxy.type != ProxyType.SYSTEM) {
+                if (_proxy.type == ProxyType.NONE) {
+                    Cef.set_string(&name, "no-proxy-server");
+                    command_line.append_switch(&name);
+                } else {
+                    Cef.set_string(&name, "proxy-server");
+                    Cef.set_string(&value, "%s://%s:%u".printf(
+                        _proxy.type == ProxyType.SOCKS ? "socks" : "http", _proxy.server, _proxy.port));
+                    command_line.append_switch_with_value(&name, &value);
+                }
             }
         };
     }
