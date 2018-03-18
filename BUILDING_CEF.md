@@ -17,7 +17,7 @@ On Debian Stretch:
       curl build-essential flex g++ git-svn libcairo2-dev libglib2.0-dev \
       libcups2-dev libgtkglext1-dev git-core libglu1-mesa-dev libnspr4-dev \
       libnss3-dev libgnome-keyring-dev libasound2-dev gperf bison libpci-dev \
-      libkrb5-dev libgtk-3-dev libxss-dev
+      libkrb5-dev libgtk-3-dev libxss-dev python libpulse-dev
 
 Maybe also something from this:
 
@@ -54,13 +54,26 @@ have excellent beer, btw.
 Download & build CEF
 ------------------
 
+### Full download
+
     cd /media/fenryxo/exthdd8/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3239 --checkout=origin/3239-valacef \
+      --branch=3325 --checkout=origin/3325-valacef \
       --force-clean --force-clean-deps --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
-    
+
+### Update
+
+    cd /media/fenryxo/exthdd8/cef/build/
+    time python automate-git.py --download-dir=download \
+      --url=/home/fenryxo/dev/projects/cef/cef \
+      --branch=3325 --checkout=origin/3325-valacef \
+      --force-clean --force-config \
+      --x64-build --build-target=cefsimple --no-build --no-distrib
+
+### Build
+
     for i in $(grep -rIl "\-Werror" .)
     do
       echo $i; sed -i -e 's/-Werror/-Wno-error/g' $i
@@ -68,7 +81,7 @@ Download & build CEF
     
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3239  --checkout=origin/3239-valacef \
+      --branch=3325  --checkout=origin/3325-valacef \
       --x64-build --build-target=cefsimple --no-update --force-build \
       --no-debug-build --minimal-distrib  --client-distrib
 
@@ -91,3 +104,14 @@ In the directory of an extracted minimal CEF distribution:
 
 If you use a non-standard prefix (i.e. different than `/usr`, `/usr/local`, `/app`), use `CEF_PREFIX=/myprefix`
 to build ValaCEF.
+
+Issues
+------
+
+### curl: (35) error:140770FC:SSL routines:SSL23_GET_SERVER_HELLO:unknown protocol
+
+This happens behind a HTTP proxy.
+
+  * Use a VPN connection tunnelled through the proxy
+  * unset http_proxy; unset https_proxy
+  * nano /etc/resolv.conf
