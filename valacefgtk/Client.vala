@@ -77,16 +77,6 @@ public class Client : Cef.ClientRef {
         };
 
         /**
-         * Return the handler for geolocation permissions requests. If no handler is
-         * provided geolocation access will be denied by default.
-         */
-        vfunc_get_geolocation_handler = (self) => {
-            Cef.assert_browser_ui_thread();
-            message("get_geolocation_handler");
-            return null;
-        };
-
-        /**
          * Return the handler for JavaScript dialogs. If no handler is provided the
          * default implementation will be used.
          */

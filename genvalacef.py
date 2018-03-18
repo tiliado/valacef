@@ -50,7 +50,6 @@ header_files = [
     'capi/cef_request_handler_capi.h',
     'capi/cef_download_handler_capi.h',
     'capi/cef_find_handler_capi.h',
-    'capi/cef_geolocation_handler_capi.h',
     'capi/cef_display_handler_capi.h',
     'capi/cef_frame_capi.h',
     'capi/cef_menu_model_capi.h',
