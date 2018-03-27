@@ -10,12 +10,15 @@ public class BrowserWindow : Gtk.ApplicationWindow {
     private URLBar url_bar;
     private string home_uri;
     private unowned Gtk.Application app;
+    private Gtk.Overlay overlay;
+    Gtk.EventBox box;
     
     public BrowserWindow(Gtk.Application app, CefGtk.WebView web_view, string home_uri, string? default_status) {
         this.app = app;
         this.default_status = default_status;
         this.web_view = web_view;
         this.home_uri = home_uri;
+        overlay = new Gtk.Overlay();
         header_bar = new Gtk.HeaderBar();
         header_bar.show_close_button = true;
         header_bar.show();
@@ -63,8 +66,23 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         status_bar.margin = 5;
         status_bar.ellipsize = Pango.EllipsizeMode.MIDDLE;
         web_view.hexpand = web_view.vexpand = true;
+        overlay.add(web_view);
+        
+        box = new Gtk.EventBox();
+        box.set_app_paintable(true);
+        box.set_visual(box.get_screen().get_rgba_visual());
+        box.override_background_color(Gtk.StateFlags.NORMAL, {1.0, 1.0, 1.0, 0.1});
+        var button = new Gtk.Button.with_label("Close overlay");
+        button.vexpand = button.hexpand = false;
+        button.valign = button.halign = Gtk.Align.CENTER;
+        button.clicked.connect((b) => {button.get_parent().get_parent().remove(button.get_parent());});
+        button.show();
+        box.add(button);
+        box.show();
+        overlay.add_overlay(box);
+        overlay.hexpand = overlay.vexpand = true;
         grid.attach(tool_bar, 0, 0, 1, 1);
-        grid.attach(web_view, 0, 1, 1, 1);
+        grid.attach(overlay, 0, 1, 1, 1);
         grid.attach(status_bar, 0, 5, 1, 1);
         grid.show_all();
         web_view.notify.connect_after(on_web_view_notify);

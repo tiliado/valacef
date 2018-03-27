@@ -337,8 +337,51 @@ public class WebView : Gtk.Widget {
     }
     
     public override void realize() {
-		embed_cef();
+        Gtk.Allocation allocation;
+        get_allocation(out allocation);
         set_realized(true);
+
+        Gdk.WindowAttr attributes = {};
+        attributes.x = allocation.x;
+        attributes.y = allocation.y;
+        attributes.width = allocation.width;
+        attributes.height = allocation.height;
+        attributes.window_type = Gdk.WindowType.CHILD;
+        attributes.visual = get_visual();
+        attributes.wclass = Gdk.WindowWindowClass.INPUT_OUTPUT;
+        attributes.event_mask = (get_events()
+            | Gdk.EventMask.BUTTON_MOTION_MASK
+            | Gdk.EventMask.BUTTON_PRESS_MASK
+            | Gdk.EventMask.BUTTON_RELEASE_MASK
+            | Gdk.EventMask.EXPOSURE_MASK
+            | Gdk.EventMask.ENTER_NOTIFY_MASK
+            | Gdk.EventMask.LEAVE_NOTIFY_MASK);
+        Gdk.WindowAttributesType attributes_mask = (
+            Gdk.WindowAttributesType.X | Gdk.WindowAttributesType.Y | Gdk.WindowAttributesType.VISUAL);
+        
+        var window = new Gdk.Window (get_parent_window (), attributes, attributes_mask);
+        set_window(window);
+        register_window(window);
+		embed_cef();
+    }
+
+    public override void size_allocate (Gtk.Allocation allocation) {
+        Gtk.Allocation child_allocation = {};
+        set_allocation(allocation);
+        if (!get_has_window()) {
+            child_allocation.x = allocation.x;
+            child_allocation.y = allocation.y;
+        }
+        else {
+            child_allocation.x = 0;
+            child_allocation.y = 0;
+        }
+        child_allocation.width = allocation.width;
+        child_allocation.height = allocation.height;
+        if (get_realized() && get_has_window()) {
+            get_window().move_resize(allocation.x, allocation.y, child_allocation.width, child_allocation.height);
+            cef_window.move_resize(child_allocation.x, child_allocation.y, child_allocation.width, child_allocation.height);
+        }
     }
     
     public override void grab_focus() {
@@ -401,16 +444,16 @@ public class WebView : Gtk.Widget {
 		var toplevel = get_toplevel();
 		assert(toplevel.is_toplevel());
         CefGtk.override_system_visual(toplevel.get_visual());
-        Gtk.Allocation clip;
-        get_clip(out clip);
-        var parent_window = get_parent_window() as Gdk.X11.Window;
+        var parent_window = get_window() as Gdk.X11.Window;
         assert(parent_window != null);
+        Gtk.Allocation allocation;
+        get_allocation(out allocation);
         Cef.WindowInfo window_info = {};
         window_info.parent_window = (Cef.WindowHandle) parent_window.get_xid();
-        window_info.x = clip.x;
-        window_info.y = clip.y;
-        window_info.width = clip.width;
-        window_info.height = clip.height;
+        window_info.x = 0;
+        window_info.y = 0;
+        window_info.width = allocation.width;
+        window_info.height = allocation.height;
         Cef.BrowserSettings browser_settings = {sizeof(Cef.BrowserSettings)};
         browser_settings.javascript_access_clipboard = Cef.State.ENABLED;
         browser_settings.javascript_dom_paste = Cef.State.ENABLED;
@@ -435,11 +478,12 @@ public class WebView : Gtk.Widget {
         var host = browser.get_host();
 		cef_window = wrap_xwindow(
             parent_window.get_display() as Gdk.X11.Display, (X.Window) host.get_window_handle());
+        cef_window.ensure_native();
         register_window(cef_window);
         chromium_window = find_child_window(cef_window);
         assert(chromium_window != null);
+        chromium_window.ensure_native();
         register_window(chromium_window);
-        set_window(cef_window);
         ready();
     }
     
