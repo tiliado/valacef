@@ -608,6 +608,12 @@ public class WebView : Gtk.Widget {
             assert_not_reached();
         }
     }
+
+    public Gdk.Pixbuf? get_snapshot() {
+        Gtk.Allocation allocation;
+        get_allocation(out allocation);
+        return Gdk.pixbuf_get_from_window(get_window(), 0, 0, allocation.width, allocation.height);
+    }
 }
 
 public class RendererExtensionInfo {
