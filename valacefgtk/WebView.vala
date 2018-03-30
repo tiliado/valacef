@@ -123,6 +123,8 @@ public class WebView : Gtk.Widget {
     
     public signal void prompt_dialog(ref bool handled, string? url, string? message_text, string? default_prompt_text,
     Cef.JsdialogCallback callback);
+
+    public signal void navigation_request(NavigationRequest request);
     
     public bool is_ready() {
         return browser != null;
@@ -464,7 +466,9 @@ public class WebView : Gtk.Widget {
             new LoadHandler(this),
             new JsdialogHandler(this),
             new DownloadHandler(download_manager),
-            new KeyboardHandler(this));
+            new KeyboardHandler(this),
+            new RequestHandler(this),
+            new LifeSpanHandler(this));
         Cef.String url = {};
         Cef.set_string(&url, "about:blank");
         browser = Cef.browser_host_create_browser_sync(

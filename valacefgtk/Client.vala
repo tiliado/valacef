@@ -3,7 +3,7 @@ namespace CefGtk {
 public class Client : Cef.ClientRef {
     public Client(WebView web_view, FocusHandler focus_handler, DisplayHandler display_handler,
     LoadHandler load_handler, JsdialogHandler js_dialog_handler, DownloadHandler download_handler,
-    KeyboardHandler keyboard_handler) {
+    KeyboardHandler keyboard_handler, RequestHandler request_handler, LifeSpanHandler life_span_handler) {
         base();
         priv_set<unowned WebView>("web_view", web_view);
         priv_set("focus_handler", focus_handler);
@@ -12,6 +12,8 @@ public class Client : Cef.ClientRef {
         priv_set("js_dialog_handler", js_dialog_handler);
         priv_set("download_handler", download_handler);
         priv_set("keyboard_handler", keyboard_handler);
+        priv_set("request_handler", request_handler);
+        priv_set("life_span_handler", life_span_handler);
         
         /**
          * Return the handler for context menus. If no handler is provided the default
@@ -99,7 +101,7 @@ public class Client : Cef.ClientRef {
         vfunc_get_life_span_handler = (self) => {
             Cef.assert_browser_ui_thread();
             message("get_life_span_handler");
-            return null;
+            return ((Cef.ClientRef?)self).priv_get<Cef.LifeSpanHandler?>("life_span_handler");
         };
 
         /**
@@ -124,7 +126,7 @@ public class Client : Cef.ClientRef {
          */
         vfunc_get_request_handler = (self) => {
             assert(Cef.currently_on(Cef.ThreadId.UI) + Cef.currently_on(Cef.ThreadId.IO) == 1);
-            return null;
+             return ((Cef.ClientRef?)self).priv_get<Cef.RequestHandler?>("request_handler");
         };
         /**
          * Called when a new message is received from a different process. Return true
