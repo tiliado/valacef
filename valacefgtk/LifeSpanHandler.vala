@@ -33,12 +33,17 @@ public class LifeSpanHandler : Cef.LifeSpanHandlerRef {
             /*WindowInfo*/ windowInfo, out /*Client*/ client, /*BrowserSettings*/ settings, /*int*/ no_javascript_access
         ) => {
             client = null;
+            string? url = Cef.get_string(target_url);
             var request = new NavigationRequest(
-                browser, frame, Cef.get_string(target_url), Cef.get_string(target_frame_name),
+                browser, frame, url, Cef.get_string(target_frame_name),
                 target_disposition, Cef.TransitionType.EXPLICIT,
                 frame.is_main() == 1 ? Cef.ResourceType.MAIN_FRAME : Cef.ResourceType.SUB_FRAME,
                 (bool) user_gesture, true, false);
-            ((Cef.LifeSpanHandlerRef) self).priv_get<unowned WebView>("web_view").navigation_request(request);
+            unowned WebView _web_view = ((Cef.LifeSpanHandlerRef) self).priv_get<unowned WebView>("web_view");
+            _web_view.navigation_request(request);
+            if (url == "about:blank" && request.allowed) {
+                client = new AboutBlankPopupClient(_web_view);
+            }
             return request.allowed ? 0 : 1;
         };
         /**
