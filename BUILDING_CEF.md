@@ -4,8 +4,8 @@ Building Chromium Embedded Framework for ValaCEF
 Paths
 -----
 
-  * /media/fenryxo/exthdd8/cef/build/ -- the build directory
-  * /media/fenryxo/exthdd8/cef/build/ -- the download directory
+  * /media/fenryxo/exthdd7/cef/build/ -- the build directory
+  * /media/fenryxo/exthdd7/cef/build/ -- the download directory
   * /home/fenryxo/dev/projects/cef/cef -- the CEF source directory
 
 Install dependencies
@@ -34,8 +34,8 @@ Maybe also something from this:
 Download automate-git.py script
 ----------------------------
 
-    mkdir -p /media/fenryxo/exthdd8/cef/build
-    cd /media/fenryxo/exthdd8/cef/build
+    mkdir -p /media/fenryxo/exthdd7/cef/build
+    cd /media/fenryxo/exthdd7/cef/build
     wget https://bitbucket.org/chromiumembedded/cef/raw/master/tools/automate/automate-git.py
 
 Set up environment
@@ -56,19 +56,19 @@ Download & build CEF
 
 ### Full download
 
-    cd /media/fenryxo/exthdd8/cef/build/
+    cd /media/fenryxo/exthdd7/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3325 --checkout=origin/3325-valacef \
+      --branch=3396 --checkout=3396-valacef \
       --force-clean --force-clean-deps --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
 
 ### Update
 
-    cd /media/fenryxo/exthdd8/cef/build/
+    cd /media/fenryxo/exthdd7/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3325 --checkout=origin/3325-valacef \
+      --branch=3396 --checkout=origin/3396-valacef \
       --force-clean --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
 
@@ -81,7 +81,7 @@ Download & build CEF
     
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3325  --checkout=origin/3325-valacef \
+      --branch=3396  --checkout=origin/3396-valacef \
       --x64-build --build-target=cefsimple --no-update --force-build \
       --no-debug-build --minimal-distrib  --client-distrib
 

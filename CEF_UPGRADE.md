@@ -17,33 +17,33 @@ $ git fetch upstream
   and branch it.
 
 ```
-git checkout upstream/3325
-git checkout -b 3325
-git checkout -b 3325-valacef
+git checkout upstream/3396
+git checkout -b 3396
+git checkout -b 3396-valacef
 ```
 
 * Or update it:
 
 ```
-git checkout 3325
-git rebase upstream/3325
-git checkout 3325-valacef
-git rebase 3325
+git checkout 3396
+git rebase upstream/3396
+git checkout 3396-valacef
+git rebase 3396
 ```
 
 * Rebase patches
 
 ```
 cd  ~/dev/projects/cef/cef
-git checkout 3325-valacef
+git checkout 3396-valacef
 git cherry-pick ...
-cd /media/fenryxo/exthdd8/cef/build/
-time python automate-git.py --dowtime python automate-git.py --download-dir=download \
-  --url=/home/fenryxo/dev/projects/cef/cef --branch=3325 --checkout=origin/3325-valacef  \
+cd /media/fenryxo/exthdd7/cef/build/
+time python automate-git.py --download-dir=download \
+  --url=/home/fenryxo/dev/projects/cef/cef --branch=3396 --checkout=origin/3396-valacef  \
   --force-clean --force-config  --x64-build --build-target=cefsimple --no-build --no-distrib
-cd /media/fenryxo/exthdd8/cef/build/download/chromium/src/cef/tools
+cd /media/fenryxo/exthdd7/cef/build/download/chromium/src/cef/tools
 # Attempt to update patch files. Any merge conflicts will be highlighted in the output.
 python patch_updater.py
-cp -v /media/fenryxo/exthdd8/cef/build/download/chromium/src/cef/patch/patches/* /home/fenryxo/dev/projects/cef/cef/patch/patches
+cp -v /media/fenryxo/exthdd7/cef/build/download/chromium/src/cef/patch/patches/* /home/fenryxo/dev/projects/cef/cef/patch/patches
 ...
 ```
