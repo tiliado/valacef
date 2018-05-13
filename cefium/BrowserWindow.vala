@@ -18,6 +18,7 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         this.default_status = default_status;
         this.web_view = web_view;
         this.home_uri = home_uri;
+        override_background_color(Gtk.StateFlags.NORMAL, {0.4, 0.9, 0.4, 1.0});
         overlay = new Gtk.Overlay();
         header_bar = new Gtk.HeaderBar();
         header_bar.show_close_button = true;
