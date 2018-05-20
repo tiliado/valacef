@@ -71,6 +71,7 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         overlay.add(web_view);
 
         box = new Gtk.EventBox();
+        box.margin = 200;
         box.set_app_paintable(true);
         box.set_visual(box.get_screen().get_rgba_visual());
         box.override_background_color(Gtk.StateFlags.NORMAL, {1.0, 1.0, 1.0, 0.1});
