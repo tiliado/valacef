@@ -381,6 +381,9 @@ public class WebView : Gtk.Widget {
         child_allocation.width = allocation.width;
         child_allocation.height = allocation.height;
         if (get_realized() && get_has_window()) {
+            debug("allocation %d,%d+%d,%d child_allocation %d,%d+%d,%d",
+                allocation.x, allocation.y, allocation.width, allocation.height,
+                child_allocation.x, child_allocation.y, child_allocation.width, child_allocation.height);
             get_window().move_resize(allocation.x, allocation.y, child_allocation.width, child_allocation.height);
             cef_window.move_resize(child_allocation.x, child_allocation.y, child_allocation.width, child_allocation.height);
         }
