@@ -33,11 +33,10 @@ public bool on_browser_io_thread(string context=GLib.Log.METHOD) {
 public int get_current_thread_id() {
     Cef.ThreadId[] ids = {
         Cef.ThreadId.UI,
-        Cef.ThreadId.DB,
-        Cef.ThreadId.FILE,
+        Cef.ThreadId.FILE_BACKGROUND,
         Cef.ThreadId.FILE_USER_BLOCKING,
+        Cef.ThreadId.FILE_USER_VISIBLE,
         Cef.ThreadId.PROCESS_LAUNCHER,
-        Cef.ThreadId.CACHE,
         Cef.ThreadId.IO,
         Cef.ThreadId.RENDERER
     };
