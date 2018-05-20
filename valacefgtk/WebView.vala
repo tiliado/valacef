@@ -42,7 +42,7 @@ public class WebView : Gtk.Widget {
         scaling_factor = dpi > 0 ? (1.0 * dpi / 1024 / 96) : 1.0;
         this.zoom_level = current_zoom_level;
     }
-    
+
     private double _zoom_level = 0.0;
     private Cef.Browser? browser = null;
     private Client? client = null;
@@ -54,45 +54,45 @@ public class WebView : Gtk.Widget {
     private Cef.JsdialogCallback? js_dialog_callback = null;
     private Cef.JsdialogType js_dialog_type = Cef.JsdialogType.ALERT;
     private SList<RendererExtensionInfo> autoloaded_renderer_extensions = null;
-    
+
     public WebView(WebContext web_context) {
         update_dpi();
         Gtk.Settings.get_default().notify["gtk-xft-dpi"].connect_after(update_dpi);
         set_has_window(true);
-		set_can_focus(true);
+        set_can_focus(true);
         this.web_context = web_context;
         web_context.render_process_created.connect(on_render_process_created);
         this.download_manager = new DownloadManager(this);
     }
-    
+
     public virtual signal void ready() {
         if (zoom_level != _zoom_level) {
             zoom_level = _zoom_level;
         }
     }
-    
+
     public signal void load_started(Cef.TransitionType transition);
-    
+
     public signal void load_ended(int http_status_code);
-    
+
     public signal void load_error(Cef.Errorcode error_code, string? error_text, string? failed_url);
-    
+
     public virtual signal void console_message(string? source, int line, string? text) {
         message("Console: %s:%d: %s", source, line, text);
     }
-    
+
     public virtual signal void message_received(string name, Variant?[]? parameters) {
         message("Message received from renderer: '%s'", name);
     }
-    
+
     public virtual signal void renderer_created(uint id) {
         message("Renderer #%u created.", id);
     }
-    
+
     public virtual signal void renderer_destroyed(uint id) {
         message("Renderer #%u destroyed.", id);
     }
-    
+
     public virtual signal void discard_js_dialogs() {
         if (js_dialog != null) {
             js_dialog.response.disconnect(on_js_dialog_response);
@@ -101,7 +101,7 @@ public class WebView : Gtk.Widget {
             js_dialog_callback = null;
         }
     }
-    
+
     public virtual signal void alert_dialog(ref bool handled, string? url, string? message_text,
     Cef.JsdialogCallback callback) {
         if (!handled && js_dialog == null) {
@@ -117,19 +117,19 @@ public class WebView : Gtk.Widget {
             js_dialog.show();
         }
     }
-    
+
     public signal void confirm_dialog(ref bool handled, string? url, string? message_text,
     Cef.JsdialogCallback callback);
-    
+
     public signal void prompt_dialog(ref bool handled, string? url, string? message_text, string? default_prompt_text,
     Cef.JsdialogCallback callback);
 
     public signal void navigation_request(NavigationRequest request);
-    
+
     public bool is_ready() {
         return browser != null;
     }
-    
+
     public void load_uri(string uri) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
@@ -143,7 +143,7 @@ public class WebView : Gtk.Widget {
             string_to_load = null;
         }
     }
-    
+
     public void load_html(owned string code, string fake_url) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
@@ -159,7 +159,7 @@ public class WebView : Gtk.Widget {
             string_to_load = (owned) code;
         }
     }
-    
+
     public bool start_download(string uri) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
@@ -170,61 +170,61 @@ public class WebView : Gtk.Widget {
         }
         return false;
     }
-    
+
     public async bool download_file(string uri, string destination, Cancellable? cancellable=null) {
         return yield download_manager.download_file(uri, destination, cancellable);
     }
-    
+
     public void go_back() {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             browser.go_back();
         }
     }
-    
+
     public void go_forward() {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             browser.go_forward();
         }
     }
-    
+
     public void reload() {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             browser.reload();
         }
     }
-    
+
     public void reload_ignore_cache() {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             browser.reload_ignore_cache();
         }
     }
-    
+
     public void stop_load() {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             browser.stop_load();
         }
     }
-    
+
     [Signal (action=true)]
     public void zoom_in() {
         zoom_level += 0.1;
     }
-    
+
     [Signal (action=true)]
     public void zoom_out() {
         zoom_level -= 0.1;
     }
-    
+
     [Signal (action=true)]
     public void zoom_reset() {
         zoom_level = 1.0;
     }
-    
+
     [Signal (action=true)]
     public void edit_cut() {
         if (browser != null) {
@@ -235,7 +235,7 @@ public class WebView : Gtk.Widget {
             }
         }
     }
-    
+
     [Signal (action=true)]
     public void edit_copy() {
         if (browser != null) {
@@ -246,7 +246,7 @@ public class WebView : Gtk.Widget {
             }
         }
     }
-    
+
     [Signal (action=true)]
     public void edit_paste() {
         if (browser != null) {
@@ -257,7 +257,7 @@ public class WebView : Gtk.Widget {
             }
         }
     }
-    
+
     [Signal (action=true)]
     public void edit_select_all() {
         if (browser != null) {
@@ -268,7 +268,7 @@ public class WebView : Gtk.Widget {
             }
         }
     }
-    
+
     [Signal (action=true)]
     public void edit_undo() {
         if (browser != null) {
@@ -279,7 +279,7 @@ public class WebView : Gtk.Widget {
             }
         }
     }
-    
+
     [Signal (action=true)]
     public void edit_redo() {
         if (browser != null) {
@@ -290,7 +290,7 @@ public class WebView : Gtk.Widget {
             }
         }
     }
-    
+
     public void open_developer_tools() {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
@@ -305,23 +305,23 @@ public class WebView : Gtk.Widget {
                 Cef.BrowserSettings browser_settings = {sizeof(Cef.BrowserSettings)};
                 browser_settings.javascript_access_clipboard = Cef.State.ENABLED;
                 browser_settings.javascript_dom_paste = Cef.State.ENABLED;
-                host.show_dev_tools(window_info, new Cef.ClientRef(), browser_settings, null);   
+                host.show_dev_tools(window_info, new Cef.ClientRef(), browser_settings, null);
             } else {
-                host.show_dev_tools(null, null, null, null);   
+                host.show_dev_tools(null, null, null, null);
             }
         }
     }
-    
+
     public void close_developer_tools() {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             var host = browser.get_host();
             if (host.has_dev_tools() == 1) {
-                host.close_dev_tools();   
+                host.close_dev_tools();
             }
         }
     }
-    
+
     public bool has_developer_tools() {
         if (browser == null) {
             return false;
@@ -329,15 +329,15 @@ public class WebView : Gtk.Widget {
         Cef.assert_browser_ui_thread();
         return (bool) browser.get_host().has_dev_tools();
     }
-    
+
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
         minimum_width = natural_width = 100;
     }
-    
+
     public override void get_preferred_height(out int minimum_height, out int natural_height) {
         minimum_height = natural_height = 100;
     }
-    
+
     public override void realize() {
         Gtk.Allocation allocation;
         get_allocation(out allocation);
@@ -360,11 +360,11 @@ public class WebView : Gtk.Widget {
             | Gdk.EventMask.LEAVE_NOTIFY_MASK);
         Gdk.WindowAttributesType attributes_mask = (
             Gdk.WindowAttributesType.X | Gdk.WindowAttributesType.Y | Gdk.WindowAttributesType.VISUAL);
-        
+
         var window = new Gdk.Window (get_parent_window (), attributes, attributes_mask);
         set_window(window);
         register_window(window);
-		embed_cef();
+        embed_cef();
     }
 
     public override void size_allocate (Gtk.Allocation allocation) {
@@ -385,66 +385,66 @@ public class WebView : Gtk.Widget {
             cef_window.move_resize(child_allocation.x, child_allocation.y, child_allocation.width, child_allocation.height);
         }
     }
-    
+
     public override void grab_focus() {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             browser.get_host().send_focus_event(1);
         }
         base.grab_focus();
-	}
-    
+    }
+
     public override bool focus_in_event(Gdk.EventFocus event) {
-		base.focus_in_event(event);
+        base.focus_in_event(event);
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             browser.get_host().send_focus_event(1);
         }
-		return false;
-	}
-	
+        return false;
+    }
+
     public override bool focus_out_event(Gdk.EventFocus event) {
-		base.focus_out_event(event);
+        base.focus_out_event(event);
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             browser.get_host().send_focus_event(0);
         }
-		return false;
-	}
-    
+        return false;
+    }
+
     public void send_click_event(Gdk.EventButton event) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             UIEvents.send_click_event(event, browser.get_host());
         }
     }
-    
+
     public void send_scroll_event(Gdk.EventScroll event) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             UIEvents.send_scroll_event(event, browser.get_host());
         }
     }
-    
+
     public void send_key_event(Gdk.EventKey event) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             UIEvents.send_key_event(event, browser.get_host());
         }
     }
-    
+
     public void send_motion_event(Gdk.EventMotion event) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
-            UIEvents.send_motion_event(event, browser.get_host()); 
+            UIEvents.send_motion_event(event, browser.get_host());
         }
     }
-    
+
     private void embed_cef() {
-		assert(CefGtk.is_initialized());
+        assert(CefGtk.is_initialized());
         Cef.assert_browser_ui_thread();
-		var toplevel = get_toplevel();
-		assert(toplevel.is_toplevel());
+        var toplevel = get_toplevel();
+        assert(toplevel.is_toplevel());
         CefGtk.override_system_visual(toplevel.get_visual());
         var parent_window = get_window() as Gdk.X11.Window;
         assert(parent_window != null);
@@ -480,9 +480,9 @@ public class WebView : Gtk.Widget {
         } else if (uri_to_load != null) {
             load_uri(uri_to_load);
         }
-        
+
         var host = browser.get_host();
-		cef_window = wrap_xwindow(
+        cef_window = wrap_xwindow(
             parent_window.get_display() as Gdk.X11.Display, (X.Window) host.get_window_handle());
         cef_window.ensure_native();
         register_window(cef_window);
@@ -492,7 +492,7 @@ public class WebView : Gtk.Widget {
         register_window(chromium_window);
         ready();
     }
-    
+
     public void send_message(string name, Variant?[] parameters) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
@@ -500,7 +500,7 @@ public class WebView : Gtk.Widget {
             browser.send_process_message(Cef.ProcessId.RENDERER, msg);
         }
     }
-    
+
     public void load_renderer_extension(string path, Variant?[]? parameters=null) {
          Variant?[] args;
          if (parameters != null && parameters.length > 0) {
@@ -514,13 +514,13 @@ public class WebView : Gtk.Widget {
          args[0] = new Variant.string(path);
          send_message(MsgId.LOAD_RENDERER_EXTENSION, args);
      }
-     
+
      public RendererExtensionInfo add_autoloaded_renderer_extension(string path, Variant?[]? parameters=null) {
          var extension = new RendererExtensionInfo(browser == null ? -1 : browser.get_identifier(), path, parameters);
          autoloaded_renderer_extensions.append(extension);
          return extension;
      }
-     
+
     private void on_render_process_created(Cef.ListValue extra_info) {
         foreach (var extension in autoloaded_renderer_extensions) {
             var n_params = extension.parameters == null ? 0 : extension.parameters.length;
@@ -530,7 +530,7 @@ public class WebView : Gtk.Widget {
             Cef.set_string(&cef_string, MsgId.AUTOLOAD_EXTENSION);
             list.set_string(0, &cef_string);
             list.set_int(1, extension.browser_id != -1 ? extension.browser_id: browser.get_identifier());
-            
+
             var params = Cef.list_value_create();
             if (n_params > 0) {
                 Utils.set_list_from_variant(params, extension.parameters, 1);
@@ -541,14 +541,14 @@ public class WebView : Gtk.Widget {
             params.set_string(0, &cef_string);
             params.ref();
             list.set_list(2, params);
-            
+
             var index = extra_info.get_size();
             extra_info.set_size(index + 1);
             list.ref();
             extra_info.set_list(index, list);
         }
     }
-     
+
     internal bool on_message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
         if (browser.get_identifier() != this.browser.get_identifier()) {
             return false;
@@ -568,7 +568,7 @@ public class WebView : Gtk.Widget {
         }
         return true;
     }
-    
+
     internal bool handle_key_event(Cef.KeyEvent key) {
         if (key.type != Cef.KeyEventType.RAWKEYDOWN) {
             return false;
@@ -577,7 +577,7 @@ public class WebView : Gtk.Widget {
         if (window == null) {
             return false;
         }
-        
+
         if (fullscreen) {
             uint keyval = 0;
             var success = Gdk.Keymap.get_default().translate_keyboard_state(
@@ -588,17 +588,17 @@ public class WebView : Gtk.Widget {
                 return true;
             }
         }
-        
+
         var event = new Gdk.Event(Gdk.EventType.BUTTON_PRESS);
         event.key.hardware_keycode = (uint16) key.native_key_code;
         event.key.state = CefGtk.UIEvents.get_gdk_state_modifiers(key.modifiers);
         return window.activate_key(event.key);
     }
-    
+
     internal void toggle_fullscreen(bool fullscreen) {
         this.fullscreen = fullscreen;
     }
-    
+
     private void on_js_dialog_response(Gtk.Dialog dialog, int response_id) {
         Cef.assert_browser_ui_thread();
         dialog.response.disconnect(on_js_dialog_response);
@@ -626,7 +626,7 @@ public class RendererExtensionInfo {
     public int browser_id {get; private set;}
     public string path {get; private set;}
     public Variant?[] parameters {get; private set;}
-    
+
     public RendererExtensionInfo(int browser_id, string path, Variant?[] parameters) {
         this.browser_id = browser_id;
         this.path = path;

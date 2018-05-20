@@ -12,7 +12,7 @@ public class BrowserWindow : Gtk.ApplicationWindow {
     private unowned Gtk.Application app;
     private Gtk.Overlay overlay;
     Gtk.EventBox box;
-    
+
     public BrowserWindow(Gtk.Application app, CefGtk.WebView web_view, string home_uri, string? default_status) {
         this.app = app;
         this.default_status = default_status;
@@ -28,7 +28,7 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         grid.hexpand = grid.vexpand = true;
         add(grid);
         tool_bar = new Gtk.HeaderBar();
-        
+
         add_simple_action("go-back", "<Alt>Left").activate.connect(() => web_view.go_back());
         add_simple_action("go-forward", "<Alt>Right").activate.connect(() => web_view.go_forward());
         add_simple_action("go-home", "<Alt>Home").activate.connect(() => go_home());
@@ -46,7 +46,7 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         add_simple_action("snapshot").activate.connect(() => take_snapshot());
         add_simple_action("open-developer-tools", "<Control><Shift>c").activate.connect(() => web_view.open_developer_tools());
         add_simple_action("quit", "<Control>q").activate.connect(() => quit());
-        
+
         add_buttons({
             "(", "go-previous-symbolic|go-back", "go-next-symbolic|go-forward", ")",
             "(", "go-home-symbolic|go-home", "view-refresh-symbolic|reload", "process-stop-symbolic|abort", ")",
@@ -57,7 +57,7 @@ public class BrowserWindow : Gtk.ApplicationWindow {
             "(", "edit-cut-symbolic|edit-cut", "edit-copy-symbolic|edit-copy",
             "edit-paste-symbolic|edit-paste", "edit-select-all-symbolic|edit-select-all", ")",
         });
-        
+
         url_bar = new URLBar(null);
         url_bar.hexpand = true;
         url_bar.response.connect(on_url_bar_response);
@@ -69,7 +69,7 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         status_bar.ellipsize = Pango.EllipsizeMode.MIDDLE;
         web_view.hexpand = web_view.vexpand = true;
         overlay.add(web_view);
-        
+
         box = new Gtk.EventBox();
         box.set_app_paintable(true);
         box.set_visual(box.get_screen().get_rgba_visual());
@@ -97,13 +97,13 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         go_home();
         delete_event.connect(() => {hide(); quit(); return true;});
     }
-    
+
     public signal void quit();
-    
+
     public void go_home() {
         web_view.load_uri(home_uri);
     }
-    
+
     private GLib.SimpleAction add_simple_action(string action_name, string? accelerator=null) {
         var action = new GLib.SimpleAction(action_name, null);
         action.set_enabled(true);
@@ -113,7 +113,7 @@ public class BrowserWindow : Gtk.ApplicationWindow {
         }
         return action;
     }
-    
+
     private void add_buttons(string[] buttons) {
         Gtk.Grid? grid = null;
         bool start = true;
@@ -149,11 +149,11 @@ public class BrowserWindow : Gtk.ApplicationWindow {
             }
         }
     }
-    
+
     private void on_web_view_notify(GLib.Object? o, ParamSpec param) {
         update(param.name);
     }
-    
+
     private void update(string property) {
         switch (property) {
         case "title":
@@ -190,13 +190,13 @@ public class BrowserWindow : Gtk.ApplicationWindow {
             break;
         }
     }
-    
+
     public void set_action_enabled(string name, bool enabled) {
         var action = lookup_action(name) as GLib.SimpleAction;
         return_if_fail(action != null);
         action.set_enabled(enabled);
     }
-    
+
     private void on_url_bar_response(bool accepted) {
         if (accepted) {
             web_view.load_uri(url_bar.url);
