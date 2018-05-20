@@ -115,7 +115,7 @@ class Parser:
                     v['name'],   # c_name
                     v['name'][n_prefix:],  # vala_name
                     v.get('doxygen')  # comment
-                    ) for v in enum['values']]
+                    ) for v in enum['values'] if v['name'] not in self.ignore]
                 self.repo.add_enum(Enum(
                     c_name=name,
                     vala_name=self.naming.enum(name),

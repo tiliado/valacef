@@ -86,6 +86,7 @@ ignore = {
     'XEvent',
     'XDisplay',
     'cef_get_xdisplay',
+    'TID_FILE',
 }
 
 base_structs = {
