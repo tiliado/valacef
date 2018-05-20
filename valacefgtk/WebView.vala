@@ -459,6 +459,8 @@ public class WebView : Gtk.Widget {
         Cef.BrowserSettings browser_settings = {sizeof(Cef.BrowserSettings)};
         browser_settings.javascript_access_clipboard = Cef.State.ENABLED;
         browser_settings.javascript_dom_paste = Cef.State.ENABLED;
+        browser_settings.universal_access_from_file_urls = Cef.State.ENABLED;
+        browser_settings.file_access_from_file_urls = Cef.State.ENABLED;
         client = new Client(
             this,
             new FocusHandler(this),
