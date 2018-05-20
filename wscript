@@ -208,6 +208,7 @@ def build(ctx):
             'valacefgtk/x11.vala',
             'valacefgtk/WeakRef.vala',
             'valacefgtk/WebView.vala',
+            'valacefgtk/WebViewWindowed.vala',
             'valacefgtk/WebContext.vala',
             'valacefgtk/DownloadManager.vala',
             'valacefgtk/BrowserProcess.vala',
