@@ -1,6 +1,6 @@
 namespace CefGtk {
 
-private class WebViewWindowed : Gtk.Widget {
+private class WebViewWindowed : Gtk.Widget, WebViewWidget {
     private Gdk.X11.Window? chromium_window = null;
     private Gdk.X11.Window? cef_window = null;
     private unowned WebView web_view;
@@ -11,7 +11,6 @@ private class WebViewWindowed : Gtk.Widget {
         set_can_focus(false);
     }
 
-    public signal void browser_created(Client client, Cef.Browser browser);
 
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
         minimum_width = natural_width = 100;

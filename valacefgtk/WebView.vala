@@ -48,7 +48,7 @@ public class WebView : Gtk.Bin {
         this.zoom_level = current_zoom_level;
     }
 
-    private WebViewWindowed web_view;
+    private WebViewWidget web_view;
     private double _zoom_level = 0.0;
     private Cef.Browser? browser = null;
     private Client? client = null;
