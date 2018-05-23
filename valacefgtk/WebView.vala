@@ -1,5 +1,9 @@
 namespace CefGtk {
 
+public enum RenderingMode {
+    WINDOWED;
+}
+
 public class WebView : Gtk.Bin {
     public string? title {get; internal set; default = null;}
     public string? uri {get; internal set; default = null;}
@@ -27,6 +31,7 @@ public class WebView : Gtk.Bin {
             }
         }
     }
+    public RenderingMode rendering_mode {get; construct; default = RenderingMode.WINDOWED;}
 
     private double translate_cef_zoom_to_percentage(double cef_zoom) {
         return Math.pow(1.2, cef_zoom) / scaling_factor;
@@ -54,7 +59,8 @@ public class WebView : Gtk.Bin {
     private Cef.JsdialogType js_dialog_type = Cef.JsdialogType.ALERT;
     private SList<RendererExtensionInfo> autoloaded_renderer_extensions = null;
 
-    public WebView(WebContext web_context) {
+    public WebView(WebContext web_context, RenderingMode rendering_mode = RenderingMode.WINDOWED) {
+        GLib.Object(rendering_mode: rendering_mode);
         update_dpi();
         Gtk.Settings.get_default().notify["gtk-xft-dpi"].connect_after(update_dpi);
         set_has_window(false);
