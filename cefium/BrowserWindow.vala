@@ -72,9 +72,9 @@ public class BrowserWindow : Gtk.ApplicationWindow {
 
         box = new Gtk.EventBox();
         box.margin = 200;
-        box.set_app_paintable(true);
+        box.set_app_paintable(false);
         box.set_visual(box.get_screen().get_rgba_visual());
-        box.override_background_color(Gtk.StateFlags.NORMAL, {1.0, 1.0, 1.0, 0.1});
+        box.override_background_color(Gtk.StateFlags.NORMAL, {0.5, 0.5, 1.0, 0.5});
         var button = new Gtk.Button.with_label("Close overlay");
         button.vexpand = button.hexpand = false;
         button.valign = button.halign = Gtk.Align.CENTER;
