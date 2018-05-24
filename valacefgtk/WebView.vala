@@ -64,11 +64,11 @@ public class WebView : Gtk.Bin {
         update_dpi();
         Gtk.Settings.get_default().notify["gtk-xft-dpi"].connect_after(update_dpi);
         set_has_window(false);
-        set_can_focus(true);
         this.web_context = web_context;
         web_context.render_process_created.connect(on_render_process_created);
         this.download_manager = new DownloadManager(this);
         this.web_view = new WebViewWindowed(this);
+        set_can_focus(!web_view.get_can_focus());
         web_view.browser_created.connect(on_browser_created);
         add(web_view);
         web_view.show();
@@ -351,29 +351,31 @@ public class WebView : Gtk.Bin {
     }
 
     public override void grab_focus() {
-        if (browser != null) {
-            Cef.assert_browser_ui_thread();
-            browser.get_host().send_focus_event(1);
-        }
         base.grab_focus();
+        if (get_can_focus()) {
+            send_focus_toggled(true);
+        }
     }
 
     public override bool focus_in_event(Gdk.EventFocus event) {
-        base.focus_in_event(event);
-        if (browser != null) {
-            Cef.assert_browser_ui_thread();
-            browser.get_host().send_focus_event(1);
-        }
-        return false;
+        send_focus_event(event);
+        return base.focus_in_event(event);
     }
 
     public override bool focus_out_event(Gdk.EventFocus event) {
-        base.focus_out_event(event);
+        send_focus_event(event);
+        return base.focus_out_event(event);
+    }
+
+    public void send_focus_toggled(bool focused) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
-            browser.get_host().send_focus_event(0);
+            browser.get_host().send_focus_event((int) focused);
         }
-        return false;
+    }
+
+    public void send_focus_event(Gdk.EventFocus event) {
+        send_focus_toggled((bool) event.@in);
     }
 
     public void send_click_event(Gdk.EventButton event) {
