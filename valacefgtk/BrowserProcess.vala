@@ -81,6 +81,10 @@ public class BrowserProcess : Cef.AppRef {
                     command_line.append_switch_with_value(&name, &value);
                 }
             }
+            if (Environment.get_variable("VALACEF_FORCE_GPU") == "yes") {
+                Cef.set_string(&name, "force-gpu-rasterization");
+                command_line.append_switch(&name);
+            }
         };
     }
 

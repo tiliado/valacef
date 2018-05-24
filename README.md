@@ -31,9 +31,16 @@ Build Instructions
   * `./waf configure`
   * `make run`
 
+Environment variables
+---------------------
+
+ValaCEF supports following environment variables for debugging purposes:
+
+  * `VALACEF_FORCE_GPU=yes` - Force GPU rasterization (disables builtin GPU blacklist).
+
 Copyright
 --------
 
   * Copyright 2017-2089 Jiří Janoušek
   * License: [BSD-2-Clause](./LICENSE)
-  
+
