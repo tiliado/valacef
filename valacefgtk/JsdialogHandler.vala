@@ -4,7 +4,7 @@ public class JsdialogHandler: Cef.JsdialogHandlerRef {
     public JsdialogHandler(WebView web_view) {
         base();
         priv_set("web_view", web_view);
-        
+
         /**
          * Called to run a JavaScript dialog. If |origin_url| is non-NULL it can be
          * passed to the CefFormatUrlForSecurityDisplay function to retrieve a secure
@@ -77,7 +77,7 @@ public class JsdialogHandler: Cef.JsdialogHandlerRef {
          */
         // /*void*/ on_dialog_closed = (self, owned Browser? browser);
     }
-    
+
     private static WebView get_web_view(Cef.JsdialogHandler self) {
         return ((Cef.JsdialogHandlerRef) self).priv_get<WebView>("web_view");
     }

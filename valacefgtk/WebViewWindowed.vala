@@ -11,7 +11,6 @@ private class WebViewWindowed : Gtk.Widget, WebViewWidget {
         set_can_focus(false);
     }
 
-
     public override void get_preferred_width(out int minimum_width, out int natural_width) {
         minimum_width = natural_width = 100;
     }
@@ -106,7 +105,7 @@ private class WebViewWindowed : Gtk.Widget, WebViewWidget {
         Cef.set_string(&url, "about:blank");
         Cef.Browser browser = Cef.browser_host_create_browser_sync(
             window_info, client, &url, browser_settings, web_view.web_context.request_context);
-        
+
         var host = browser.get_host();
         cef_window = wrap_xwindow(
             parent_window.get_display() as Gdk.X11.Display, (X.Window) host.get_window_handle());

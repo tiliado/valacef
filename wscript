@@ -43,7 +43,7 @@ def find_cef(ctx, lib_dirs=None, incude_dirs=None):
     else:
         ctx.end_msg(False, color='RED')
         ctx.fatal("Could not find 'libcef.so' in %s." % (lib_dirs,))
-    
+
     ctx.start_msg("Checking for 'libcef_dll_wrapper'")
     libcef_dll_wrappers = 'libcef_dll_wrapper.a', 'libcef_dll_wrapper'
     for wrapper_name in libcef_dll_wrappers:
@@ -55,7 +55,7 @@ def find_cef(ctx, lib_dirs=None, incude_dirs=None):
     else:
         ctx.end_msg(False, color='RED')
         ctx.fatal("Could not find %s in '%s'." % (libcef_dll_wrappers, ctx.env.CEF_LIB_DIR))
-    
+
     ctx.start_msg("Checking for 'cef_version.h' dir")
     incude_dirs = incude_dirs or ('./cef/include', '/app/include/cef/include', '/usr/local/include/cef/include', '/usr/include/cef/include')
     for cef_include_dir in incude_dirs:
@@ -148,17 +148,17 @@ def configure(ctx):
         find_cef(ctx, [CEF_PREFIX + '/lib/cef'], [CEF_PREFIX + '/include/cef/include'])
     else:
         find_cef(ctx)
-    
+
     ctx.env.append_unique("VALAFLAGS", "-v")
     ctx.env.append_unique('CFLAGS', ['-w', '-Wno-incompatible-pointer-types'])
     ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
     ctx.env.append_unique('CFLAGS', '-O2')
     ctx.env.append_unique('CFLAGS', '-g3')
-        
+
     ctx.env.VALACEF_LIBDIR = "%s/%s" % (ctx.env.LIBDIR, APPNAME)
     ctx.define("VALACEF_LIBDIR", ctx.env.VALACEF_LIBDIR)
     ctx.define("CEFIUM_LIBDIR", ctx.env.VALACEF_LIBDIR)
-    
+
     add_version_info(ctx)
 
 
@@ -178,7 +178,7 @@ def build(ctx):
         source=[ctx.path.find_node('genvalacef.py')] + ctx.path.ant_glob('valacefgen/*.py'),
         target=[cef_vala, valacef_api_vapi, valacef_api_h, valacef_api_c]
     )
-    
+
     ctx.shlib(
         source = [
             cef_vala, valacef_api_c,
@@ -197,11 +197,11 @@ def build(ctx):
         lib = ['cef'],
         libpath = [ctx.env.CEF_LIB_DIR],
         rpath = [ctx.env.CEF_LIB_DIR],
-        cflags = ['-O2', ctx.env.CEF_LIB_WRAPPER], 
+        cflags = ['-O2', ctx.env.CEF_LIB_WRAPPER],
         #vala_target_glib = TARGET_GLIB,
         #install_path = ctx.env.NUVOLA_LIBDIR,
     )
-    
+
     ctx.shlib(
         source = [
             'valacefgtk/init.vala',
@@ -250,11 +250,11 @@ def build(ctx):
         lib = ['cef', 'm'],
         libpath = [ctx.env.CEF_LIB_DIR],
         rpath = [ctx.env.CEF_LIB_DIR],
-        cflags = ['-O2'], 
+        cflags = ['-O2'],
         #vala_target_glib = TARGET_GLIB,
         #install_path = ctx.env.NUVOLA_LIBDIR,
     )
-    
+
     ctx.program(
         source = ['cefsubprocess/Subprocess.vala'],
         target = 'ValacefSubprocess',
@@ -267,11 +267,11 @@ def build(ctx):
         lib = ['cef'],
         libpath = [ctx.env.CEF_LIB_DIR],
         rpath = [ctx.env.CEF_LIB_DIR],
-        cflags = ['-O2'], 
+        cflags = ['-O2'],
         #vala_target_glib = TARGET_GLIB,
         install_path = ctx.env.VALACEF_LIBDIR,
     )
-    
+
     ctx.program(
         source = [
             'cefium/Cefium.vala',
@@ -289,11 +289,11 @@ def build(ctx):
         lib = ['cef'],
         libpath = [ctx.env.CEF_LIB_DIR],
         rpath = [ctx.env.CEF_LIB_DIR],
-        cflags = ['-O2'], 
+        cflags = ['-O2'],
         #vala_target_glib = TARGET_GLIB,
         #install_path = ctx.env.NUVOLA_LIBDIR,
     )
-    
+
     ctx.shlib(
         source = [
             'cefium/CefiumRendererExtension.vala',
@@ -308,18 +308,18 @@ def build(ctx):
         lib = ['cef'],
         libpath = [ctx.env.CEF_LIB_DIR],
         rpath = [ctx.env.CEF_LIB_DIR],
-        cflags = ['-O2'], 
+        cflags = ['-O2'],
         #vala_target_glib = TARGET_GLIB,
         install_path = ctx.env.VALACEF_LIBDIR,
     )
-    
+
     ctx(features = 'subst',
         source='launch.sh.in',
         target='launch.sh',
         CEF_LIB_DIR=ctx.env.CEF_LIB_DIR,
         OUT=out
     )
-    
+
     ctx(features = 'subst',
         source='valacef/valacef.pc.in',
         target='valacef.pc',
@@ -333,7 +333,7 @@ def build(ctx):
         CEFLIBDIR=ctx.env.CEF_LIB_DIR,
         INCLUDE_CEF_DIRS="-I%s -I%s" % (ctx.env.CEF_INCLUDE_DIR, os.path.dirname(ctx.env.CEF_INCLUDE_DIR)),
     )
-    
+
     ctx(features = 'subst',
         source='valacefgtk/valacefgtk.pc.in',
         target='valacefgtk.pc',
@@ -347,7 +347,7 @@ def build(ctx):
         CEFLIBDIR=ctx.env.CEF_LIB_DIR,
         INCLUDE_CEF_DIRS="-I%s -I%s" % (ctx.env.CEF_INCLUDE_DIR, os.path.dirname(ctx.env.CEF_INCLUDE_DIR)),
     )
-    
+
     ctx.install_files('${PREFIX}/share/vala/vapi', ['valacef_api.vapi'])
     ctx.install_files('${PREFIX}/include/valacef-1.0', ['valacef_api.h'])
 

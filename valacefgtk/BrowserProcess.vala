@@ -6,8 +6,8 @@ public class BrowserProcess : Cef.AppRef {
         priv_set("bph", new BrowserProcessHandler());
         priv_set("flash_plugin", flash_plugin);
         priv_set("proxy", (owned) proxy);
-        priv_set<Variant>("scale_factor", scale_factor); 
-        
+        priv_set<Variant>("scale_factor", scale_factor);
+
         /**
          * Provides an opportunity to register custom schemes. Do not keep a reference
          * to the |registrar| object. This function is called on the main thread for
@@ -31,7 +31,7 @@ public class BrowserProcess : Cef.AppRef {
         vfunc_get_browser_process_handler = (self) => {
             return ((BrowserProcess) self).priv_get<BrowserProcessHandler>("bph");
         };
-        
+
         /**
          * Provides an opportunity to view and/or modify command-line arguments before
          * processing by CEF and Chromium. The |process_type| value will be NULL for
@@ -61,7 +61,7 @@ public class BrowserProcess : Cef.AppRef {
                 Cef.set_string(&value, "allow");
                 command_line.append_switch_with_value(&name, &value);
             }
-            
+
             double _scale_factor = _this.get_scale_factor();
             if (_scale_factor > 0.0) {
                 Cef.set_string(&name, "force-device-scale-factor");
@@ -94,9 +94,8 @@ public class BrowserProcess : Cef.AppRef {
      * @return The current scaling factor.
      */
     public double get_scale_factor() {
-        return priv_get<Variant>("scale_factor").get_double(); 
+        return priv_get<Variant>("scale_factor").get_double();
     }
-    
 }
 
 } // namespace CefGtk

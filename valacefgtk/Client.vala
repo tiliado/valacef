@@ -16,6 +16,7 @@ public class Client : Cef.ClientRef {
         priv_set("life_span_handler", life_span_handler);
         
         priv_set("menu_handler", new ContextMenuHandler(web_view));
+
         /**
          * Return the handler for context menus. If no handler is provided the default
          * implementation will be used.
@@ -120,7 +121,7 @@ public class Client : Cef.ClientRef {
             message("get_render_handler");
             return null;
         };
-        
+
         /**
          * Return the handler for browser request events.
          */

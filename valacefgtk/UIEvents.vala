@@ -227,7 +227,7 @@ public enum KeyboardCode {
     VKEY_PA1 = 0xFD,
     VKEY_OEM_CLEAR = 0xFE,
     VKEY_UNKNOWN = 0,
-    
+
     // POSIX specific VKEYs. Note that as of Windows SDK 7.1, 0x97-9F, 0xD8-DA,
     // and 0xE8 are unassigned.
     VKEY_WLAN = 0x97,
@@ -236,7 +236,7 @@ public enum KeyboardCode {
     VKEY_BRIGHTNESS_UP = 0xD9,
     VKEY_KBD_BRIGHTNESS_DOWN = 0xDA,
     VKEY_KBD_BRIGHTNESS_UP = 0xE8,
-    
+
     // Windows does not have a specific key code for AltGr. We use the unused 0xE1
     // (VK_OEM_AX) code to represent AltGr, matching the behaviour of Firefox on
     // Linux.
