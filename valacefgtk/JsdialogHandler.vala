@@ -24,7 +24,7 @@ public class JsdialogHandler: Cef.JsdialogHandlerRef {
          */
         /*int*/ vfunc_on_jsdialog = (self, /*Browser*/ browser, /*String*/ url, /*JsdialogType*/ dialog_type,
         /*String*/ message_text, /*String*/ default_prompt_text, /*JsdialogCallback*/ callback,
-        /*int?*/ suppress_message) => {
+        /*int*/ ref suppress_message) => {
             Cef.assert_browser_ui_thread();
             message("Show JS dialog for %s", dialog_type.to_string());
             var _web_view = get_web_view(self);

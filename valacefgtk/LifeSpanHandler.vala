@@ -30,7 +30,8 @@ public class LifeSpanHandler : Cef.LifeSpanHandlerRef {
         /*int*/ vfunc_on_before_popup = (
             self, /*Browser*/ browser, /*Frame*/ frame, /*String*/ target_url, /*String*/ target_frame_name,
             /*WindowOpenDisposition*/ target_disposition, /*int*/ user_gesture, /*PopupFeatures*/ popupFeatures,
-            /*WindowInfo*/ windowInfo, out /*Client*/ client, /*BrowserSettings*/ settings, /*int*/ no_javascript_access
+            /*WindowInfo*/ windowInfo, out /*Client*/ client, /*BrowserSettings*/ settings,
+            /*int*/ ref no_javascript_access
         ) => {
             client = null;
             string? url = Cef.get_string(target_url);

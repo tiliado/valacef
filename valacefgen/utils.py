@@ -1,6 +1,7 @@
 from collections import namedtuple
 from typing import List, Tuple, Iterable, Optional
 
+from . import vala
 
 def find_prefix(items: List[str]) -> str:
     pos = len(items[0])
@@ -73,9 +74,13 @@ def parse_c_type(c_type: str) -> TypeInfo:
     pointer = c_type.endswith('*')
     out = c_type.endswith('**')
     c_type = c_type.rstrip('*')
+    is_ref = False
+    if pointer and c_type in vala.VALUE_TYPES:
+        pointer = False
+        is_ref = True
 
     c_type = lstrip(c_type, 'struct _')
-    return TypeInfo(c_type, pointer, const, volatile, False, out)
+    return TypeInfo(c_type, pointer, const, volatile, is_ref, out)
 
 
 def vala_comment(lines: Iterable[str], valadoc: bool = False) -> Iterable[str]:
