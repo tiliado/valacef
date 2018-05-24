@@ -3,7 +3,9 @@ namespace CefGtk {
 public class Client : Cef.ClientRef {
     public Client(WebView web_view, FocusHandler focus_handler, DisplayHandler display_handler,
     LoadHandler load_handler, JsdialogHandler js_dialog_handler, DownloadHandler download_handler,
-    KeyboardHandler keyboard_handler, RequestHandler request_handler, LifeSpanHandler life_span_handler) {
+    KeyboardHandler keyboard_handler, RequestHandler request_handler, LifeSpanHandler life_span_handler,
+    Cef.RenderHandler? render_handler
+    ) {
         base();
         priv_set<unowned WebView>("web_view", web_view);
         priv_set("focus_handler", focus_handler);
@@ -14,7 +16,7 @@ public class Client : Cef.ClientRef {
         priv_set("keyboard_handler", keyboard_handler);
         priv_set("request_handler", request_handler);
         priv_set("life_span_handler", life_span_handler);
-        
+        priv_set("render_handler", render_handler);
         priv_set("menu_handler", new ContextMenuHandler(web_view));
 
         /**
@@ -118,8 +120,8 @@ public class Client : Cef.ClientRef {
          */
         vfunc_get_render_handler = (self) => {
             Cef.assert_browser_ui_thread();
-            message("get_render_handler");
-            return null;
+            Cef.RenderHandler? handler = ((Cef.ClientRef?)self).priv_get<Cef.RenderHandler?>("render_handler");
+            return handler;
         };
 
         /**

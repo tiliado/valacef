@@ -63,7 +63,7 @@ public class BrowserProcess : Cef.AppRef {
             }
 
             double _scale_factor = _this.get_scale_factor();
-            if (_scale_factor > 0.0) {
+            if (_scale_factor > 0.0 && (Environment.get_variable("VALACEF_DEFAULT_RENDERING_MODE") != "offscreen")) {
                 Cef.set_string(&name, "force-device-scale-factor");
                 Cef.set_string(&value, _scale_factor.to_string());
                 command_line.append_switch_with_value(&name, &value);

@@ -1,7 +1,9 @@
 namespace CefGtk {
 
 public enum RenderingMode {
-    WINDOWED;
+    DEFAULT,
+    WINDOWED,
+    OFFSCREEN;
 }
 
 public class WebView : Gtk.Bin {
@@ -31,7 +33,7 @@ public class WebView : Gtk.Bin {
             }
         }
     }
-    public RenderingMode rendering_mode {get; construct; default = RenderingMode.WINDOWED;}
+    public RenderingMode rendering_mode {get; construct; default = RenderingMode.DEFAULT;}
     public bool context_menu_visible {get; internal set; default = false;}
 
     private double translate_cef_zoom_to_percentage(double cef_zoom) {
@@ -60,15 +62,27 @@ public class WebView : Gtk.Bin {
     private Cef.JsdialogType js_dialog_type = Cef.JsdialogType.ALERT;
     private SList<RendererExtensionInfo> autoloaded_renderer_extensions = null;
 
-    public WebView(WebContext web_context, RenderingMode rendering_mode = RenderingMode.WINDOWED) {
+    public WebView(WebContext web_context, RenderingMode rendering_mode = RenderingMode.DEFAULT) {
+        if (rendering_mode == RenderingMode.DEFAULT) {
+            if (Environment.get_variable("VALACEF_DEFAULT_RENDERING_MODE") == "offscreen") {
+                rendering_mode = RenderingMode.OFFSCREEN;
+            } else {
+                rendering_mode = RenderingMode.WINDOWED;
+            }
+        }
         GLib.Object(rendering_mode: rendering_mode);
+        message("CEF rendering mode: %s", rendering_mode.to_string());
         update_dpi();
         Gtk.Settings.get_default().notify["gtk-xft-dpi"].connect_after(update_dpi);
         set_has_window(false);
         this.web_context = web_context;
         web_context.render_process_created.connect(on_render_process_created);
         this.download_manager = new DownloadManager(this);
-        this.web_view = new WebViewWindowed(this);
+        if (rendering_mode == RenderingMode.OFFSCREEN) {
+            this.web_view = new WebViewOffscreen(this);
+        } else {
+            this.web_view = new WebViewWindowed(this);
+        }
         set_can_focus(!web_view.get_can_focus());
         web_view.browser_created.connect(on_browser_created);
         add(web_view);
@@ -531,6 +545,20 @@ public class WebView : Gtk.Bin {
 
     public Gdk.Pixbuf? get_snapshot() {
         return web_view.get_snapshot();
+    }
+
+    internal void update_screen_info() {
+        if (browser != null) {
+            Cef.assert_browser_ui_thread();
+            browser.get_host().notify_screen_info_changed();
+        }
+    }
+
+    internal void close_browser(bool force_close) {
+        if (browser != null) {
+            Cef.assert_browser_ui_thread();
+            browser.get_host().close_browser((int) force_close);
+        }
     }
 }
 

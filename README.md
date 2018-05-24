@@ -37,6 +37,7 @@ Environment variables
 ValaCEF supports following environment variables for debugging purposes:
 
   * `VALACEF_FORCE_GPU=yes` - Force GPU rasterization (disables builtin GPU blacklist).
+  * `VALACEF_DEFAULT_RENDERING_MODE=offscreen` - Set offscreen rendering as the default rendering mode.
 
 Copyright
 --------
