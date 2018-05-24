@@ -118,12 +118,6 @@ private class WebViewWindowed : Gtk.Widget, WebViewWidget {
         register_window(chromium_window);
         browser_created(client, browser);
     }
-
-    public Gdk.Pixbuf? get_snapshot() {
-        Gtk.Allocation allocation;
-        get_allocation(out allocation);
-        return Gdk.pixbuf_get_from_window(get_window(), 0, 0, allocation.width, allocation.height);
-    }
 }
 
 } // namespace CefGtk
