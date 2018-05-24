@@ -123,7 +123,10 @@ private class WebViewOffscreen : Gtk.DrawingArea, WebViewWidget {
                 return false;
             }
             cr.save();
-            cr.rectangle(clip.x, clip.y, clip.width, clip.height);
+            /* The surface is in device pixels, but cairo scale is in logical pixels. */
+            int factor = scale_factor;
+            cr.scale(1.0 / factor, 1.0 / factor);
+            cr.rectangle(factor * clip.x, factor * clip.y, factor * clip.width, factor * clip.height);
             surface.mark_dirty();
             cr.set_source_surface(surface, 0, 0);
             cr.set_operator(Cairo.Operator.OVER);
@@ -134,6 +137,7 @@ private class WebViewOffscreen : Gtk.DrawingArea, WebViewWidget {
     }
 
     internal void paint(Cef.Rect[] dirty_rects, void* buffer, int width, int height) {
+        /* Width & height are in device pixels, not logical pixels. */
         if (width <= 2 || height <= 2) {
             surface = null;
             return;

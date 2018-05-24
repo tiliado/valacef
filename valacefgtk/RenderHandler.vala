@@ -168,8 +168,8 @@ private class RenderHandler : Cef.RenderHandlerRef {
         unowned WebViewOffscreen view = priv_get<unowned WebViewOffscreen>("web_view");
         view.get_allocation(out alloc);
         rect.x = rect.y = 0;
-        rect.width = alloc.width / view.scale_factor;
-        rect.height = alloc.height / view.scale_factor;
+        rect.width = alloc.width;
+        rect.height = alloc.height;
     }
 
     public void get_screen_coords(int x, int y, ref int screen_x, ref int screen_y) {

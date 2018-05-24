@@ -882,8 +882,8 @@ public void send_click_event(Gdk.EventButton event, Cef.BrowserHost host, int sc
     }
 
     Cef.MouseEvent mouse = {};
-    mouse.x = (int) event.x / scale_factor;
-    mouse.y = (int) event.y / scale_factor;
+    mouse.x = (int) event.x;
+    mouse.y = (int) event.y;
 //~         self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
     mouse.modifiers = get_cef_state_modifiers(event.state);
 
@@ -914,8 +914,8 @@ public void send_click_event(Gdk.EventButton event, Cef.BrowserHost host, int sc
 
 public void send_scroll_event(Gdk.EventScroll event, Cef.BrowserHost host, int scale_factor) {
     Cef.MouseEvent mouse = {};
-    mouse.x = (int) event.x / scale_factor;
-    mouse.y = (int) event.y / scale_factor;
+    mouse.x = (int) event.x;
+    mouse.y = (int) event.y;
 //~         self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
     mouse.modifiers = get_cef_state_modifiers(event.state);
     const int SCROLLBAR_PIXELS_PER_GTK_TICK = 40;
@@ -994,8 +994,8 @@ public void send_motion_event(Gdk.EventMotion event, Cef.BrowserHost host, int s
     }
 
     Cef.MouseEvent mouse = {};
-    mouse.x = x / scale_factor;
-    mouse.y = y / scale_factor;
+    mouse.x = x;
+    mouse.y = y;
     // self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
     mouse.modifiers = get_cef_state_modifiers(state);
     bool mouse_leave = event.type == Gdk.EventType.LEAVE_NOTIFY;
