@@ -864,7 +864,7 @@ public int get_control_character(KeyboardCode windows_key_code, bool shift) {
   }
 }
 
-public void send_click_event(Gdk.EventButton event, Cef.BrowserHost host) {
+public void send_click_event(Gdk.EventButton event, Cef.BrowserHost host, int scale_factor) {
     Cef.MouseButtonType button_type;
     switch (event.button) {
     case 1:
@@ -882,10 +882,9 @@ public void send_click_event(Gdk.EventButton event, Cef.BrowserHost host) {
     }
 
     Cef.MouseEvent mouse = {};
-    mouse.x = (int) event.x;
-    mouse.y = (int) event.y;
+    mouse.x = (int) event.x / scale_factor;
+    mouse.y = (int) event.y / scale_factor;
 //~         self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
-//~         DeviceToLogical(mouse_event, self->device_scale_factor_);
     mouse.modifiers = get_cef_state_modifiers(event.state);
 
     bool mouse_up = event.type == Gdk.EventType.BUTTON_RELEASE;
@@ -913,12 +912,11 @@ public void send_click_event(Gdk.EventButton event, Cef.BrowserHost host) {
 //~       }
 }
 
-public void send_scroll_event(Gdk.EventScroll event, Cef.BrowserHost host) {
+public void send_scroll_event(Gdk.EventScroll event, Cef.BrowserHost host, int scale_factor) {
     Cef.MouseEvent mouse = {};
-    mouse.x = (int) event.x;
-    mouse.y = (int) event.y;
+    mouse.x = (int) event.x / scale_factor;
+    mouse.y = (int) event.y / scale_factor;
 //~         self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
-//~         DeviceToLogical(mouse_event, self->device_scale_factor_);
     mouse.modifiers = get_cef_state_modifiers(event.state);
     const int SCROLLBAR_PIXELS_PER_GTK_TICK = 40;
     int dx = 0;
@@ -978,7 +976,7 @@ public void send_key_event(Gdk.EventKey event, Cef.BrowserHost host) {
     }
 }
 
-public void send_motion_event(Gdk.EventMotion event, Cef.BrowserHost host) {
+public void send_motion_event(Gdk.EventMotion event, Cef.BrowserHost host, int scale_factor) {
     int x, y;
     Gdk.ModifierType state;
     if (event.is_hint > 0) {
@@ -996,10 +994,9 @@ public void send_motion_event(Gdk.EventMotion event, Cef.BrowserHost host) {
     }
 
     Cef.MouseEvent mouse = {};
-    mouse.x = x;
-    mouse.y = y;
+    mouse.x = x / scale_factor;
+    mouse.y = y / scale_factor;
     // self->ApplyPopupOffset(mouse_event.x, mouse_event.y);
-    // DeviceToLogical(mouse_event, self->device_scale_factor_);
     mouse.modifiers = get_cef_state_modifiers(state);
     bool mouse_leave = event.type == Gdk.EventType.LEAVE_NOTIFY;
     host.send_mouse_move_event(mouse, (int) mouse_leave);

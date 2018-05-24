@@ -382,14 +382,14 @@ public class WebView : Gtk.Bin {
     public void send_click_event(Gdk.EventButton event) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
-            UIEvents.send_click_event(event, browser.get_host());
+            UIEvents.send_click_event(event, browser.get_host(), scale_factor);
         }
     }
 
     public void send_scroll_event(Gdk.EventScroll event) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
-            UIEvents.send_scroll_event(event, browser.get_host());
+            UIEvents.send_scroll_event(event, browser.get_host(), scale_factor);
         }
     }
 
@@ -403,7 +403,7 @@ public class WebView : Gtk.Bin {
     public void send_motion_event(Gdk.EventMotion event) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
-            UIEvents.send_motion_event(event, browser.get_host());
+            UIEvents.send_motion_event(event, browser.get_host(), scale_factor);
         }
     }
 
