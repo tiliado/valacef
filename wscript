@@ -216,6 +216,7 @@ def build(ctx):
             'valacefgtk/AboutBlankPopupClient.vala',
             'valacefgtk/Client.vala',
             'valacefgtk/BrowserProcessHandler.vala',
+            'valacefgtk/ContextMenuHandler.vala',
             'valacefgtk/FocusHandler.vala',
             'valacefgtk/DisplayHandler.vala',
             'valacefgtk/LoadHandler.vala',

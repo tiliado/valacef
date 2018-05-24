@@ -32,6 +32,7 @@ public class WebView : Gtk.Bin {
         }
     }
     public RenderingMode rendering_mode {get; construct; default = RenderingMode.WINDOWED;}
+    public bool context_menu_visible {get; internal set; default = false;}
 
     private double translate_cef_zoom_to_percentage(double cef_zoom) {
         return Math.pow(1.2, cef_zoom) / scaling_factor;

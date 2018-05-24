@@ -15,14 +15,14 @@ public class Client : Cef.ClientRef {
         priv_set("request_handler", request_handler);
         priv_set("life_span_handler", life_span_handler);
         
+        priv_set("menu_handler", new ContextMenuHandler(web_view));
         /**
          * Return the handler for context menus. If no handler is provided the default
          * implementation will be used.
          */
         vfunc_get_context_menu_handler = (self) => {
             Cef.assert_browser_ui_thread();
-            message("vfunc_get_context_menu_handler");
-            return null;
+            return ((Cef.ClientRef?)self).priv_get<Cef.ContextMenuHandler?>("menu_handler");
         };
 
         /**
