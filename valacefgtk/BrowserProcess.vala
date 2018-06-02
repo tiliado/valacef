@@ -1,9 +1,10 @@
 namespace CefGtk {
 
 public class BrowserProcess : Cef.AppRef {
-    public BrowserProcess(FlashPlugin? flash_plugin, double scale_factor, owned ProxySettings proxy) {
+    public BrowserProcess(InitFlags? flags, FlashPlugin? flash_plugin, double scale_factor, owned ProxySettings proxy) {
         base();
         priv_set("bph", new BrowserProcessHandler());
+        priv_set("flags", flags ?? new InitFlags());
         priv_set("flash_plugin", flash_plugin);
         priv_set("proxy", (owned) proxy);
         priv_set<Variant>("scale_factor", scale_factor);
@@ -84,6 +85,13 @@ public class BrowserProcess : Cef.AppRef {
             if (Environment.get_variable("VALACEF_FORCE_GPU") == "yes") {
                 Cef.set_string(&name, "force-gpu-rasterization");
                 command_line.append_switch(&name);
+            }
+
+            var _flags = _this.priv_get<InitFlags>("flags");
+            if (_flags.auto_play_policy != AutoPlayPolicy.DEFAULT) {
+                Cef.set_string(&name, "autoplay-policy");
+                Cef.set_string(&value, _flags.auto_play_policy.to_string());
+                command_line.append_switch_with_value(&name, &value);
             }
         };
     }

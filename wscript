@@ -205,6 +205,7 @@ def build(ctx):
     ctx.shlib(
         source = [
             'valacefgtk/init.vala',
+            'valacefgtk/InitFlags.vala',
             'valacefgtk/x11.vala',
             'valacefgtk/WeakRef.vala',
             'valacefgtk/WebView.vala',

@@ -4,14 +4,14 @@ private extern const string LIBDIR;
 
 struct Args {
 	static bool disable_widevine = false;
-	static bool disable_flash = false;
     static string? url = null;	
+	static bool enable_flash = false;
 	public const OptionEntry[] main_options = {
         {"url", 'U', 0, OptionArg.STRING, ref Args.url, "Load URL", "URL" },
 		{"disable-widevine", 0, 0, OptionArg.NONE, ref Args.disable_widevine,
              "Disable widevine DRM plugin.", null},
-		{"disable-flash", 0, 0, OptionArg.NONE, ref Args.disable_flash,
-            "Disable Adobe Flash plugin.", null},
+		{"enable-flash", 0, 0, OptionArg.NONE, ref Args.enable_flash,
+            "Enable Adobe Flash plugin.", null},
 		{null}
 	};
 }
@@ -37,7 +37,9 @@ int main(string[] argv) {
     Gtk.init(ref gtk_argv);
     var window = new Gtk.Window();
     window.show();
-    CefGtk.init(window.scale_factor * 1.0, Args.disable_widevine? null : Cef.get_cef_lib_dir(), !Args.disable_flash);
+    var flags = new CefGtk.InitFlags();
+    flags.auto_play_policy = CefGtk.AutoPlayPolicy.NO_USER_GESTURE_REQUIRED;
+    CefGtk.init(flags, window.scale_factor * 1.0, Args.disable_widevine? null : Cef.get_cef_lib_dir(), Args.enable_flash);
     window.destroy();
     window = null;
 	var app = new Application(versions);
