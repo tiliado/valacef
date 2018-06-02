@@ -10,7 +10,7 @@ public class InitializationResult {
 	public WidevinePlugin? widevine_plugin {get; private set;}
 	public FlashPlugin? flash_plugin {get; private set;}
     public BrowserProcess app {get; private set;}
-	
+
 	public InitializationResult(BrowserProcess app, string cef_lib_dir, WidevinePlugin? widevine_plugin,
 	FlashPlugin? flash_plugin) {
 		this.cef_lib_dir = cef_lib_dir;
@@ -34,7 +34,7 @@ public InitializationResult init(
 	Cef.override_path(Cef.PathKey.DIR_EXE, &cef_path);
 	
 	Cef.MainArgs main_args = {0, null};
-	FlashPlugin? flash_plugin = null; 
+	FlashPlugin? flash_plugin = null;
 	if (enable_flash_plugin) {
         flash_plugin = new FlashPlugin();
         if (!flash_plugin.register(Cef.get_cef_lib_dir() + "/PepperFlash")) {
@@ -44,7 +44,7 @@ public InitializationResult init(
 	var app = new BrowserProcess(flags, flash_plugin, scale_factor, new ProxySettings(proxy_type, proxy_server, proxy_port));
 	var code = Cef.execute_process(main_args, app, null);
 	assert(code < 0);
-	
+
 	Cef.Settings settings = {sizeof(Cef.Settings)};
 	settings.no_sandbox = 1;
 	/* Even if we use a fixed 50 ms timer (see bellow),
@@ -88,7 +88,7 @@ public InitializationResult init(
     } else if (product_version != null) {
         Cef.set_string(&settings.product_version, product_version);
     }
-	
+
 	Cef.initialize(main_args, settings, app, null);
 	var source = new TimeoutSource(20);
 	source.set_priority(GLib.Priority.DEFAULT_IDLE);
@@ -98,7 +98,7 @@ public InitializationResult init(
 	});
 	source.set_can_recurse(false);
 	message_loop_source_id = source.attach(MainContext.ref_thread_default());
-    
+
 	initialization_result = new InitializationResult(app, Cef.get_cef_lib_dir(), widevine_plugin, flash_plugin);
 	return initialization_result;
 }
