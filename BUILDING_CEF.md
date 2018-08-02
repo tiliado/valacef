@@ -109,3 +109,11 @@ This happens behind a HTTP proxy.
   * Use a VPN connection tunnelled through the proxy
   * unset http_proxy; unset https_proxy
   * nano /etc/resolv.conf
+
+Build cefclient
+---------------
+
+* apt install libgtk2.0-dev libgtkglext1-dev cmake
+* mkdir build && cd build
+* cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..
+* make -j4 cefclient cefsimple
