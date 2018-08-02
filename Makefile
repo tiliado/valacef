@@ -15,3 +15,15 @@ rebuild:
 
 clean:
 	rm -rf build
+
+push:
+	git checkout master
+	git push && git push --tags
+	git checkout 3.3440.x
+	git push && git push --tags
+	git checkout master
+
+merge:
+	git checkout 3.3440.x
+	git merge --ff-only master
+	git checkout master
