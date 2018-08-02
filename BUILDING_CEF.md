@@ -17,7 +17,7 @@ On Debian Stretch:
       curl build-essential flex g++ git-svn libcairo2-dev libglib2.0-dev \
       libcups2-dev libgtkglext1-dev git-core libglu1-mesa-dev libnspr4-dev \
       libnss3-dev libgnome-keyring-dev libasound2-dev gperf bison libpci-dev \
-      libkrb5-dev libgtk-3-dev libxss-dev python libpulse-dev
+      libkrb5-dev libgtk-3-dev libxss-dev python libpulse-dev ca-certificates
 
 Maybe also something from this:
 
@@ -44,9 +44,8 @@ Set up environment
 If you live in the USA, consult either your lawyer or therapist before enabling proprietary codecs.
 Yes, there might be some patents. Software patents don't apply in the Czech Republic and we also
 have excellent beer, btw.
- 
-    export GYP_DEFINES='use_gtk3=true disable_nacl=1 buildtype=Official use_allocator=none branding=Chrome'
-    export GN_DEFINES='use_gtk3=true is_official_build=true use_allocator=none symbol_level=1 use_gconf=false ffmpeg_branding=Chrome proprietary_codecs=true'
+
+    export GN_DEFINES='use_gtk3=true is_official_build=true use_allocator=none symbol_level=1 ffmpeg_branding=Chrome proprietary_codecs=true'
     export CFLAGS="-Wno-error"
     export CXXFLAGS="-Wno-error"
     export CEF_ARCHIVE_FORMAT=tar.bz2
@@ -59,7 +58,7 @@ Download & build CEF
     cd /media/fenryxo/exthdd7/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3396 --checkout=3396-valacef \
+      --branch=3440 --checkout=3440-valacef \
       --force-clean --force-clean-deps --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
 
@@ -68,22 +67,17 @@ Download & build CEF
     cd /media/fenryxo/exthdd7/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3396 --checkout=origin/3396-valacef \
+      --branch=3440 --checkout=origin/3440-valacef \
       --force-clean --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
 
 ### Build
 
-    for i in $(grep -rIl "\-Werror" .)
-    do
-      echo $i; sed -i -e 's/-Werror/-Wno-error/g' $i
-    done
-    
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3396  --checkout=origin/3396-valacef \
+      --branch=3440  --checkout=origin/3440-valacef \
       --x64-build --build-target=cefsimple --no-update --force-build \
-      --no-debug-build --minimal-distrib  --client-distrib
+      --no-debug-build
 
 Install CEF to be found by ValaCEF
 ------------------------------
