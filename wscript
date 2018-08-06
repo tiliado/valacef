@@ -158,6 +158,7 @@ def configure(ctx):
     ctx.env.VALACEF_LIBDIR = "%s/%s" % (ctx.env.LIBDIR, APPNAME)
     ctx.define("VALACEF_LIBDIR", ctx.env.VALACEF_LIBDIR)
     ctx.define("CEFIUM_LIBDIR", ctx.env.VALACEF_LIBDIR)
+    ctx.define("VALACEF_WIDEVINE_MANIFEST_PATH", os.path.join(ctx.env.PREFIX, 'share/valacef/widevine/manifest.json'))
 
     add_version_info(ctx)
 
@@ -353,4 +354,5 @@ def build(ctx):
 
     ctx.install_files('${PREFIX}/share/vala/vapi', ['valacef_api.vapi'])
     ctx.install_files('${PREFIX}/include/valacef-1.0', ['valacef_api.h'])
+    ctx.install_files('${PREFIX}/share/valacef/widevine', ['widevine/manifest.json'])
 

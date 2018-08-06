@@ -32,7 +32,7 @@ public InitializationResult init(
 	Cef.set_string(&cef_path, Cef.get_cef_lib_dir());
 	Cef.override_path(Cef.PathKey.DIR_MODULE, &cef_path);
 	Cef.override_path(Cef.PathKey.DIR_EXE, &cef_path);
-	
+
 	Cef.MainArgs main_args = {0, null};
 	FlashPlugin? flash_plugin = null;
 	if (enable_flash_plugin) {
@@ -64,13 +64,22 @@ public InitializationResult init(
         File adapter = base_dir.get_child("libwidevinecdmadapter.so");
         File manifest = base_dir.get_child("manifest.json");
         if (libwidevine.query_exists()) {
-            File cef_lib_dir = File.new_for_path(Cef.get_cef_lib_dir());
             try {
-                if (!adapter.query_exists()) {
-                    adapter.make_symbolic_link(cef_lib_dir.get_child("libwidevinecdmadapter.so").get_path(), null);
+                if (adapter.query_file_type(GLib.FileQueryInfoFlags.NONE, null) != GLib.FileType.REGULAR) {
+                    try {
+                        adapter.@delete(null);
+                    } catch (GLib.Error e) {
+                        debug("Failed to remove '%s'. %s", adapter.get_path(), e.message);
+                    }
+                    adapter.make_symbolic_link(Cef.get_widevine_adapter_path(), null);
                 }
-                if (!manifest.query_exists()) {
-                    manifest.make_symbolic_link(cef_lib_dir.get_child("manifest.json").get_path(), null);
+                if (manifest.query_file_type(GLib.FileQueryInfoFlags.NONE, null) != GLib.FileType.REGULAR) {
+                    try {
+                        manifest.@delete(null);
+                    } catch (GLib.Error e) {
+                        debug("Failed to remove '%s'. %s", manifest.get_path(), e.message);
+                    }
+                    manifest.make_symbolic_link(Cef.get_widevine_manifest_path(), null);
                 }
             } catch (GLib.Error e) {
                 warning("Failed to set up Widevine adapter/manifest symlinks. %s", e.message);
