@@ -33,4 +33,9 @@ public unowned string get_widevine_adapter_path() {
     return cached_widevine_adapter_path;
 }
 
+
+public unowned string get_minimal_chromium_version_for_widevine() {
+    return "68";
+}
+
 } // namespace Cef
