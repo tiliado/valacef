@@ -651,7 +651,7 @@ public KeyboardCode keyboard_code_from_x_keysym(uint keysym) {
 
 // From content/browser/renderer_host/input/web_input_event_util_posix.cc.
 public KeyboardCode gdk_event_to_windows_keycode(Gdk.EventKey event) {
-  int[] hardware_code_to_gdk_keyval = {
+  uint[] hardware_code_to_gdk_keyval = {
       0,                 // 0x00:
       0,                 // 0x01:
       0,                 // 0x02:
@@ -791,7 +791,7 @@ public KeyboardCode gdk_event_to_windows_keycode(Gdk.EventKey event) {
     return windows_key_code;
 
   if (event.hardware_keycode < hardware_code_to_gdk_keyval.length) {
-    int keyval = hardware_code_to_gdk_keyval[event.hardware_keycode];
+    int keyval = (int) hardware_code_to_gdk_keyval[event.hardware_keycode];
     if (keyval > 0)
       return keyboard_code_from_x_keysym(keyval);
   }
