@@ -1,22 +1,24 @@
 namespace CefGtk {
 
 public class FlashPlugin: GLib.Object {
-    public const string FILENAME = "libpepflashplayer.so";
+    public const string PLUGIN_FILENAME = "libpepflashplayer.so";
+    public const string VERSION_FILENAME = "libpepflashplayer.so.version";
+    public const string MANIFEST_FILENAME = "manifest.json";
     public string? plugin_directory {get; private set; default = null;}
     public string? plugin_path {get; private set; default = null;}
     public string? registration_error {get; private set; default = null;}
     public bool available {get; private set; default = false;}
     public string version {get; private set; default = "";}
-    
-    public FlashPlugin() {        
+
+    public FlashPlugin() {
     }
-    
+
     public bool register(string plugin_directory) {
         assert(!CefGtk.is_initialized());
-        var path = "%s/%s".printf(plugin_directory, FILENAME);
+        var path = "%s/%s".printf(plugin_directory, PLUGIN_FILENAME);
         if (FileUtils.test(path, FileTest.IS_REGULAR)) {
             this.plugin_path = path;
-            path = "%s/%s.version".printf(plugin_directory, FILENAME);
+            path = "%s/%s".printf(plugin_directory, VERSION_FILENAME);
             if (FileUtils.test(path, FileTest.IS_REGULAR)) {
                 string? version;
                 try {
@@ -34,7 +36,7 @@ public class FlashPlugin: GLib.Object {
                 this.available = true;
                 return true;
             }
-        } 
+        }
         this.plugin_directory = null;
         this.plugin_path = null;
         this.registration_error = "File '%s' does not exist.".printf(path);

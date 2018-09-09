@@ -22,7 +22,7 @@ public class InitializationResult {
 
 public InitializationResult init(
     InitFlags? flags, double scale_factor,
-    string? widevine_plugin_dir=null, bool enable_flash_plugin=true,
+    string? widevine_plugin_dir=null, string? flash_plugin_dir=null,
     string? user_agent=null, string? product_version=null,
     ProxyType proxy_type=ProxyType.SYSTEM, string? proxy_server=null, uint proxy_port=0) {
 	assert (initialization_result == null);
@@ -35,9 +35,9 @@ public InitializationResult init(
 
 	Cef.MainArgs main_args = {0, null};
 	FlashPlugin? flash_plugin = null;
-	if (enable_flash_plugin) {
+	if (flash_plugin_dir != null) {
         flash_plugin = new FlashPlugin();
-        if (!flash_plugin.register(Cef.get_cef_lib_dir() + "/PepperFlash")) {
+        if (!flash_plugin.register(flash_plugin_dir)) {
             warning("Failed to register Flash plugin: %s", flash_plugin.registration_error);
         }
 	}
