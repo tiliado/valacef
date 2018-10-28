@@ -54,6 +54,7 @@ public class WebView : Gtk.Bin {
     private WebViewWidget web_view;
     private double _zoom_level = 0.0;
     private Cef.Browser? browser = null;
+    private int browser_id = -1;
     private Client? client = null;
     private string? uri_to_load = null;
     private string? string_to_load = null;
@@ -357,6 +358,7 @@ public class WebView : Gtk.Bin {
     private void on_browser_created(Client client, Cef.Browser browser) {
         this.client = client;
         this.browser = browser;
+        this.browser_id = browser.get_identifier();
         if (string_to_load != null) {
             load_html(string_to_load, uri_to_load);
         } else if (uri_to_load != null) {
@@ -450,6 +452,17 @@ public class WebView : Gtk.Bin {
      }
 
     private void on_render_process_created(Cef.ListValue extra_info) {
+        /* Cannot use this.browser.get_identifier() directly as we are called from IOThread
+         * and this.browser may still be null. Instead, use this.browser_id if it is >= 0
+         * or wait until it is set (it doesn't happen often though).
+         */
+        int browser_id = -1;
+        for (var i = 0; (browser_id = this.browser_id) < 0 && i < 1000; i++) {
+            Thread.usleep(5000);
+        }
+        assert(browser_id > -1);
+
+        // TODO: Is thread-safe to use `autoloaded_renderer_extensions`?
         foreach (var extension in autoloaded_renderer_extensions) {
             var n_params = extension.parameters == null ? 0 : extension.parameters.length;
             var list = Cef.list_value_create();
@@ -457,7 +470,7 @@ public class WebView : Gtk.Bin {
             Cef.String cef_string = {};
             Cef.set_string(&cef_string, MsgId.AUTOLOAD_EXTENSION);
             list.set_string(0, &cef_string);
-            list.set_int(1, extension.browser_id != -1 ? extension.browser_id: browser.get_identifier());
+            list.set_int(1, extension.browser_id != -1 ? extension.browser_id : browser_id);
 
             var params = Cef.list_value_create();
             if (n_params > 0) {
