@@ -130,7 +130,7 @@ base_refcounted.set_ref_counting(ref_func.c_name, unref_func.c_name)
 
 ref_func = Function('cef_base_ref_counted_ref', 'ref', "capi/cef_base_capi.h",
                     params=[("cef_base_ref_counted_t*", "self")],
-                    body=['self->add_ref(self); return self;'],
+                    body=['self->add_ref(self);', 'return self;'],
                     ret_type="cef_base_ref_counted_t*")
 unref_func = Function('cef_base_ref_counted_unref', 'unref', "capi/cef_base_capi.h",
                       params=[("cef_base_ref_counted_t*", "self")],
