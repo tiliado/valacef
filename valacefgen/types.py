@@ -214,7 +214,7 @@ class Struct(Type):
             buf.extend(utils.vala_comment(self.comment, valadoc=True))
         ccode = {
             'cname': '"%s"' % self.c_name,
-            'cheader_filename': '"%s"' % self.c_header,
+            'cheader_filename': '"%s,valacef.h"' % self.c_header,
             'has_type_id': 'false',
         }
         if self.is_class:
