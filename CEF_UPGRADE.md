@@ -17,29 +17,30 @@ $ git fetch upstream
   and branch it.
 
 ```
-git checkout upstream/3440
-git checkout -b 3440
-git checkout -b 3440-valacef
+git checkout upstream/3497
+git checkout -b 3497
+git checkout -b 3497-valacef
 ```
 
 * Or update it:
 
 ```
-git checkout 3440
-git rebase upstream/3440
-git checkout 3440-valacef
-git rebase 3440
+git checkout 3497
+git rebase upstream/3497
+git checkout 3497-valacef
+git rebase 3497
 ```
 
 * Rebase patches
 
 ```
 cd  ~/dev/projects/cef/cef
-git checkout 3440-valacef
+git checkout 3497-valacef
 git cherry-pick ...
 cd /media/fenryxo/exthdd7/cef/build/
+wget https://bitbucket.org/chromiumembedded/cef/raw/07f57223a87f634dbb7ba6b3960251225413b9ac/tools/automate/automate-git.py
 time python automate-git.py --download-dir=download \
-  --url=/home/fenryxo/dev/projects/cef/cef --branch=3440 --checkout=origin/3440-valacef  \
+  --url=/home/fenryxo/dev/projects/cef/cef --branch=3497 --checkout=origin/3497-valacef  \
   --force-clean --force-config  --x64-build --build-target=cefsimple --no-build --no-distrib
 cd /media/fenryxo/exthdd7/cef/build/download/chromium/src/cef/tools
 # Attempt to update patch files. Any merge conflicts will be highlighted in the output.

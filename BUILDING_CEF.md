@@ -11,7 +11,7 @@ Paths
 Install dependencies
 ------------------
 
-On Debian Stretch:
+On Ubuntu 18.04 LTS:
 
     apt install \
       curl build-essential flex g++ git-svn libcairo2-dev libglib2.0-dev \
@@ -19,17 +19,18 @@ On Debian Stretch:
       libnss3-dev libgnome-keyring-dev libasound2-dev gperf bison libpci-dev \
       libkrb5-dev libgtk-3-dev libxss-dev python libpulse-dev ca-certificates
 
-Maybe also something from this:
+Use LXC container (here in Fedora 29):
 
-    apt install \
-      elfutils fakeroot libav-tools libbrlapi-dev libbz2-dev libcap-dev \
-      libcurl4-gnutls-dev libdrm-dev libelf-dev libexif-dev libffi-dev \
-      libgconf2-dev libgl1-mesa-dev libgtk2.0-dev libpam0g-dev libpulse-dev \
-      libsctp-dev libspeechd-dev libsqlite3-dev libssl-dev libudev-dev \
-      libwww-perl libxslt1-dev libxt-dev libxtst-dev mesa-common-dev \
-      patch perl pkg-config python python-crypto python-dev python-psutil \
-      python-numpy python-opencv python-openssl python-yaml ruby subversion \
-      ttf-dejavu-core fonts-indic fonts-thai-tlwg wdiff wget zip
+    sudo lxc-create -n cef-bionic -t /usr/share/lxc/templates/lxc-download  -- -d ubuntu -r bionic -a amd64
+    sudo lxc-start -n cef-bionic
+    sudo lxc-attach -n cef-bionic
+        apt update && apt full-upgrade
+        apt install ...
+        mkdir -p /media/fenryxo/exthdd7/cef
+        poweroff
+    sudo nano /var/lib/lxc/cef-bionic/config
+        lxc.mount.entry = /media/fenryxo/exthdd7/cef media/fenryxo/exthdd7/cef none bind 0 0
+
 
 Download automate-git.py script
 ----------------------------
@@ -41,10 +42,10 @@ Download automate-git.py script
 Set up environment
 ----------------
 
-If you live in the USA, consult either your lawyer or therapist before enabling proprietary codecs.
-Yes, there might be some patents. Software patents don't apply in the Czech Republic and we also
-have excellent beer, btw.
-
+    sudo lxc-start -n cef-bionic
+    sudo lxc-attach -n cef-bionic
+    su ubuntu
+    cd /media/fenryxo/exthdd7/cef/build
     export GN_DEFINES='use_gtk3=true is_official_build=true use_allocator=none symbol_level=1 ffmpeg_branding=Chrome proprietary_codecs=true'
     export CFLAGS="-Wno-error"
     export CXXFLAGS="-Wno-error"
@@ -58,7 +59,7 @@ Download & build CEF
     cd /media/fenryxo/exthdd7/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3440 --checkout=3440-valacef \
+      --branch=3497 --checkout=3497-valacef \
       --force-clean --force-clean-deps --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
 
@@ -67,7 +68,7 @@ Download & build CEF
     cd /media/fenryxo/exthdd7/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3440 --checkout=origin/3440-valacef \
+      --branch=3497 --checkout=origin/3497-valacef \
       --force-clean --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
 
@@ -75,7 +76,7 @@ Download & build CEF
 
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3440  --checkout=origin/3440-valacef \
+      --branch=3497  --checkout=origin/3497-valacef \
       --x64-build --build-target=cefsimple --no-update --force-build \
       --no-debug-build
 
