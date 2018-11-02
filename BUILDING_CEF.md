@@ -46,7 +46,7 @@ Set up environment
     sudo lxc-attach -n cef-bionic
     su ubuntu
     cd /media/fenryxo/exthdd7/cef/build
-    export GN_DEFINES='use_gtk3=true is_official_build=true use_allocator=none symbol_level=1 ffmpeg_branding=Chrome proprietary_codecs=true'
+    export GN_DEFINES='is_official_build=true use_allocator=none symbol_level=1 ffmpeg_branding=Chrome proprietary_codecs=true'
     export CFLAGS="-Wno-error"
     export CXXFLAGS="-Wno-error"
     export CEF_ARCHIVE_FORMAT=tar.bz2
@@ -59,7 +59,7 @@ Download & build CEF
     cd /media/fenryxo/exthdd7/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3497 --checkout=3497-valacef \
+      --branch=3538 --checkout=3538-valacef \
       --force-clean --force-clean-deps --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
 
@@ -68,7 +68,7 @@ Download & build CEF
     cd /media/fenryxo/exthdd7/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3497 --checkout=origin/3497-valacef \
+      --branch=3538 --checkout=origin/3538-valacef \
       --force-clean --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
 
@@ -76,7 +76,7 @@ Download & build CEF
 
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3497  --checkout=origin/3497-valacef \
+      --branch=3538  --checkout=origin/3538-valacef \
       --x64-build --build-target=cefsimple --no-update --force-build \
       --no-debug-build
 
