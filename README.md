@@ -1,4 +1,4 @@
-Vala-CEF 3.3325
+Vala-CEF 3.3538
 ===============
 
 **WIP [Vala](https://wiki.gnome.org/Projects/Vala) bindings for
@@ -22,7 +22,7 @@ Dependencies
   * glib-2.0 >= 2.52.0
   * gtk+-3.0 >= 3.22.0
   * x11
-  * CEF 3.3325.x (built with GTK+ 3) -- see [BUILDING_CEF.md](./BUILDING_CEF.md)
+  * CEF 3.3538.x (built with GTK+ 3) -- see [BUILDING_CEF.md](./BUILDING_CEF.md)
 
 Build Instructions
 ----------------
@@ -42,6 +42,6 @@ ValaCEF supports following environment variables for debugging purposes:
 Copyright
 --------
 
-  * Copyright 2017-2089 Jiří Janoušek
+  * Copyright 2017-2019 Jiří Janoušek
   * License: [BSD-2-Clause](./LICENSE)
 
