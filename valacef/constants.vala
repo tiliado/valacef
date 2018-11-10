@@ -7,7 +7,7 @@ private extern const string WIDEVINE_MANIFEST_PATH;
 private static unowned string? cached_cef_lib_dir;
 private static unowned string? cached_widevine_manifest_path;
 private static string? cached_widevine_adapter_path;
-
+private static string? minimal_chromium_version_for_widevine = null;
 
 public unowned string get_cef_lib_dir() {
     if (cached_cef_lib_dir == null) {
@@ -35,7 +35,10 @@ public unowned string get_widevine_adapter_path() {
 
 
 public unowned string get_minimal_chromium_version_for_widevine() {
-    return "68";
+    if (minimal_chromium_version_for_widevine == null) {
+        minimal_chromium_version_for_widevine = Cef.get_chromium_major().to_string();
+    }
+    return minimal_chromium_version_for_widevine;
 }
 
 } // namespace Cef
