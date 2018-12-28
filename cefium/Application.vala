@@ -3,12 +3,12 @@ namespace Cefium {
 public class Application : Gtk.Application {
     private BrowserWindow main_window;
     private string versions;
-    
+
     public Application(string versions) {
 		GLib.Object(application_id: "eu.tiliado.Cefium", flags: ApplicationFlags.FLAGS_NONE);
         this.versions = versions;
 	}
-    
+
     protected override void startup() {
 		base.startup();
 		var source = new IdleSource();
@@ -20,12 +20,12 @@ public class Application : Gtk.Application {
 		source.set_can_recurse(false);
 		source.attach(MainContext.ref_thread_default());
 	}
-    
+
     protected override void activate () {
         create_main_window();
         main_window.present();
     }
-    
+
     private void create_main_window() {
         if (main_window == null) {
             var ctx = new CefGtk.WebContext(GLib.Environment.get_user_config_dir() + "/cefium");
@@ -42,4 +42,4 @@ public class Application : Gtk.Application {
     }
 }
 
-} // namespace Cefium 
+} // namespace Cefium
