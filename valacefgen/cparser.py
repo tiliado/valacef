@@ -347,7 +347,7 @@ class Parser:
         return "".join(buf)
 
     def create_valacef_c_header(self) -> str:
-        buf = ['#ifndef VALACEF_H\n#define VALACEF_H\n\n']
+        buf = ['#ifndef VALACEF_H\n#define VALACEF_H\n\n#include <glib.h>\n\n']
         for entry in self.c_glue:
             for line in entry.gen_c_header(self.repo):
                 buf.extend((line, '\n'))
