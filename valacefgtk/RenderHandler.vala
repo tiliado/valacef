@@ -21,11 +21,10 @@ private class RenderHandler : Cef.RenderHandlerRef {
 
         /**
          * Called to retrieve the view rectangle which is relative to screen
-         * coordinates. Return true (1) if the rectangle was provided.
+         * coordinates. This function must always provide a non-NULL rectangle.
          */
-        /*int*/ vfunc_get_view_rect = (self, /*Browser*/ browser, /*Rect?*/ rect) => {
+        /*void*/ vfunc_get_view_rect = (self, /*Browser*/ browser, /*Rect?*/ rect) => {
             ((RenderHandler) self).set_rect_from_allocation(rect);
-            return 1;
         };
 
         /**
