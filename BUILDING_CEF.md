@@ -59,7 +59,7 @@ Download & build CEF
     cd /media/fenryxo/exthdd7/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3538 --checkout=3538-valacef \
+      --branch=3578 --checkout=3578-valacef \
       --force-clean --force-clean-deps --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
 
@@ -68,7 +68,7 @@ Download & build CEF
     cd /media/fenryxo/exthdd7/cef/build/
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3538 --checkout=origin/3538-valacef \
+      --branch=3578 --checkout=origin/3578-valacef \
       --force-clean --force-config \
       --x64-build --build-target=cefsimple --no-build --no-distrib
 
@@ -76,7 +76,7 @@ Download & build CEF
 
     time python automate-git.py --download-dir=download \
       --url=/home/fenryxo/dev/projects/cef/cef \
-      --branch=3538  --checkout=origin/3538-valacef \
+      --branch=3578  --checkout=origin/3578-valacef \
       --x64-build --build-target=cefsimple --no-update --force-build \
       --no-debug-build
 

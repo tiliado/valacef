@@ -19,11 +19,11 @@ clean:
 push:
 	git checkout master
 	git push && git push --tags
-	git checkout 3.3538.x
+	git checkout 3.3578.x
 	git push && git push --tags
 	git checkout master
 
 merge:
-	git checkout 3.3538.x
+	git checkout 3.3578.x
 	git merge --ff-only master
 	git checkout master
