@@ -36,7 +36,7 @@ public unowned string get_widevine_adapter_path() {
 
 public unowned string get_minimal_chromium_version_for_widevine() {
     if (minimal_chromium_version_for_widevine == null) {
-        minimal_chromium_version_for_widevine = Cef.get_chromium_major().to_string();
+        minimal_chromium_version_for_widevine = "72";
     }
     return minimal_chromium_version_for_widevine;
 }
