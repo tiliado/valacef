@@ -28,10 +28,6 @@ public InitializationResult init(
 	assert (initialization_result == null);
     Cef.enable_highdpi_support();
 	set_x11_error_handlers();
-	Cef.String cef_path = {};
-	Cef.set_string(&cef_path, Cef.get_cef_lib_dir());
-	Cef.override_path(Cef.PathKey.DIR_MODULE, &cef_path);
-	Cef.override_path(Cef.PathKey.DIR_EXE, &cef_path);
 
 	Cef.MainArgs main_args = {0, null};
 	FlashPlugin? flash_plugin = null;
