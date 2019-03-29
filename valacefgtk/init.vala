@@ -26,6 +26,14 @@ public InitializationResult init(
     string? user_agent=null, string? product_version=null,
     ProxyType proxy_type=ProxyType.SYSTEM, string? proxy_server=null, uint proxy_port=0) {
 	assert (initialization_result == null);
+
+    if (Cef.get_chromium_major() != Cef.get_valacef_major()
+    || Cef.get_chromium_branch() != Cef.get_valacef_branch()) {
+        error(
+            "Incompatible versions: ValaCEF %s, Chromium %s",
+            Cef.get_valacef_version(), Cef.get_chromium_version());
+    }
+
     Cef.enable_highdpi_support();
 	set_x11_error_handlers();
 

@@ -41,6 +41,9 @@ public int get_chromium_patch() {
 	return version_info(7);
 }
 
+public int get_chromium_branch() {
+	return version_info(6);
+}
 
 public int get_valacef_major() {
 	return VALACEF_VERSION_MAJOR;
@@ -55,6 +58,9 @@ public int get_valacef_micro() {
 	return VALACEF_VERSION_MICRO;
 }
 
+public int get_valacef_branch() {
+	return VALACEF_VERSION_MINOR;
+}
 
 public string get_valacef_version() {
 	return "%d.%d.%d".printf(get_valacef_major(), get_valacef_minor(), get_valacef_micro());
