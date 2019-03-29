@@ -27,6 +27,7 @@ header_files = [
     'capi/cef_app_capi.h',
     'capi/cef_base_capi.h',
     'internal/cef_time.h',
+    'capi/cef_audio_handler_capi.h',
     'capi/cef_command_line_capi.h',
     'capi/cef_browser_process_handler_capi.h',
     'capi/cef_render_process_handler_capi.h',
