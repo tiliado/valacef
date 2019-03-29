@@ -18,27 +18,27 @@ public int get_cef_major() {
 
 
 public int get_cef_commit() {
-	return version_info(1);
-}
-
-
-public int get_chromium_major() {
-	return version_info(2);
-}
-
-
-public int get_chromium_minor() {
 	return version_info(3);
 }
 
 
-public int get_chromium_build() {
+public int get_chromium_major() {
 	return version_info(4);
 }
 
 
-public int get_chromium_patch() {
+public int get_chromium_minor() {
 	return version_info(5);
+}
+
+
+public int get_chromium_build() {
+	return version_info(6);
+}
+
+
+public int get_chromium_patch() {
+	return version_info(7);
 }
 
 
