@@ -1,5 +1,6 @@
 namespace Cef.V8 {
 
+[Compact]
 public class SimpleAccessor : V8accessorRef {
 	public SimpleAccessor() {
 		base();
@@ -15,7 +16,7 @@ public class SimpleAccessor : V8accessorRef {
 			message("SimpleV8accessor.set");
 			return 0;
 		};
-		
+
         /**
          * Handle assignment of the accessor value identified by |name|. |object| is
          * the receiver ('this' object) of the accessor. |value| is the new value

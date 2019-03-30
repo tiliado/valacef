@@ -121,8 +121,8 @@ for entry in header_files:
     parser.parse_header(path, c_include_path)
 
 repo = parser.repo
-ref_func = Function('cef_base_ref_counted_ref', 'ref', "valacef.h")
-unref_func = Function('cef_base_ref_counted_unref', 'unref', "valacef.h")
+ref_func = Function('cef_base_ref_counted_ref', 'ref', "valacef_api.h")
+unref_func = Function('cef_base_ref_counted_unref', 'unref', "valacef_api.h")
 
 base_refcounted = repo.structs['cef_base_ref_counted_t']
 base_refcounted.add_method(ref_func)
@@ -206,7 +206,7 @@ utf16_to_utf8_func = Function(
 parser.add_c_glue(utf16_to_utf8_func)
 
 utf16_to_utf8_func = Function(
-    'cef_utf16_string_to_vala_string', 'get_string', 'valacef.h', 'char*',
+    'cef_utf16_string_to_vala_string', 'get_string', 'valacef_api.h', 'char*',
     params=[('cef_string_t*', 'utf16_str')])
 repo.add_function(utf16_to_utf8_func)
 
@@ -219,7 +219,7 @@ utf8_to_utf16_func = Function(
 parser.add_c_glue(utf8_to_utf16_func)
 
 utf8_to_utf16_func = Function(
-    'cef_utf16_string_from_vala_string', 'set_string', 'valacef.h',
+    'cef_utf16_string_from_vala_string', 'set_string', 'valacef_api.h',
     params=[('cef_string_t*', 'utf16_str'), ('char*', 'str')])
 repo.add_function(utf8_to_utf16_func)
 

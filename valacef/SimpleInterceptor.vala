@@ -1,5 +1,6 @@
 namespace Cef.V8 {
 
+[Compact]
 public class SimpleInterceptor : V8interceptorRef {
 	public SimpleInterceptor(){
 		base();
