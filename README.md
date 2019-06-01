@@ -1,4 +1,4 @@
-Vala-CEF 73.3683
+Vala-CEF 74.3729
 ================
 
 **WIP [Vala](https://wiki.gnome.org/Projects/Vala) bindings for
@@ -22,7 +22,7 @@ Dependencies
   * glib-2.0 >= 2.52.0
   * gtk+-3.0 >= 3.22.0
   * x11
-  * CEF 73.3683.x (built with GTK+ 3) -- see [BUILDING_CEF.md](./BUILDING_CEF.md)
+  * CEF 74.3729.x -- see [BUILDING_CEF.md](./BUILDING_CEF.md)
 
 Build Instructions
 ----------------
