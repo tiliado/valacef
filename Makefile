@@ -19,11 +19,11 @@ clean:
 push:
 	git checkout master
 	git push && git push --tags
-	git checkout 73.3683.x
+	git checkout 74.3729.x
 	git push && git push --tags
 	git checkout master
 
 merge:
-	git checkout 73.3683.x
+	git checkout 74.3729.x
 	git merge --ff-only master
 	git checkout master
