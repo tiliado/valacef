@@ -21,6 +21,7 @@ header_files = [
     ('%s/overrides/cef_primitives.h' % TOP, 'capi/cef_base_capi.h'),
     ('%s/overrides/cef_base.h' % TOP, 'capi/cef_base_capi.h'),
     ('%s/overrides/cef_string.h' % TOP, 'capi/cef_base_capi.h'),
+    ('%s/overrides/cef_error_codes.h' % TOP, 'internal/cef_types.h'),
     'internal/cef_types_linux.h',
     'internal/cef_types.h',
     'internal/cef_string_list.h',
