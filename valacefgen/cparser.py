@@ -110,7 +110,10 @@ class Parser:
             if enum['typedef']:
                 name = enum['name']
                 # For vala names, we strip the common prefix to make enum member names shorter.
-                n_prefix = len(find_prefix([v['name'] for v in enum['values']]))
+                if len(enum['values']) == 1:
+                    n_prefix = enum['values'][0]['name'].index('_') + 1
+                else:
+                    n_prefix = len(find_prefix([v['name'] for v in enum['values']]))
                 values = [EnumValue(
                     v['name'],   # c_name
                     v['name'][n_prefix:],  # vala_name
