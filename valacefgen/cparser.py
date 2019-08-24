@@ -1,4 +1,5 @@
 import re
+from contextlib import AbstractContextManager
 from typing import Set, Dict, Any, List, Tuple
 
 from CppHeaderParser import CppHeader
@@ -7,6 +8,21 @@ from valacefgen.types import Repository, EnumValue, Enum, Struct, Typedef, Struc
     StructVirtualFunc, OpaqueClass
 from valacefgen.utils import find_prefix, lstrip, rstrip, camel_case
 from valacefgen import utils
+
+
+class ParseError(Exception):
+    def __init__(self, context):
+        self.context = context
+
+
+class Context(list, AbstractContextManager):
+    def __call__(self, *args) -> 'Context':
+        self.append(args)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self and not exc_type:
+            self.pop()
 
 
 class Naming:
@@ -44,6 +60,7 @@ class Parser:
         self.repo = repo
         self.vala_glue: List[Type] = []
         self.c_glue: List[Type] = []
+        self.context: Context = Context()
 
     def preprocess_header(self, data: str) -> str:
         data = data.replace('CEF_EXPORT', '').replace('CEF_CALLBACK', '')
@@ -55,13 +72,17 @@ class Parser:
         return COMMENT_RE.sub(repl, data)
 
     def parse_header(self, path: str, c_include_path: str):
-        with open(path) as f:
-            data = self.preprocess_header(f.read())
-        header = CppHeader(data, 'string')
-        self.parse_typedefs(c_include_path, header.typedefs)
-        self.parse_enums(c_include_path, header.enums)
-        self.parse_classes_and_structs(c_include_path, header.classes)
-        self.parse_functions(c_include_path, header.functions)
+        try:
+            with self.context('header', path, c_include_path):
+                with open(path) as f:
+                    data = self.preprocess_header(f.read())
+                header = CppHeader(data, 'string')
+                self.parse_typedefs(c_include_path, header.typedefs)
+                self.parse_enums(c_include_path, header.enums)
+                self.parse_classes_and_structs(c_include_path, header.classes)
+                self.parse_functions(c_include_path, header.functions)
+        except Exception as e:
+            raise ParseError(self.context) from e
 
     def parse_typedefs(self, c_include_path: str, typedefs):
         for alias, c_type in typedefs.items():
