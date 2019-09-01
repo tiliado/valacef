@@ -105,7 +105,7 @@ private class WebViewWindowed : Gtk.Widget, WebViewWidget {
         Cef.String url = {};
         Cef.set_string(&url, "about:blank");
         Cef.Browser browser = Cef.browser_host_create_browser_sync(
-            window_info, client, &url, browser_settings, web_view.web_context.request_context);
+            window_info, client, &url, browser_settings, null, web_view.web_context.request_context);
 
         var host = browser.get_host();
         cef_window = wrap_xwindow(

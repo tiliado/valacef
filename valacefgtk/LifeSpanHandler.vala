@@ -31,9 +31,10 @@ public class LifeSpanHandler : Cef.LifeSpanHandlerRef {
             self, /*Browser*/ browser, /*Frame*/ frame, /*String*/ target_url, /*String*/ target_frame_name,
             /*WindowOpenDisposition*/ target_disposition, /*int*/ user_gesture, /*PopupFeatures*/ popupFeatures,
             /*WindowInfo*/ windowInfo, out /*Client*/ client, /*BrowserSettings*/ settings,
-            /*int*/ ref no_javascript_access
+            out /*DictionaryValue?*/ extra_info, /*int*/ ref no_javascript_access
         ) => {
             client = null;
+            extra_info = null;
             string? url = Cef.get_string(target_url);
             var request = new NavigationRequest(
                 browser, frame, url, Cef.get_string(target_frame_name),
