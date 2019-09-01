@@ -1,5 +1,5 @@
 APPNAME = 'valacef'
-VERSION = '75.3770.0'
+VERSION = '76.3809.0'
 MIN_VALA = "0.34.7"
 MIN_GLIB = "2.52.0"
 MIN_GTK = "3.22.0"
