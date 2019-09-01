@@ -32,45 +32,28 @@ public class WebContext : GLib.Object {
         }
         request_settings.persist_user_preferences = 1;
         request_settings.enable_net_security_expiration = 1;
-        
-        Cef.String cef_cookie_path = {};
-        if (user_data_path != null) {
-            Cef.set_string(&cef_cookie_path, user_data_path + "/CefCookies");
-        }
-        cookie_manager = Cef.cookie_manager_create_manager(
-            user_data_path != null ? &cef_cookie_path : null, 0, new Cef.CompletionCallbackRef());
+
+
+        context_handler = new Handler();
+        request_context = Cef.request_context_create_context(request_settings, context_handler);
+        cookie_manager = request_context.get_cookie_manager(null);
+        assert(cookie_manager != null);
         Timeout.add(200, () => {
             cookie_manager.flush_store(null);
             return true;
         });
-        assert(cookie_manager != null);
-        context_handler = new Handler(cookie_manager);
-        request_context = Cef.request_context_create_context(request_settings, context_handler);
     }
     
     private class Handler : Cef.RequestContextHandlerRef {
-        public Handler(Cef.CookieManager cookie_manager) {
+        public Handler() {
             base();
-            priv_set<unowned Cef.CookieManager>("cookie_manager", cookie_manager);
-            
+
             /**
              * Called on the browser process UI thread immediately after the request
              * context has been initialized.
              */
             /*void vfunc_on_request_context_initialized(owned RequestContext? request_context);*/
-            /**
-             * Called on the browser process IO thread to retrieve the cookie manager. If
-             * this function returns NULL the default cookie manager retrievable via
-             * cef_request_tContext::get_default_cookie_manager() will be used.
-             */
-            /*CookieManager*/ vfunc_get_cookie_manager = (self) => {
-                Cef.assert_browser_io_thread();
-                var cm = ((Cef.RequestContextHandlerRef) self).priv_get<unowned Cef.CookieManager>(
-                    "cookie_manager");
-                assert(cm != null);
-                return cm;
-            };
-            
+
             /**
              * Called on multiple browser process threads before a plugin instance is
              * loaded. |mime_type| is the mime type of the plugin that will be loaded.
