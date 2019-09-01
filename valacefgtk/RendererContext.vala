@@ -7,11 +7,11 @@ public class RendererContext : GLib.Object {
     public RenderSideEventLoop event_loop {get; construct;}
     private SList<RendererExtension> renderer_extensions = null;
     private SList<RendererExtensionInfo> autoloaded_renderer_extensions = null;
-    
+
     public RendererContext(RenderProcessHandler handler) {
         GLib.Object(handler: handler, event_loop: new RenderSideEventLoop(GLib.MainContext.@default()));
     }
-    
+
     public void init(Cef.ListValue? extra_info) {
         Cef.assert_renderer_thread();
         event_loop.start();
@@ -33,38 +33,38 @@ public class RendererContext : GLib.Object {
                             new RendererExtensionInfo(browser_id, path, parameters));
                     }
                     break;
-                default: 
+                default:
                     break;
                 }
             }
         }
     }
-    
+
     public virtual signal void browser_created(Cef.Browser browser) {
         Cef.assert_renderer_thread();
         send_message(browser, MsgId.BROWSER_CREATED, {browser.get_identifier()});
         autoload_renderer_extensions(browser);
     }
-    
+
     public virtual signal void browser_destroyed(Cef.Browser browser) {
         Cef.assert_renderer_thread();
         send_message(browser, MsgId.BROWSER_DESTROYED, {browser.get_identifier()});
     }
-    
+
     public virtual signal void js_context_created(Cef.Browser browser, Cef.Frame frame, Cef.V8context context) {
         Cef.assert_renderer_thread();
         if (frame.is_main() > 0) {
             message("JS Context created %d", browser.get_identifier());
         }
     }
-    
+
     public virtual signal void js_context_released(Cef.Browser browser, Cef.Frame frame, Cef.V8context context) {
         Cef.assert_renderer_thread();
         if (frame.is_main() > 0) {
             message("JS Context released: %d", browser.get_identifier());
         }
     }
-    
+
     public void load_renderer_extension(Cef.Browser browser, string path, owned Variant?[] parameters) {
         Cef.assert_renderer_thread();
         assert(GLib.Module.supported());
@@ -84,13 +84,13 @@ public class RendererContext : GLib.Object {
             }
         }
     }
-    
+
     public void send_message(Cef.Browser browser, string name, Variant?[] parameters) {
         Cef.assert_renderer_thread();
         var msg = Utils.create_process_message(name, parameters);
         send_cef_message(browser, name, msg);
     }
-    
+
     private bool send_cef_message(Cef.Browser browser, string name, Cef.ProcessMessage msg) {
         var frame = browser.get_main_frame();
         if (frame != null) {
@@ -115,7 +115,7 @@ public class RendererContext : GLib.Object {
         }
         return true;
     }
-    
+
     private void autoload_renderer_extensions(Cef.Browser browser) {
          foreach (var extension in autoloaded_renderer_extensions) {
              if (browser.get_identifier() == extension.browser_id) {
@@ -123,14 +123,14 @@ public class RendererContext : GLib.Object {
             }
          }
     }
-    
+
     private class RendererExtension {
         unowned RendererContext ctx;
         int browser;
         GLib.Module? module;
         void* init_function;
         Variant?[] parameters;
-        
+
         public RendererExtension(RendererContext ctx, int browser, owned GLib.Module? module,
         void* init_function, owned Variant?[] parameters) {
             this.ctx = ctx;
@@ -139,7 +139,7 @@ public class RendererContext : GLib.Object {
             this.init_function = init_function;
             this.parameters = (owned) parameters;
         }
-        
+
         public void init() {
             InitRendererExtensionFunc init_renderer_extension = (InitRendererExtensionFunc) init_function;
             init_renderer_extension(ctx, browser, parameters);

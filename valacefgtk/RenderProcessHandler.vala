@@ -16,7 +16,7 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
             ctx.init(extra_info);
             _this.priv_set("context", ctx);
         };
-        
+
         /**
          * Called when a new message is received from a different process. Return true
          * (1) if the message was handled or false (0) otherwise. Do not keep a
@@ -27,7 +27,7 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
              Cef.assert_renderer_thread();
             return (int) get_ctx(self).message_received(browser, frame, message);
         };
-        
+
         /**
          * Called after a browser has been created. When browsing cross-origin a new
          * browser will be created before the old browser with the same identifier is
@@ -45,7 +45,7 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
             Cef.assert_renderer_thread();
             get_ctx(self).browser_destroyed(browser);
         };
-        
+
          /**
          * Called immediately after the V8 context for a frame has been created. To
          * retrieve the JavaScript 'window' object use the
@@ -68,7 +68,7 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
             get_ctx(self).js_context_released(browser, frame, context);
         };
     }
-    
+
     private static RendererContext get_ctx(Cef.RenderProcessHandler self) {
         return ((RenderProcessHandler) self).priv_get<RendererContext>("context");
     }

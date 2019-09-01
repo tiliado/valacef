@@ -6,7 +6,7 @@ public class WebContext : GLib.Object {
     internal Cef.RequestContext request_context;
     internal Cef.RequestContextHandlerRef context_handler;
     internal Cef.CookieManager cookie_manager;
-    
+
     public static void notify_render_process_created(Cef.ListValue extra_info) {
         foreach (unowned WeakRef<WebContext> weakref in all_contexts) {
             var ctx = weakref.get();
@@ -15,14 +15,14 @@ public class WebContext : GLib.Object {
             }
         }
     }
-    
+
     public WebContext(string? user_data_path) {
         GLib.Object(user_data_path: user_data_path);
         all_contexts.append(new WeakRef<WebContext>(this));
     }
-    
+
     public signal void render_process_created(Cef.ListValue extra_info);
-    
+
     construct {
         assert(CefGtk.is_initialized());
         Cef.assert_browser_ui_thread();
@@ -43,7 +43,7 @@ public class WebContext : GLib.Object {
             return true;
         });
     }
-    
+
     private class Handler : Cef.RequestContextHandlerRef {
         public Handler() {
             base();
@@ -74,7 +74,7 @@ public class WebContext : GLib.Object {
              * cef_request_tContext::PurgePluginListCache.
              */
             /*int on_before_plugin_load(String* mime_type, String* plugin_url, int is_main_frame, String* top_origin_url, owned WebPluginInfo? plugin_info, PluginPolicy? plugin_policy);*/
-    
+
         }
     }
 }

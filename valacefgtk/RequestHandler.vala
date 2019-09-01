@@ -5,7 +5,7 @@ public class RequestHandler: Cef.RequestHandlerRef {
     public RequestHandler(WebView web_view) {
         base();
         priv_set<unowned WebView>("web_view", web_view);
-       
+
         /**
          * Called on the UI thread before browser navigation. Return true (1) to
          * cancel the navigation or false (0) to allow the navigation to proceed. The

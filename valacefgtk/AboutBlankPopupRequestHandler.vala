@@ -6,7 +6,7 @@ public class AboutBlankPopupRequestHandler: Cef.RequestHandlerRef {
         base();
         priv_set<unowned WebView>("web_view", web_view);
         priv_set<unowned AboutBlankPopupClient>("client", client);
-       
+
         /**
          * Called on the UI thread before browser navigation. Return true (1) to
          * cancel the navigation or false (0) to allow the navigation to proceed. The
