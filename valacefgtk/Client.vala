@@ -136,10 +136,10 @@ public class Client : Cef.ClientRef {
          * (1) if the message was handled or false (0) otherwise. Do not keep a
          * reference to or attempt to access the message outside of this callback.
          */
-        vfunc_on_process_message_received = (self, browser, source_process, msg) => {
+        vfunc_on_process_message_received = (self, browser, frame, source_process, msg) => {
             Cef.assert_browser_ui_thread();
             return (int) ((Cef.ClientRef?) self).priv_get<unowned WebView>("web_view").on_message_received(
-                browser, msg);
+                browser, frame, msg);
         };
     }
 }

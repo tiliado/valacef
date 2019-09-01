@@ -92,16 +92,18 @@ public class RendererContext : GLib.Object {
     }
     
     private bool send_cef_message(Cef.Browser browser, string name, Cef.ProcessMessage msg) {
-        if (browser.send_process_message(Cef.ProcessId.BROWSER, msg) == 0) {
-            Task.schedule(Cef.ThreadId.RENDERER, 50, () => {
-                send_cef_message(browser, name, msg);
-            });
-            return false;
+        var frame = browser.get_main_frame();
+        if (frame != null) {
+            frame.send_process_message(Cef.ProcessId.BROWSER, msg);
+            return true;
         }
-        return true;
+        Task.schedule(Cef.ThreadId.RENDERER, 50, () => {
+            send_cef_message(browser, name, msg);
+        });
+        return false;
     }
-    
-    public bool message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
+
+    public bool message_received(Cef.Browser? browser, Cef.Frame? frame, Cef.ProcessMessage? msg) {
         Cef.assert_renderer_thread();
         var args = Utils.convert_list_to_variant(msg.get_argument_list());
         var name = msg.get_name();

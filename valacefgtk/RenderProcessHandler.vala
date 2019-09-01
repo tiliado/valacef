@@ -22,10 +22,10 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
          * (1) if the message was handled or false (0) otherwise. Do not keep a
          * reference to or attempt to access the message outside of this callback.
          */
-        /*int*/ vfunc_on_process_message_received = (self, /*Browser*/ browser, /*ProcessId*/ source_process,
-         /*ProcessMessage*/ message) => {
+        /*int*/ vfunc_on_process_message_received = (self, /*Browser*/ browser, /*Frame*/ frame,
+         /*ProcessId*/ source_process, /*ProcessMessage*/ message) => {
              Cef.assert_renderer_thread();
-            return (int) get_ctx(self).message_received(browser, message);
+            return (int) get_ctx(self).message_received(browser, frame, message);
         };
         
         /**

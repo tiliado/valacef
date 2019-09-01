@@ -427,7 +427,12 @@ public class WebView : Gtk.Bin {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             var msg = Utils.create_process_message(name, parameters);
-            browser.send_process_message(Cef.ProcessId.RENDERER, msg);
+            var frame = browser.get_main_frame();
+            if (frame != null) {
+                frame.send_process_message(Cef.ProcessId.RENDERER, msg);
+            } else {
+                warning("Cannot send process message - main fame is null.");
+            }
         }
     }
 
@@ -490,7 +495,7 @@ public class WebView : Gtk.Bin {
         }
     }
 
-    internal bool on_message_received(Cef.Browser? browser, Cef.ProcessMessage? msg) {
+    internal bool on_message_received(Cef.Browser? browser, Cef.Frame? frame, Cef.ProcessMessage? msg) {
         if (browser.get_identifier() != this.browser.get_identifier()) {
             return false;
         }
