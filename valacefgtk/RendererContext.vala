@@ -1,5 +1,6 @@
 namespace CefGtk {
 
+[CCode (has_target = false)]
 public delegate void InitRendererExtensionFunc(RendererContext ctx, int browser, Variant?[] parameters);
 
 public class RendererContext : GLib.Object {
