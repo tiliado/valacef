@@ -49,7 +49,6 @@ public class RendererContext : GLib.Object {
 
     public virtual signal void browser_destroyed(Cef.Browser browser) {
         Cef.assert_renderer_thread();
-        send_message(browser, MsgId.BROWSER_DESTROYED, {browser.get_identifier()});
     }
 
     public virtual signal void js_context_created(Cef.Browser browser, Cef.Frame frame, Cef.V8context context) {

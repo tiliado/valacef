@@ -114,10 +114,6 @@ public class WebView : Gtk.Bin {
         message("Renderer #%u created.", id);
     }
 
-    public virtual signal void renderer_destroyed(uint id) {
-        message("Renderer #%u destroyed.", id);
-    }
-
     public virtual signal void discard_js_dialogs() {
         if (js_dialog != null) {
             js_dialog.response.disconnect(on_js_dialog_response);
@@ -504,9 +500,6 @@ public class WebView : Gtk.Bin {
         switch (name) {
         case MsgId.BROWSER_CREATED:
             renderer_created((uint) args[0].get_int64());
-            break;
-        case MsgId.BROWSER_DESTROYED:
-            renderer_destroyed((uint) args[0].get_int64());
             break;
         default:
             message_received(name, args);
