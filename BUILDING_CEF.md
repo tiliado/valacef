@@ -52,6 +52,11 @@ Set up environment
     export CFLAGS="-Wno-error"
     export CXXFLAGS="-Wno-error"
     export CEF_ARCHIVE_FORMAT=tar.bz2
+    
+Set up cef source code
+----------------
+
+    git clone https://github.com/tiliado/cef.git /home/fenryxo/dev/projects/cef/cef
 
 Download & build CEF
 ------------------
