@@ -1,6 +1,18 @@
 Vala-CEF 76.3809
 ================
 
+⛔ Deprecated ⛔
+----------------
+
+💀 Valacef is deprecated as [I haven't managed to make Nuvola work with Chromium 76 or newer](https://github.com/tiliado/valacef/issues/17).
+
+👉 [The last working branch is 75.3770.x](https://github.com/tiliado/valacef/tree/75.3770.x).
+
+👍 [Nuvola will be ported to QtWebEngine](https://github.com/tiliado/nuvolaruntime/issues/583).
+
+About
+-----
+
 **WIP [Vala](https://wiki.gnome.org/Projects/Vala) bindings for
 [Chromium Embedded Framework](https://bitbucket.org/chromiumembedded/cef/)**
 
