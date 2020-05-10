@@ -227,6 +227,14 @@ utf8_to_utf16_func = Function(
     params=[('cef_string_t*', 'utf16_str'), ('char*', 'str')])
 repo.add_function(utf8_to_utf16_func)
 
+cef_string_destroy_func = Function(
+    'cef_string_destroy', 'cef_string_destroy', 'stdio.h', None,
+    params=[('void*', 'self_ptr')],
+    body=[
+        '(void) self_ptr;',
+    ])
+parser.add_c_glue(cef_string_destroy_func)
+
 vapi, vala, c_header, c_glue = parser.finish()
 
 os.makedirs(OUT, exist_ok=True)
