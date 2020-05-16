@@ -1,12 +1,15 @@
 Building Chromium Embedded Framework for ValaCEF
 ===========================================
 
+You need [patched CEF 75.3770.x](https://github.com/tiliado/cef/tree/3770-valacef).
+
 Paths
 -----
 
   * /media/fenryxo/exthdd7/cef/build/ -- the build directory
   * /media/fenryxo/exthdd7/cef/build/ -- the download directory
-  * /home/fenryxo/dev/projects/cef/cef -- the CEF source directory
+  * /home/fenryxo/dev/projects/cef/cef -- the source directory
+    of [patched CEF 75.3770.x](https://github.com/tiliado/cef/tree/3770-valacef)
 
 Install dependencies
 ------------------

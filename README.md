@@ -22,7 +22,7 @@ Dependencies
   * glib-2.0 >= 2.52.0
   * gtk+-3.0 >= 3.22.0
   * x11
-  * CEF 75.3770.x -- see [BUILDING_CEF.md](./BUILDING_CEF.md)
+  * [Patched CEF 75.3770.x](https://github.com/tiliado/cef/tree/3770-valacef) (see [BUILDING_CEF.md](./BUILDING_CEF.md))
 
 Build Instructions
 ----------------
