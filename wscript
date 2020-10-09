@@ -192,7 +192,7 @@ def build(ctx):
         ],
         target = 'valacef',
         packages = "valacef_api",
-        defines = ['G_LOG_DOMAIN="Cef"', 'CEF_LIB_DIR="%s"' % ctx.env.CEF_LIB_DIR, '__VALACEF_H__'],
+        defines = ['G_LOG_DOMAIN="Cef"', 'CEF_LIB_DIR="%s"' % ctx.env.CEF_LIB_DIR],
         vapi_dirs = vapi_dirs,
         includes = include_dirs,
         lib = ['cef'],
