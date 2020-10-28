@@ -30,6 +30,7 @@ public class WebContext : GLib.Object {
         if (user_data_path != null) {
             Cef.set_string(&request_settings.cache_path, user_data_path);
         }
+        request_settings.persist_session_cookies = 1;
         request_settings.persist_user_preferences = 1;
         request_settings.enable_net_security_expiration = 1;
 

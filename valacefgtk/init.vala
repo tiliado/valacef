@@ -50,6 +50,8 @@ public InitializationResult init(
 	assert(code < 0);
 
 	Cef.Settings settings = {sizeof(Cef.Settings)};
+    settings.persist_session_cookies = 1;
+    settings.persist_user_preferences = 1;
 	settings.no_sandbox = 1;
 	/* Even if we use a fixed 50 ms timer (see bellow),
 	 * turning the external_message_pump on decreases CPU usage rapidly. */
