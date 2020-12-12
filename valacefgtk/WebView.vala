@@ -7,6 +7,7 @@ public enum RenderingMode {
 }
 
 public class WebView : Gtk.Bin {
+    private static bool debug_key_events = false;
     public string? title {get; internal set; default = null;}
     public string? uri {get; internal set; default = null;}
     public string? status_message {get; internal set; default = null;}
@@ -62,6 +63,10 @@ public class WebView : Gtk.Bin {
     private Cef.JsdialogCallback? js_dialog_callback = null;
     private Cef.JsdialogType js_dialog_type = Cef.JsdialogType.ALERT;
     private SList<RendererExtensionInfo> autoloaded_renderer_extensions = null;
+
+    static construct {
+        debug_key_events = Environment.get_variable("VALACEF_DEBUG_KEYS") == "yes";
+    }
 
     public WebView(WebContext web_context, RenderingMode rendering_mode = RenderingMode.DEFAULT) {
         if (rendering_mode == RenderingMode.DEFAULT) {
@@ -406,6 +411,48 @@ public class WebView : Gtk.Bin {
     }
 
     public void send_key_event(Gdk.EventKey event) {
+        if (debug_key_events) {
+            string[] modifiers = {};
+            Gdk.ModifierType[] candidates = {
+                Gdk.ModifierType.BUTTON1_MASK,
+                Gdk.ModifierType.BUTTON2_MASK,
+                Gdk.ModifierType.BUTTON3_MASK,
+                Gdk.ModifierType.BUTTON4_MASK,
+                Gdk.ModifierType.BUTTON5_MASK,
+                Gdk.ModifierType.CONTROL_MASK,
+                Gdk.ModifierType.HYPER_MASK,
+                Gdk.ModifierType.LOCK_MASK,
+                Gdk.ModifierType.META_MASK,
+                Gdk.ModifierType.MOD1_MASK,
+                Gdk.ModifierType.MOD2_MASK,
+                Gdk.ModifierType.MOD3_MASK,
+                Gdk.ModifierType.MOD4_MASK,
+                Gdk.ModifierType.MOD5_MASK,
+                Gdk.ModifierType.RELEASE_MASK,
+                Gdk.ModifierType.SHIFT_MASK,
+                Gdk.ModifierType.SUPER_MASK
+            };
+
+            foreach (Gdk.ModifierType candidate in candidates) {
+                if ((event.state & candidate) != 0) {
+                    modifiers += candidate.to_string();
+                }
+            }
+
+            debug(
+                "Key event %s: group=%u keycode=%u modifiers=%s keyval=%u length=%i send_event=%s state=%i str='%s'",
+                event.type.to_string(),
+                event.group,
+                event.hardware_keycode,
+                string.joinv(",", modifiers),
+                event.keyval,
+                event.length,
+                event.send_event == 0 ? "false" : "true",
+                event.state,
+                event.str
+            );
+        }
+
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             UIEvents.send_key_event(event, browser.get_host());
@@ -509,6 +556,42 @@ public class WebView : Gtk.Bin {
     }
 
     internal bool handle_key_event(Cef.KeyEvent key) {
+        if (debug_key_events) {
+            Cef.EventFlags[] flags = {
+                Cef.EventFlags.NONE,
+                Cef.EventFlags.CAPS_LOCK_ON,
+                Cef.EventFlags.SHIFT_DOWN,
+                Cef.EventFlags.CONTROL_DOWN,
+                Cef.EventFlags.ALT_DOWN,
+                Cef.EventFlags.LEFT_MOUSE_BUTTON,
+                Cef.EventFlags.MIDDLE_MOUSE_BUTTON,
+                Cef.EventFlags.RIGHT_MOUSE_BUTTON,
+                Cef.EventFlags.COMMAND_DOWN,
+                Cef.EventFlags.NUM_LOCK_ON,
+                Cef.EventFlags.IS_KEY_PAD,
+                Cef.EventFlags.IS_LEFT,
+                Cef.EventFlags.IS_RIGHT
+            };
+
+            string[] modifiers = {};
+            foreach (Cef.EventFlags flag in flags) {
+                if ((key.modifiers & flag) != 0) {
+                    modifiers += flag.to_string().substring(10);
+                }
+            }
+
+            debug(
+                "Key event %s: modifiers=%u=%s win_code=%i native_code=%i character='%s'|'%s'",
+                key.type.to_string(),
+                key.modifiers,
+                string.joinv("|", modifiers),
+                key.windows_key_code,
+                key.native_key_code,
+                ((unichar) key.character).to_string(),
+                ((unichar) key.unmodified_character).to_string()
+            );
+        }
+
         if (key.type != Cef.KeyEventType.RAWKEYDOWN) {
             return false;
         }
