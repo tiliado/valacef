@@ -85,6 +85,9 @@ header_files = [
     'capi/cef_ssl_status_capi.h',
     'capi/cef_extension_capi.h',
     'capi/cef_extension_handler_capi.h',
+    'capi/cef_devtools_message_observer_capi.h',
+    'capi/cef_registration_capi.h',
+    'capi/cef_media_router_capi.h',
 ]
 
 ignore = {

@@ -9,13 +9,13 @@ public class RenderProcessHandler: Cef.RenderProcessHandlerRef {
          * cef_browser_process_handler_t::on_render_process_thread_created(). Do not
          * keep a reference to |extra_info| outside of this function.
          */
-        /*void*/ vfunc_on_render_thread_created = (self, /*ListValue*/ extra_info) => {
-            Cef.assert_renderer_thread();
-            var _this = ((RenderProcessHandler) self);
-            var ctx = new RendererContext(_this);
-            ctx.init(extra_info);
-            _this.priv_set("context", ctx);
-        };
+        // ! /*void*/ vfunc_on_render_thread_created = (self, /*ListValue*/ extra_info) => {
+        // !     Cef.assert_renderer_thread();
+        // !     var _this = ((RenderProcessHandler) self);
+        // !     var ctx = new RendererContext(_this);
+        // !     ctx.init(extra_info);
+        // !     _this.priv_set("context", ctx);
+        // ! };
 
         /**
          * Called when a new message is received from a different process. Return true

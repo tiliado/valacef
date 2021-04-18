@@ -31,7 +31,7 @@ public class WebContext : GLib.Object {
             Cef.set_string(&request_settings.cache_path, user_data_path);
         }
         request_settings.persist_user_preferences = 1;
-        request_settings.enable_net_security_expiration = 1;
+        // request_settings.enable_net_security_expiration = 1;
 
 
         context_handler = new Handler();

@@ -93,12 +93,12 @@ private class RenderHandler : Cef.RenderHandlerRef {
          * Called when the browser's cursor has changed. If |type| is CT_CUSTOM then
          * |custom_cursor_info| will be populated with the custom cursor information.
          */
-        /*void*/ vfunc_on_cursor_change = (
-            self, /*Browser*/ browser, /*CursorHandle*/ cursor, /*CursorType*/ type, /*CursorInfo*/ custom_cursor
-        ) => {
-            ((RenderHandler) self).priv_get<unowned WebViewOffscreen>("web_view").change_cursor(
-                cursor, type, custom_cursor);
-        };
+        // ! /*void*/ vfunc_on_cursor_change = (
+        // !     self, /*Browser*/ browser, /*CursorHandle*/ cursor, /*CursorType*/ type, /*CursorInfo*/ custom_cursor
+        // ! ) => {
+        // !     ((RenderHandler) self).priv_get<unowned WebViewOffscreen>("web_view").change_cursor(
+        // !         cursor, type, custom_cursor);
+        // ! };
 
         /**
          * Called when the user starts dragging content in the web view. Contextual

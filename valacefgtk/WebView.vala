@@ -169,7 +169,7 @@ public class WebView : Gtk.Bin {
         }
     }
 
-    public void load_html(owned string code, string fake_url) {
+    /*public void load_html(owned string code, string fake_url) {
         if (browser != null) {
             Cef.assert_browser_ui_thread();
             Cef.String _fake_url = {};
@@ -183,7 +183,7 @@ public class WebView : Gtk.Bin {
             uri_to_load = fake_url;
             string_to_load = (owned) code;
         }
-    }
+    }*/
 
     public bool start_download(string uri) {
         if (browser != null) {
@@ -359,9 +359,9 @@ public class WebView : Gtk.Bin {
         this.client = client;
         this.browser = browser;
         this.browser_id = browser.get_identifier();
-        if (string_to_load != null) {
+        /* if (string_to_load != null) {
             load_html(string_to_load, uri_to_load);
-        } else if (uri_to_load != null) {
+        } else */ if (uri_to_load != null) {
             load_uri(uri_to_load);
         }
         ready();
